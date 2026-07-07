@@ -600,4 +600,477 @@ local function RefillFireplace()
         char.HumanoidRootPart.CFrame = CFrame.new(-27.149, 8.7, -118.611)
         task.wait(0.25)
         local cl = d and d:FindFirstChild("ClickDetector")
+        if cl then fireclickdetector(cl) end
+        task.wait(0.25)
+        char.HumanoidRootPart.CFrame = CFrame.new(-45.113, 7.849, -60.241)
+        task.wait(0.5)
+        char.HumanoidRootPart.CFrame = OC
+    end
+end
+
+local function GrabWood()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local OC = char.HumanoidRootPart.CFrame
+    local wp = workspace:FindFirstChild("WoodPile")
+    if wp then
+        local d = wp:FindFirstChild("Detector")
+        if d then d.CanCollide = false end
+        char.HumanoidRootPart.CFrame = CFrame.new(-27.149, 8.7, -118.611)
+        task.wait(0.25)
+        local cl = d and d:FindFirstChild("ClickDetector")
+        if cl then fireclickdetector(cl) end
+        task.wait(0.25)
+        char.HumanoidRootPart.CFrame = OC
+    end
+end
+
+local function RefillGenerator()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local OC = char.HumanoidRootPart.CFrame
+    char.HumanoidRootPart.CFrame = CFrame.new(-76.039, 4.675, -133.78)
+    task.wait(0.25)
+    local shack = workspace:FindFirstChild("Shack")
+    if shack then
+        local jc = shack:FindFirstChild("JerryCan")
+        if jc then
+            local cl = jc:FindFirstChild("ClickDetector")
+            if cl then fireclickdetector(cl) end
+        end
+        task.wait(0.5)
+        local gen = shack:FindFirstChild("Generator")
+        if gen then
+            local cl = gen:FindFirstChild("ClickDetector")
+            if cl then fireclickdetector(cl) end
+        end
+    end
+    task.wait(0.5)
+    char.HumanoidRootPart.CFrame = OC
+end
+
+local function GrabJerryCan()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local OC = char.HumanoidRootPart.CFrame
+    char.HumanoidRootPart.CFrame = CFrame.new(-76.039, 4.675, -133.78)
+    task.wait(0.25)
+    local shack = workspace:FindFirstChild("Shack")
+    if shack then
+        local jc = shack:FindFirstChild("JerryCan")
+        if jc then
+            local cl = jc:FindFirstChild("ClickDetector")
+            if cl then fireclickdetector(cl) end
+        end
+    end
+    task.wait(0.25)
+    char.HumanoidRootPart.CFrame = OC
+end
+
+-- ============================================================
+-- NIGHT 2
+-- ============================================================
+local janelasAS = {
+    {posJan=Vector3.new(-292.1,82.4,-38.8), posBot=Vector3.new(-288.5,82.4,-39.6)},
+    {posJan=Vector3.new(-321.9,82.4,-37.4), posBot=Vector3.new(-318.1,82.4,-40.1)},
+    {posJan=Vector3.new(-311.1,82.4,38.7), posBot=Vector3.new(-313,82.6,35.4)},
+    {posJan=Vector3.new(-282,82.4,-111.9), posBot=Vector3.new(-278.4,82.4,-113.3)},
+    {posJan=Vector3.new(-309.6,82.4,-111.9), posBot=Vector3.new(-307.9,82.4,-113.4)},
+}
+
+local scareActive = false
+local lastScare = 0
+local lastMutant = nil
+local DISTANCIA = 60
+local COOLDOWN = 4.5
+
+local function ativarLuz(jan)
+    local char = player.Character or player.CharacterAdded:Wait()
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    char.HumanoidRootPart.CFrame = CFrame.new(jan.posBot)
+    task.wait(0.3)
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("ClickDetector") then
+            local parentPos = obj.Parent and obj.Parent.Position
+            if parentPos and (parentPos - jan.posBot).Magnitude < 10 then
+                fireclickdetector(obj)
+                break
+            end
+        end
+    end
+    local fl = Instance.new("Frame")
+    fl.Size = UDim2.new(1,0,1,0)
+    fl.BackgroundColor3 = Color3.fromRGB(255,255,255)
+    fl.BackgroundTransparency = 0.5
+    fl.Parent = player.PlayerGui
+    task.wait(0.2)
+    fl:Destroy()
+end
+
+local function updateMutant()
+    local newMutant = workspace:FindFirstChild("Mutant") or workspace:FindFirstChild("Larry")
+    if newMutant and newMutant ~= lastMutant then
+        lastMutant = newMutant
+        lastScare = 0
+    elseif not newMutant then
+        lastMutant = nil
+    end
+end
+
+spawn(function()
+    while true do
+        task.wait(1)
+        if not scareActive then continue end
+        updateMutant()
+        if not lastMutant then continue end
+        local mpos = lastMutant:FindFirstChild("HumanoidRootPart") and lastMutant.HumanoidRootPart.Position or lastMutant.Position
+        local alvo, menor = nil, DISTANCIA + 1
+        for _, j in pairs(janelasAS) do
+            local d = (mpos - j.posJan).Magnitude
+            if d < menor then menor = d; alvo = j end
+        end
+        if alvo and menor <= DISTANCIA and tick() - lastScare >= COOLDOWN then
+            lastScare = tick()
+            ativarLuz(alvo)
+        end
+    end
+end)
+local function AntiVentPests()
+    local grids = workspace:FindFirstChild("Grids")
+    if not grids then return end
+    for _, gridel in pairs(grids:GetChildren()) do
+        if gridel:IsA("Model") then
+            for _, child in pairs(gridel:GetChildren()) do
+                if child:IsA("Part") and child.Name == "Hitbox" then
+                    child:Destroy()
+                end
+            end
+        end
+    end
+end
+
+local function ReviveN2()
+    if RS and RS:FindFirstChild("Remotes") and RS.Remotes:FindFirstChild("LoadCharacter") then
+        RS.Remotes.LoadCharacter:FireServer()
+        task.wait(1)
+    end
+end
+
+local function EscapeSnatch()
+    if RS and RS:FindFirstChild("Remotes") and RS.Remotes:FindFirstChild("EscapeSnatch") then
+        RS.Remotes.EscapeSnatch:FireServer()
+    end
+end
+
+-- ============================================================
+-- AUTO SAFE SPOT
+-- ============================================================
+local autoSafeActive = false
+local autoSafeLoop = nil
+local lastSafeTeleport = 0
+local SAFE_COOLDOWN = 2
+local SAFE_SPOT_CFRAME = CFrame.new(-29.2, 3, -62.8)
+local MONSTROS_NAMES = {"Mutant", "Larry", "Stalker"}
+
+local function isMonster(obj)
+    if not obj:IsA("Model") then return false end
+    for _, nome in pairs(MONSTROS_NAMES) do
+        if obj.Name == nome then return true end
+    end
+    return false
+end
+
+local function getMonsterPositions()
+    local positions = {}
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if isMonster(obj) then
+            local humanoid = obj:FindFirstChild("Humanoid")
+            if humanoid and humanoid.Health > 0 then
+                local root = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildWhichIsA("BasePart")
+                if root then table.insert(positions, root.Position) end
+            end
+        end
+    end
+    return positions
+end
+
+local function checkAndTeleport()
+    if not autoSafeActive then return end
+    local char = player.Character
+    if not char then return end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    local playerPos = root.Position
+    for _, pos in pairs(getMonsterPositions()) do
+        local dist = (playerPos - pos).Magnitude
+        if dist >= 40 and dist <= 50 and tick() - lastSafeTeleport >= SAFE_COOLDOWN then
+            root.CFrame = SAFE_SPOT_CFRAME
+            lastSafeTeleport = tick()
+            break
+        end
+    end
+end
+
+local function startAutoSafe(v)
+    if autoSafeLoop then autoSafeLoop:Disconnect(); autoSafeLoop = nil end
+    autoSafeActive = v
+    if v then
+        autoSafeLoop = RunService.Stepped:Connect(checkAndTeleport)
+    end
+end
+-- ============================================================
+-- AIMBOT
+-- ============================================================
+local NPC_NAMES = {"Worker", "ModelWorker", "WorkerHead", "Mutant", "Larry", "Stalker", "Spider"}
+local aimbotEnabled = false
+local currentTarget = nil
+local AIM_SPEED = 80
+local MAX_DISTANCE = 80
+local lastAimbotUpdate = 0
+
+local function getNearestNPC()
+    local char = player.Character
+    if not char then return nil end
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return nil end
+    local charPos = root.Position
+    local nearest = nil
+    local shortestDist = math.huge
+
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("Model") then
+            local isNPC = false
+            for _, nome in pairs(NPC_NAMES) do
+                if obj.Name == nome then isNPC = true; break end
+            end
+            if not isNPC then continue end
+            local humanoid = obj:FindFirstChild("Humanoid")
+            if not humanoid or humanoid.Health <= 0 then continue end
+            local targetPart = obj:FindFirstChild("Head") or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildWhichIsA("BasePart")
+            if not targetPart then continue end
+            local dist = (charPos - targetPart.Position).Magnitude
+            if dist > MAX_DISTANCE then continue end
+            if dist < shortestDist then
+                shortestDist = dist
+                nearest = obj
+            end
+        end
+    end
+    return nearest
+end
+
+RunService:BindToRenderStep("AimbotNPC", Enum.RenderPriority.Camera.Value + 1, function(dt)
+    if not aimbotEnabled then return end
+    local now = tick()
+    if now - lastAimbotUpdate > 0.15 then
+        lastAimbotUpdate = now
+        if currentTarget and currentTarget.Parent then
+            local humanoid = currentTarget:FindFirstChild("Humanoid")
+            if humanoid and humanoid.Health > 0 then
+                local char = player.Character
+                if char then
+                    local root = char:FindFirstChild("HumanoidRootPart")
+                    if root then
+                        local targetPart = currentTarget:FindFirstChild("Head") or currentTarget:FindFirstChild("HumanoidRootPart") or currentTarget:FindFirstChildWhichIsA("BasePart")
+                        if targetPart then
+                            local dist = (root.Position - targetPart.Position).Magnitude
+                            if dist > MAX_DISTANCE then currentTarget = getNearestNPC() end
+                        else
+                            currentTarget = getNearestNPC()
+                        end
+                    else
+                        currentTarget = getNearestNPC()
+                    end
+                else
+                    currentTarget = getNearestNPC()
+                end
+            else
+                currentTarget = getNearestNPC()
+            end
+        else
+            currentTarget = getNearestNPC()
+        end
+    end
+    if currentTarget then
+        local targetPart = currentTarget:FindFirstChild("Head") or currentTarget:FindFirstChild("HumanoidRootPart") or currentTarget:FindFirstChildWhichIsA("BasePart")
+        if targetPart then
+            local targetPos = targetPart.Position
+            local camPos = Camera.CFrame.Position
+            local targetCFrame = CFrame.new(camPos, targetPos)
+            local lerpSpeed = math.clamp(AIM_SPEED * dt, 0, 1)
+            Camera.CFrame = Camera.CFrame:Lerp(targetCFrame, lerpSpeed)
+        end
+    end
+end)
+
+local function AutoMunicao()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local root = char:WaitForChild("HumanoidRootPart")
+    local ammoPiles = workspace:FindFirstChild("AmmoPiles")
+    if not ammoPiles then return end
+    local ammoPile = nil
+    for _, A in pairs(ammoPiles:GetChildren()) do
+        if A and A:FindFirstChild("Detector") and A.Detector:FindFirstChild("ClickDetector") then
+            ammoPile = A; break
+        end
+    end
+    if not ammoPile then return end
+    local detector = ammoPile.Detector
+    local click = detector.ClickDetector
+    local originalPos = root.Position
+    root.CFrame = CFrame.new(detector.Position + Vector3.new(0, 2, 0))
+    task.wait(0.1)
+    for i = 1, 2 do fireclickdetector(click); task.wait(0.1) end
+    task.wait(0.6)
+    root.CFrame = CFrame.new(originalPos)
+end
+
+-- ============================================================
+-- ESP
+-- ============================================================
+local espPlayers = {}
+local espMonster = {}
        
+local function toggleESPPlayers(v)
+    for _, h in pairs(espPlayers) do if h then h:Destroy() end end
+    espPlayers = {}
+    if v then
+        for _, p in pairs(game.Players:GetPlayers()) do
+            if p ~= player and p.Character then
+                local h = Instance.new("Highlight")
+                h.FillColor = Color3.fromRGB(0, 255, 0)
+                h.OutlineColor = Color3.fromRGB(0, 150, 0)
+                h.FillTransparency = 0.5
+                h.Adornee = p.Character
+                h.Parent = p.Character
+                espPlayers[p] = h
+            end
+        end
+    end
+end
+
+local function refreshMonsters()
+    for _, h in pairs(espMonster) do if h then h:Destroy() end end
+    espMonster = {}
+    local mutant = workspace:FindFirstChild("Mutant") or workspace:FindFirstChild("Larry")
+    if mutant then
+        local h = Instance.new("Highlight")
+        h.FillColor = Color3.fromRGB(255, 0, 0)
+        h.OutlineColor = Color3.fromRGB(200, 0, 0)
+        h.FillTransparency = 0.3
+        h.Adornee = mutant
+        h.Parent = mutant
+        table.insert(espMonster, h)
+    end
+    local stalker = workspace:FindFirstChild("Stalker")
+    if stalker then
+        local h = Instance.new("Highlight")
+        h.FillColor = Color3.fromRGB(255, 100, 0)
+        h.OutlineColor = Color3.fromRGB(200, 80, 0)
+        h.FillTransparency = 0.3
+        h.Adornee = stalker
+        h.Parent = stalker
+        table.insert(espMonster, h)
+    end
+end
+
+spawn(function()
+    while true do wait(2) refreshMonsters() end
+end)
+workspace.ChildAdded:Connect(function(child)
+    if child.Name == "Mutant" or child.Name == "Larry" or child.Name == "Stalker" then
+        task.wait(0.5); refreshMonsters()
+    end
+end)
+-- ============================================================
+-- CONSTRUÇÃO DAS ABAS
+-- ============================================================
+
+-- ABA: MENU
+local menuFrame = abaFramesMap["Menu"]
+local menuCard = addCard(menuFrame)
+addLabel(menuCard, "✦ BEM-VINDO AO DAVI HUB", Color3.fromRGB(255, 255, 255))
+addLabel(menuCard, "Selecione uma aba ao lado", Color3.fromRGB(200, 200, 200))
+addLabel(menuCard, "Versão 2.0", Color3.fromRGB(150, 150, 150))
+
+-- ABA: CHARACTER (COM NOCLIP)
+local charFrame = abaFramesMap["Char"]
+local charCard = addCard(charFrame)
+addLabel(charCard, "⚡ CHARACTER")
+addToggle(charCard, "Fullbright", toggleFullbright, false)
+addToggle(charCard, "Infinite Stamina", toggleStamina, false)
+addToggle(charCard, "Anti-Frosted", toggleAntiTemp, false)
+addToggle(charCard, "Infinite O2", toggleO2, false)
+addToggle(charCard, "🔓 Noclip", toggleNoclip, false)
+addSlider(charCard, "Sprint Speed", function(v)
+    local ch = player.Character
+    if ch then
+        ch:SetAttribute("SprintSpeed", v)
+        local hum = ch:FindFirstChild("Humanoid")
+        if hum then hum.WalkSpeed = v end
+    end
+end, 17, 45, 17)
+
+-- ABA: TELEPORTS
+local teleFrame = abaFramesMap["Tele"]
+local teleCard = addCard(teleFrame)
+addLabel(teleCard, "📍 NIGHT 1")
+for nome, cf in pairs(teleportsN1) do
+    addButton(teleCard, nome, function() teleportar(cf) end)
+end
+addLabel(teleCard, "📍 NIGHT 2")
+for nome, cf in pairs(teleportsN2) do
+    addButton(teleCard, nome, function() teleportar(cf) end)
+end
+addLabel(teleCard, "📍 NIGHT 3")
+for nome, cf in pairs(teleportsN3) do
+    addButton(teleCard, nome, function() teleportar(cf) end)
+end
+
+-- ABA: NIGHT 1
+local n1Frame = abaFramesMap["N1"]
+local n1Card = addCard(n1Frame)
+addLabel(n1Card, "🔥 NIGHT 1")
+addButton(n1Card, "Refill Fireplace", RefillFireplace)
+addButton(n1Card, "Grab Wood", GrabWood)
+addButton(n1Card, "Refill Generator", RefillGenerator)
+addButton(n1Card, "Grab JerryCan", GrabJerryCan)
+
+-- ABA: NIGHT 2
+local n2Frame = abaFramesMap["N2"]
+local n2Card = addCard(n2Frame)
+addLabel(n2Card, "🌙 NIGHT 2")
+addToggle(n2Card, "Auto Scare", function(v) scareActive = v end, false)
+addButton(n2Card, "Anti Vent-Pests", AntiVentPests)
+addButton(n2Card, "Revive", ReviveN2)
+addButton(n2Card, "Escape Snatch", EscapeSnatch)
+
+-- ABA: NIGHT 3
+local n3Frame = abaFramesMap["N3"]
+local n3Card = addCard(n3Frame)
+addLabel(n3Card, "🎯 NIGHT 3")
+addToggle(n3Card, "Ativar Aimbot", function(v) aimbotEnabled = v end, false)
+addSlider(n3Card, "Aimbot Speed", function(v) AIM_SPEED = v end, 30, 150, 80)
+addSlider(n3Card, "Aimbot Distance", function(v) MAX_DISTANCE = v end, 30, 150, 80)
+addButton(n3Card, "Auto Coletar Munição", AutoMunicao)
+
+-- ABA: ESP
+local espFrame = abaFramesMap["ESP"]
+local espCard = addCard(espFrame)
+addLabel(espCard, "👁️ ESP")
+addToggle(espCard, "ESP Players", toggleESPPlayers, false)
+addLabel(espCard, "ESP Monsters (Auto)", Color3.fromRGB(200, 200, 200))
+
+-- ABA: AUTO
+local autoFrame = abaFramesMap["Auto"]
+local autoCard = addCard(autoFrame)
+addLabel(autoCard, "⚡ AUTO")
+addToggle(autoCard, "Auto Safe Spot", startAutoSafe, false)
+
+-- ============================================================
+-- FORÇA ATUALIZAÇÃO DO SCROLL
+-- ============================================================
+task.wait(0.5)
+for _, frame in pairs(abaFrames) do
+    local flayout = frame:FindFirstChildWhichIsA("UIListLayout")
+    if flayout then
+        frame.CanvasSize = UDim2.new(0, 0, 0, flayout.AbsoluteContentSize.Y + 20)
+    end
+end
