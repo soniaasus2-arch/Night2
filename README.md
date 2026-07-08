@@ -5,7 +5,461 @@ local Lighting = game:GetService("Lighting")
 local Camera = workspace.CurrentCamera
 local UserInputService = game:GetService("UserInputService")
 local RS = game.ReplicatedStorage
+-- ============================================================
+-- SISTEMA DE KEY COM DATA DE EXPIRAÇÃO - DAVI HUB
+-- ============================================================
 
+local player = game.Players.LocalPlayer
+local HttpService = game:GetService("HttpService")
+
+-- ============================================================
+-- CONFIGURAÇÃO DAS KEYS (COM DATA DE EXPIRAÇÃO)
+-- ============================================================
+local KEYS_AUTORIZADAS = {
+    -- Key principal (válida até 31/12/2025)
+    ["DAVI-HUB-2024"] = {
+        valid = true,
+        expira = "31/12/2025",
+        tipo = "VIP"
+    },
+    -- Key de teste (válida por 7 dias)
+    ["FREE-TRIAL-2024"] = {
+        valid = true,
+        expira = os.date("%d/%m/%Y", os.time() + (7 * 86400)), -- 7 dias a partir de hoje
+        tipo = "TRIAL"
+    },
+    -- Key VIP (válida até 01/06/2025)
+    ["VIP-USER-2024"] = {
+        valid = true,
+        expira = "01/06/2025",
+        tipo = "VIP"
+    },
+    -- Key de amigo (válida por 30 dias)
+    ["AMIGO-2024"] = {
+        valid = true,
+        expira = os.date("%d/%m/%Y", os.time() + (30 * 86400)), -- 30 dias
+        tipo = "AMIGO"
+    },
+    -- Adicione mais keys aqui:
+    -- ["SUA-KEY"] = {
+    --     valid = true,
+    --     expira = "31/12/2025", -- ou os.date("%d/%m/%Y", os.time() + (N * 86400))
+    --     tipo = "NOME_DO_TIPO"
+    -- },
+}
+
+-- ============================================================
+-- FUNÇÃO PARA VERIFICAR SE A KEY ESTÁ EXPIRADA
+-- ============================================================
+local function isKeyExpirada(key)
+    local data = KEYS_AUTORIZADAS[key]
+    if not data then return true end
+    if not data.valid then return true end
+    
+    -- Converte a data de expiração para timestamp
+    local dia, mes, ano = data.expira:match("(%d+)/(%d+)/(%d+)")
+    if not dia then return true end
+    
+    local expiraTimestamp = os.time({
+        day = tonumber(dia),
+        month = tonumber(mes),
+        year = tonumber(ano),
+        hour = 23,
+        min = 59,
+        sec = 59
+    })
+    
+    local agora = os.time()
+    return agora > expiraTimestamp
+end
+
+-- ============================================================
+-- FUNÇÃO PARA VERIFICAR KEY
+-- ============================================================
+local function verificarKey(key)
+    if not KEYS_AUTORIZADAS[key] then
+        return false, "❌ KEY INVÁLIDA!"
+    end
+    
+    if not KEYS_AUTORIZADAS[key].valid then
+        return false, "❌ KEY DESATIVADA!"
+    end
+    
+    if isKeyExpirada(key) then
+        return false, "⏰ KEY EXPIRADA! (Expirou em " .. KEYS_AUTORIZADAS[key].expira .. ")"
+    end
+    
+    return true, "✅ KEY VÁLIDA! (Tipo: " .. KEYS_AUTORIZADAS[key].tipo .. " | Expira em: " .. KEYS_AUTORIZADAS[key].expira .. ")"
+end
+
+-- ============================================================
+-- FUNÇÃO PARA CALCULAR DIAS RESTANTES
+-- ============================================================
+local function diasRestantes(key)
+    local data = KEYS_AUTORIZADAS[key]
+    if not data then return 0 end
+    
+    local dia, mes, ano = data.expira:match("(%d+)/(%d+)/(%d+)")
+    if not dia then return 0 end
+    
+    local expiraTimestamp = os.time({
+        day = tonumber(dia),
+        month = tonumber(mes),
+        year = tonumber(ano),
+        hour = 23,
+        min = 59,
+        sec = 59
+    })
+    
+    local agora = os.time()
+    local diff = expiraTimestamp - agora
+    return math.ceil(diff / 86400) -- dias restantes
+end
+
+-- ============================================================
+-- CRIAR GUI DE ATIVAÇÃO COM INFORMAÇÃO DE EXPIRAÇÃO
+-- ============================================================
+local function criarGUIAtivacao()
+    -- Remove GUI antiga
+    for _, v in pairs(player.PlayerGui:GetChildren()) do
+        if v.Name == "KeySystem" then v:Destroy() end
+    end
+    
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "KeySystem"
+    gui.Parent = player.PlayerGui
+    gui.ResetOnSpawn = false
+    gui.IgnoreGuiInset = true
+    
+    -- Fundo
+    local fundo = Instance.new("Frame")
+    fundo.Size = UDim2.new(1, 0, 1, 0)
+    fundo.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    fundo.BackgroundTransparency = 0.6
+    fundo.Parent = gui
+    
+    -- Janela
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 450, 0, 380)
+    frame.Position = UDim2.new(0.5, -225, 0.5, -190)
+    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
+    frame.BackgroundTransparency = 0.05
+    frame.BorderSizePixel = 0
+    frame.ClipsDescendants = true
+    frame.Parent = fundo
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 16)
+    corner.Parent = frame
+    
+    -- Contorno laranja
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(255, 140, 0)
+    border.Thickness = 2
+    border.Transparency = 0.3
+    border.Parent = frame
+    
+    -- Título
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 55)
+    title.Text = "🔑 ATIVAÇÃO"
+    title.TextColor3 = Color3.fromRGB(255, 200, 50)
+    title.TextSize = 28
+    title.Font = Enum.Font.GothamBold
+    title.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+    title.BackgroundTransparency = 0.15
+    title.Parent = frame
+    
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 16)
+    titleCorner.Parent = title
+    
+    -- Subtítulo
+    local sub = Instance.new("TextLabel")
+    sub.Size = UDim2.new(1, 0, 0, 25)
+    sub.Position = UDim2.new(0, 0, 0.18, 0)
+    sub.Text = "Digite sua chave de ativação"
+    sub.TextColor3 = Color3.fromRGB(200, 200, 200)
+    sub.TextSize = 14
+    sub.Font = Enum.Font.Gotham
+    sub.BackgroundTransparency = 1
+    sub.Parent = frame
+    
+    -- Campo da Key
+    local keyBox = Instance.new("TextBox")
+    keyBox.Size = UDim2.new(0.8, 0, 0, 45)
+    keyBox.Position = UDim2.new(0.1, 0, 0.30, 0)
+    keyBox.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+    keyBox.BackgroundTransparency = 0.2
+    keyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    keyBox.TextSize = 18
+    keyBox.Font = Enum.Font.GothamBold
+    keyBox.Text = ""
+    keyBox.PlaceholderText = "Cole sua key aqui..."
+    keyBox.ClearTextOnFocus = true
+    keyBox.BorderSizePixel = 0
+    keyBox.Parent = frame
+    
+    local keyCorner = Instance.new("UICorner")
+    keyCorner.CornerRadius = UDim.new(0, 10)
+    keyCorner.Parent = keyBox
+    
+    -- Botão Ativar
+    local btnAtivar = Instance.new("TextButton")
+    btnAtivar.Size = UDim2.new(0.35, 0, 0, 45)
+    btnAtivar.Position = UDim2.new(0.1, 0, 0.50, 0)
+    btnAtivar.Text = "🔓 ATIVAR"
+    btnAtivar.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnAtivar.TextSize = 18
+    btnAtivar.Font = Enum.Font.GothamBold
+    btnAtivar.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+    btnAtivar.BackgroundTransparency = 0.15
+    btnAtivar.BorderSizePixel = 0
+    btnAtivar.Parent = frame
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 10)
+    btnCorner.Parent = btnAtivar
+    
+    -- Botão Verificar Key
+    local btnVerificar = Instance.new("TextButton")
+    btnVerificar.Size = UDim2.new(0.35, 0, 0, 45)
+    btnVerificar.Position = UDim2.new(0.55, 0, 0.50, 0)
+    btnVerificar.Text = "🔍 VERIFICAR"
+    btnVerificar.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnVerificar.TextSize = 16
+    btnVerificar.Font = Enum.Font.GothamBold
+    btnVerificar.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+    btnVerificar.BackgroundTransparency = 0.2
+    btnVerificar.BorderSizePixel = 0
+    btnVerificar.Parent = frame
+    
+    local btnVerifCorner = Instance.new("UICorner")
+    btnVerifCorner.CornerRadius = UDim.new(0, 10)
+    btnVerifCorner.Parent = btnVerificar
+    
+    -- Status
+    local status = Instance.new("TextLabel")
+    status.Size = UDim2.new(1, 0, 0, 25)
+    status.Position = UDim2.new(0, 0, 0.65, 0)
+    status.Text = "💡 Digite sua key e clique em VERIFICAR"
+    status.TextColor3 = Color3.fromRGB(150, 150, 150)
+    status.TextSize = 13
+    status.Font = Enum.Font.Gotham
+    status.BackgroundTransparency = 1
+    status.Parent = frame
+    
+    -- Informações da Key (aparece depois de verificar)
+    local infoFrame = Instance.new("Frame")
+    infoFrame.Size = UDim2.new(0.9, 0, 0, 55)
+    infoFrame.Position = UDim2.new(0.05, 0, 0.72, 0)
+    infoFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+    infoFrame.BackgroundTransparency = 0.2
+    infoFrame.BorderSizePixel = 0
+    infoFrame.Visible = false
+    infoFrame.Parent = frame
+    
+    local infoCorner = Instance.new("UICorner")
+    infoCorner.CornerRadius = UDim.new(0, 8)
+    infoCorner.Parent = infoFrame
+    
+    local infoTipo = Instance.new("TextLabel")
+    infoTipo.Size = UDim2.new(0.5, 0, 0, 20)
+    infoTipo.Position = UDim2.new(0.05, 0, 0.05, 0)
+    infoTipo.Text = "Tipo: "
+    infoTipo.TextColor3 = Color3.fromRGB(255, 200, 100)
+    infoTipo.TextSize = 13
+    infoTipo.Font = Enum.Font.GothamBold
+    infoTipo.BackgroundTransparency = 1
+    infoTipo.TextXAlignment = Enum.TextXAlignment.Left
+    infoTipo.Parent = infoFrame
+    
+    local infoExpira = Instance.new("TextLabel")
+    infoExpira.Size = UDim2.new(0.5, 0, 0, 20)
+    infoExpira.Position = UDim2.new(0.05, 0, 0.30, 0)
+    infoExpira.Text = "Expira: "
+    infoExpira.TextColor3 = Color3.fromRGB(200, 200, 200)
+    infoExpira.TextSize = 13
+    infoExpira.Font = Enum.Font.Gotham
+    infoExpira.BackgroundTransparency = 1
+    infoExpira.TextXAlignment = Enum.TextXAlignment.Left
+    infoExpira.Parent = infoFrame
+    
+    local infoDias = Instance.new("TextLabel")
+    infoDias.Size = UDim2.new(0.5, 0, 0, 20)
+    infoDias.Position = UDim2.new(0.05, 0, 0.55, 0)
+    infoDias.Text = "Dias restantes: "
+    infoDias.TextColor3 = Color3.fromRGB(200, 200, 200)
+    infoDias.TextSize = 13
+    infoDias.Font = Enum.Font.Gotham
+    infoDias.BackgroundTransparency = 1
+    infoDias.TextXAlignment = Enum.TextXAlignment.Left
+    infoDias.Parent = infoFrame
+    
+    -- Botão para verificar key
+    btnVerificar.MouseButton1Click:Connect(function()
+        local key = keyBox.Text
+        if key == "" then
+            status.Text = "❌ Digite uma key!"
+            status.TextColor3 = Color3.fromRGB(255, 100, 100)
+            infoFrame.Visible = false
+            return
+        end
+        
+        local valida, mensagem = verificarKey(key)
+        status.Text = mensagem
+        
+        if valida then
+            status.TextColor3 = Color3.fromRGB(100, 255, 100)
+            infoFrame.Visible = true
+            
+            local data = KEYS_AUTORIZADAS[key]
+            infoTipo.Text = "Tipo: " .. data.tipo
+            infoExpira.Text = "Expira: " .. data.expira
+            
+            local dias = diasRestantes(key)
+            if dias > 0 then
+                infoDias.Text = "Dias restantes: " .. dias .. " dias"
+                infoDias.TextColor3 = dias > 7 and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 200, 50)
+            else
+                infoDias.Text = "⚠️ EXPIRADA!"
+                infoDias.TextColor3 = Color3.fromRGB(255, 100, 100)
+            end
+        else
+            status.TextColor3 = Color3.fromRGB(255, 100, 100)
+            infoFrame.Visible = false
+        end
+    end)
+    
+    -- Ativar
+    btnAtivar.MouseButton1Click:Connect(function()
+        local key = keyBox.Text
+        if key == "" then
+            status.Text = "❌ Digite uma key!"
+            status.TextColor3 = Color3.fromRGB(255, 100, 100)
+            return
+        end
+        
+        local valida, mensagem = verificarKey(key)
+        
+        if valida then
+            status.Text = "✅ KEY VÁLIDA! Ativando DAVI HUB..."
+            status.TextColor3 = Color3.fromRGB(100, 255, 100)
+            btnAtivar.Text = "✅ ATIVADO!"
+            btnAtivar.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+            
+            -- Salva a key e a data de ativação
+            player:SetAttribute("DAVI_KEY", key)
+            player:SetAttribute("DAVI_KEY_ATIVADA", os.date("%d/%m/%Y %H:%M:%S"))
+            
+            task.wait(1)
+            gui:Destroy()
+            
+            -- Carrega o script principal
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/soniaasus2-arch/Night2/refs/heads/main/README.md"))()
+        else
+            status.Text = mensagem
+            status.TextColor3 = Color3.fromRGB(255, 100, 100)
+        end
+    end)
+    
+    -- Enter para ativar
+    keyBox.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            btnAtivar.MouseButton1Click:Fire()
+        end
+    end)
+    
+    return gui
+end
+
+-- ============================================================
+-- FUNÇÃO PARA VERIFICAR SE JÁ ESTÁ ATIVADO
+-- ============================================================
+local function isAtivado()
+    local keySalva = player:GetAttribute("DAVI_KEY")
+    if keySalva then
+        local valida, _ = verificarKey(keySalva)
+        return valida
+    end
+    return false
+end
+
+-- ============================================================
+-- FUNÇÃO PARA INICIAR O SISTEMA
+-- ============================================================
+local function iniciarSistemaKey()
+    if isAtivado() then
+        local key = player:GetAttribute("DAVI_KEY")
+        local dias = diasRestantes(key)
+        print("✅ DAVI HUB já está ativado!")
+        print("📌 Key: " .. key .. " | Tipo: " .. KEYS_AUTORIZADAS[key].tipo)
+        print("⏰ Dias restantes: " .. dias .. " dias")
+        return true
+    else
+        print("🔑 Sistema de Key ativado. Aguardando ativação...")
+        criarGUIAtivacao()
+        return false
+    end
+end
+
+-- ============================================================
+-- FUNÇÃO PARA ADICIONAR KEY PELO CHAT
+-- ============================================================
+local function setupChatCommand()
+    game:GetService("Players").LocalPlayer.Chatted:Connect(function(msg)
+        if msg:sub(1, 5) == "/key " then
+            local key = msg:sub(6)
+            local valida, mensagem = verificarKey(key)
+            if valida then
+                player:SetAttribute("DAVI_KEY", key)
+                player:SetAttribute("DAVI_KEY_ATIVADA", os.date("%d/%m/%Y %H:%M:%S"))
+                print("✅ Key ativada via chat!")
+                print("📌 " .. mensagem)
+                -- Recarrega
+                game:GetService("GuiService"):ClearError()
+            else
+                print("❌ " .. mensagem)
+            end
+        end
+    end)
+end
+
+-- ============================================================
+-- FUNÇÃO PARA VER STATUS NO CONSOLE
+-- ============================================================
+local function verStatusKey()
+    local key = player:GetAttribute("DAVI_KEY")
+    if not key then
+        print("❌ Nenhuma key ativada!")
+        return
+    end
+    
+    local valida, mensagem = verificarKey(key)
+    print("=== STATUS DA KEY ===")
+    print("🔑 Key: " .. key)
+    print("📌 " .. mensagem)
+    
+    if valida then
+        local data = KEYS_AUTORIZADAS[key]
+        print("📋 Tipo: " .. data.tipo)
+        print("📅 Expira: " .. data.expira)
+        local dias = diasRestantes(key)
+        print("⏰ Dias restantes: " .. dias .. " dias")
+        print("🕒 Ativada em: " .. (player:GetAttribute("DAVI_KEY_ATIVADA") or "N/A"))
+    end
+    print("======================")
+end
+
+-- ============================================================
+-- INICIAR SISTEMA
+-- ============================================================
+iniciarSistemaKey()
+setupChatCommand()
+
+print("🔑 Sistema de Key com expiração carregado!")
+print("📌 Use /key SUA-KEY no chat para ativar")
+print("📌 Digite 'statuskey()' no console para ver o status")
 -- ============================================================
 -- CRIA GUI (SEM FUNDO PRETO)
 -- ============================================================
