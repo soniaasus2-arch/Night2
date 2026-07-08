@@ -6,6 +6,592 @@ local Camera = workspace.CurrentCamera
 local UserInputService = game:GetService("UserInputService")
 local RS = game.ReplicatedStorage
 -- ============================================================
+-- SISTEMA DE KEY COM DISTRIBUIÇÃO EM SEQUÊNCIA + AVISO AO CRIADOR
+-- ============================================================
+
+local player = game.Players.LocalPlayer
+local HttpService = game:GetService("HttpService")
+
+-- ============================================================
+-- WEBHOOK PARA AVISAR O CRIADOR
+-- ============================================================
+local WEBHOOK_URL = "https://discord.com/api/webhooks/1524546983799427194/WyTosfrV6Opc1MPOpmTJmYNlCzBu0gpRSJ89dUnqcNVYbqJ373-tCfTLUMBgOTidUEh3"
+
+-- ============================================================
+-- LISTA DE 10 KEYS COM LINKS
+-- ============================================================
+local KEYS_SEQUENCIA = {
+    -- Key 1
+    {
+        key = "DAVI-HUB-001",
+        link = "https://link-target.net/5450045/U8UGMFUQ22Uc",
+        usada = false,
+        posicao = 1
+    },
+    -- Key 2
+    {
+        key = "DAVI-HUB-002",
+        link = "https://direct-link.net/5450045/QykQLu41Fp2x",
+        usada = false,
+        posicao = 2
+    },
+    -- Key 3
+    {
+        key = "DAVI-HUB-003",
+        link = "https://direct-link.net/5450045/m1aASokV7pIF",
+        usada = false,
+        posicao = 3
+    },
+    -- Key 4
+    {
+        key = "DAVI-HUB-004",
+        link = "https://direct-link.net/5450045/glVLfwhKt4et",
+        usada = false,
+        posicao = 4
+    },
+    -- Key 5
+    {
+        key = "DAVI-HUB-005",
+        link = "https://link-center.net/5450045/l1peI74weA4g",
+        usada = false,
+        posicao = 5
+    },
+    -- Key 6
+    {
+        key = "DAVI-HUB-006",
+        link = "https://direct-link.net/5450045/eaCiSMyybd74",
+        usada = false,
+        posicao = 6
+    },
+    -- Key 7
+    {
+        key = "DAVI-HUB-007",
+        link = "https://link-hub.net/5450045/TGIbYBsV7EcU",
+        usada = false,
+        posicao = 7
+    },
+    -- Key 8
+    {
+        key = "DAVI-HUB-008",
+        link = "https://link-hub.net/5450045/IkJsx7RSCwyp",
+        usada = false,
+        posicao = 8
+    },
+    -- Key 9
+    {
+        key = "DAVI-HUB-009",
+        link = "https://link-center.net/5450045/YR4NQ7ewNSkJ",
+        usada = false,
+        posicao = 9
+    },
+    -- Key 10
+    {
+        key = "DAVI-HUB-010",
+        link = "https://link-target.net/5450045/gdChsmYq0rb5",
+        usada = false,
+        posicao = 10
+    },
+}
+
+-- ============================================================
+-- VARIÁVEIS DE CONTROLE
+-- ============================================================
+local keyValidada = false
+
+-- ============================================================
+-- FUNÇÃO PARA VERIFICAR KEY
+-- ============================================================
+local function verificarKey(key)
+    for _, item in pairs(KEYS_SEQUENCIA) do
+        if item.key == key then
+            if item.usada then
+                return false, "❌ KEY JÁ UTILIZADA!", item.posicao
+            else
+                return true, "✅ KEY VÁLIDA!", item.posicao
+            end
+        end
+    end
+    return false, "❌ KEY INVÁLIDA!", nil
+end
+
+-- ============================================================
+-- FUNÇÃO PARA MARCAR KEY COMO USADA E PEGAR PRÓXIMO LINK
+-- ============================================================
+local function marcarKeyUsada(key)
+    for _, item in pairs(KEYS_SEQUENCIA) do
+        if item.key == key then
+            item.usada = true
+            -- Procura a próxima key disponível
+            for _, prox in pairs(KEYS_SEQUENCIA) do
+                if not prox.usada then
+                    return prox.link
+                end
+            end
+            return nil -- Todas as keys foram usadas
+        end
+    end
+    return nil
+end
+
+-- ============================================================
+-- FUNÇÃO PARA VERIFICAR SE TODAS AS KEYS ACABARAM
+-- ============================================================
+local function todasKeysAcabaram()
+    for _, item in pairs(KEYS_SEQUENCIA) do
+        if not item.usada then
+            return false
+        end
+    end
+    return true
+end
+
+-- ============================================================
+-- FUNÇÃO PARA AVISAR O CRIADOR (VIA WEBHOOK)
+-- ============================================================
+local function avisarCriador(comPing)
+    local content = ""
+    if comPing then
+        content = "@here 🔥 **TODAS AS KEYS DO DAVI HUB ACABARAM!**"
+    end
+    
+    local data = {
+        ["content"] = content,
+        ["embeds"] = {{
+            ["title"] = "🚨 KEYS ESGOTADAS - DAVI HUB",
+            ["color"] = 16711680,
+            ["fields"] = {
+                {
+                    ["name"] = "📊 Situação",
+                    ["value"] = "Todas as **10 keys** do DAVI HUB foram distribuídas!",
+                    ["inline"] = false
+                },
+                {
+                    ["name"] = "👤 Solicitante",
+                    ["value"] = player.Name .. " (ID: " .. player.UserId .. ")",
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "📅 Data/Hora",
+                    ["value"] = os.date("%d/%m/%Y %H:%M:%S"),
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "🔔 Tipo de Alerta",
+                    ["value"] = comPing and "⚡ COM @here (Rápido)" or "🔕 SEM PING (Normal)",
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "🌐 Servidor",
+                    ["value"] = game.JobId or "N/A",
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "💡 Ação Necessária",
+                    ["value"] = "Criar novas keys e atualizar o sistema de distribuição.",
+                    ["inline"] = false
+                }
+            },
+            ["footer"] = {
+                ["text"] = "DAVI HUB - Sistema de Distribuição de Keys",
+                ["icon_url"] = "https://cdn.discordapp.com/embed/avatars/0.png"
+            },
+            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S.000Z")
+        }}
+    }
+    
+    local json = HttpService:JSONEncode(data)
+    
+    local success = pcall(function()
+        local request = syn and syn.request or request or http_request
+        if request then
+            request({
+                Url = WEBHOOK_URL,
+                Method = "POST",
+                Headers = {["Content-Type"] = "application/json"},
+                Body = json
+            })
+        end
+    end)
+    
+    return success
+end
+
+-- ============================================================
+-- CRIAR GUI DE AVISO (QUANDO KEYS ACABAM)
+-- ============================================================
+local function criarGUIAvisar()
+    for _, v in pairs(player.PlayerGui:GetChildren()) do
+        if v.Name == "AvisarGUI" then v:Destroy() end
+    end
+    
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "AvisarGUI"
+    gui.Parent = player.PlayerGui
+    gui.ResetOnSpawn = false
+    gui.IgnoreGuiInset = true
+    
+    local fundo = Instance.new("Frame")
+    fundo.Size = UDim2.new(1, 0, 1, 0)
+    fundo.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    fundo.BackgroundTransparency = 0.6
+    fundo.Parent = gui
+    
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 450, 0, 280)
+    frame.Position = UDim2.new(0.5, -225, 0.5, -140)
+    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
+    frame.BackgroundTransparency = 0.05
+    frame.BorderSizePixel = 0
+    frame.ClipsDescendants = true
+    frame.Parent = fundo
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 16)
+    corner.Parent = frame
+    
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(255, 140, 0)
+    border.Thickness = 2
+    border.Transparency = 0.3
+    border.Parent = frame
+    
+    -- Título
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 55)
+    title.Text = "🚨 KEYS ESGOTADAS!"
+    title.TextColor3 = Color3.fromRGB(255, 50, 50)
+    title.TextSize = 24
+    title.Font = Enum.Font.GothamBold
+    title.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+    title.BackgroundTransparency = 0.15
+    title.Parent = frame
+    
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 16)
+    titleCorner.Parent = title
+    
+    -- Subtítulo
+    local sub = Instance.new("TextLabel")
+    sub.Size = UDim2.new(1, 0, 0, 25)
+    sub.Position = UDim2.new(0, 0, 0.2, 0)
+    sub.Text = "Todas as 10 keys foram distribuídas!"
+    sub.TextColor3 = Color3.fromRGB(255, 200, 200)
+    sub.TextSize = 14
+    sub.Font = Enum.Font.Gotham
+    sub.BackgroundTransparency = 1
+    sub.Parent = frame
+    
+    local instrucao = Instance.new("TextLabel")
+    instrucao.Size = UDim2.new(1, 0, 0, 25)
+    instrucao.Position = UDim2.new(0, 0, 0.32, 0)
+    instrucao.Text = "Deseja avisar o criador para fazer novas keys?"
+    instrucao.TextColor3 = Color3.fromRGB(200, 200, 200)
+    instrucao.TextSize = 14
+    instrucao.Font = Enum.Font.Gotham
+    instrucao.BackgroundTransparency = 1
+    instrucao.Parent = frame
+    
+    -- Botões
+    local btnPing = Instance.new("TextButton")
+    btnPing.Size = UDim2.new(0.4, 0, 0, 45)
+    btnPing.Position = UDim2.new(0.05, 0, 0.5, 0)
+    btnPing.Text = "🔔 COM @here"
+    btnPing.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnPing.TextSize = 16
+    btnPing.Font = Enum.Font.GothamBold
+    btnPing.BackgroundColor3 = Color3.fromRGB(255, 100, 0)
+    btnPing.BackgroundTransparency = 0.15
+    btnPing.BorderSizePixel = 0
+    btnPing.Parent = frame
+    
+    local btnPingCorner = Instance.new("UICorner")
+    btnPingCorner.CornerRadius = UDim.new(0, 10)
+    btnPingCorner.Parent = btnPing
+    
+    local btnSemPing = Instance.new("TextButton")
+    btnSemPing.Size = UDim2.new(0.4, 0, 0, 45)
+    btnSemPing.Position = UDim2.new(0.55, 0, 0.5, 0)
+    btnSemPing.Text = "🔕 SEM PING"
+    btnSemPing.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnSemPing.TextSize = 16
+    btnSemPing.Font = Enum.Font.GothamBold
+    btnSemPing.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+    btnSemPing.BackgroundTransparency = 0.15
+    btnSemPing.BorderSizePixel = 0
+    btnSemPing.Parent = frame
+    
+    local btnSemPingCorner = Instance.new("UICorner")
+    btnSemPingCorner.CornerRadius = UDim.new(0, 10)
+    btnSemPingCorner.Parent = btnSemPing
+    
+    local status = Instance.new("TextLabel")
+    status.Size = UDim2.new(1, 0, 0, 25)
+    status.Position = UDim2.new(0, 0, 0.75, 0)
+    status.Text = "💡 Escolha como deseja avisar o criador"
+    status.TextColor3 = Color3.fromRGB(150, 150, 150)
+    status.TextSize = 13
+    status.Font = Enum.Font.Gotham
+    status.BackgroundTransparency = 1
+    status.Parent = frame
+    
+    btnPing.MouseButton1Click:Connect(function()
+        status.Text = "⏳ Enviando aviso com @here..."
+        status.TextColor3 = Color3.fromRGB(255, 255, 100)
+        btnPing.Visible = false
+        btnSemPing.Visible = false
+        
+        if avisarCriador(true) then
+            status.Text = "✅ Aviso enviado! Criador será notificado em breve!"
+            status.TextColor3 = Color3.fromRGB(100, 255, 100)
+            btnPing.Text = "✅ ENVIADO!"
+        else
+            status.Text = "❌ Erro ao enviar! Tente novamente."
+            status.TextColor3 = Color3.fromRGB(255, 100, 100)
+            btnPing.Visible = true
+            btnSemPing.Visible = true
+        end
+    end)
+    
+    btnSemPing.MouseButton1Click:Connect(function()
+        status.Text = "⏳ Enviando aviso sem ping..."
+        status.TextColor3 = Color3.fromRGB(255, 255, 100)
+        btnPing.Visible = false
+        btnSemPing.Visible = false
+        
+        if avisarCriador(false) then
+            status.Text = "✅ Aviso enviado! Criador será notificado."
+            status.TextColor3 = Color3.fromRGB(100, 255, 100)
+            btnSemPing.Text = "✅ ENVIADO!"
+        else
+            status.Text = "❌ Erro ao enviar! Tente novamente."
+            status.TextColor3 = Color3.fromRGB(255, 100, 100)
+            btnPing.Visible = true
+            btnSemPing.Visible = true
+        end
+    end)
+    
+    return gui
+end
+
+-- ============================================================
+-- CRIAR GUI DE ATIVAÇÃO (COM DISTRIBUIÇÃO)
+-- ============================================================
+local function criarGUIAtivacao()
+    for _, v in pairs(player.PlayerGui:GetChildren()) do
+        if v.Name == "KeySystem" then v:Destroy() end
+    end
+    
+    -- Verifica se todas as keys acabaram
+    if todasKeysAcabaram() then
+        criarGUIAvisar()
+        return
+    end
+    
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "KeySystem"
+    gui.Parent = player.PlayerGui
+    gui.ResetOnSpawn = false
+    gui.IgnoreGuiInset = true
+    
+    local fundo = Instance.new("Frame")
+    fundo.Size = UDim2.new(1, 0, 1, 0)
+    fundo.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    fundo.BackgroundTransparency = 0.6
+    fundo.Parent = gui
+    
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 450, 0, 400)
+    frame.Position = UDim2.new(0.5, -225, 0.5, -200)
+    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
+    frame.BackgroundTransparency = 0.05
+    frame.BorderSizePixel = 0
+    frame.ClipsDescendants = true
+    frame.Parent = fundo
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 16)
+    corner.Parent = frame
+    
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(255, 140, 0)
+    border.Thickness = 2
+    border.Transparency = 0.3
+    border.Parent = frame
+    
+    -- Título
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 55)
+    title.Text = "🔑 DISTRIBUIÇÃO DE KEYS"
+    title.TextColor3 = Color3.fromRGB(255, 200, 50)
+    title.TextSize = 22
+    title.Font = Enum.Font.GothamBold
+    title.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+    title.BackgroundTransparency = 0.15
+    title.Parent = frame
+    
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 16)
+    titleCorner.Parent = title
+    
+    -- Subtítulo com contagem
+    local sub = Instance.new("TextLabel")
+    sub.Size = UDim2.new(1, 0, 0, 25)
+    sub.Position = UDim2.new(0, 0, 0.18, 0)
+    
+    local keysUsadas = 0
+    for _, item in pairs(KEYS_SEQUENCIA) do
+        if item.usada then keysUsadas = keysUsadas + 1 end
+    end
+    local totalKeys = #KEYS_SEQUENCIA
+    
+    sub.Text = "Digite sua key de ativação  |  " .. keysUsadas .. "/" .. totalKeys .. " keys distribuídas"
+    sub.TextColor3 = Color3.fromRGB(200, 200, 200)
+    sub.TextSize = 13
+    sub.Font = Enum.Font.Gotham
+    sub.BackgroundTransparency = 1
+    sub.Parent = frame
+    
+    -- Campo da Key
+    local keyBox = Instance.new("TextBox")
+    keyBox.Size = UDim2.new(0.8, 0, 0, 45)
+    keyBox.Position = UDim2.new(0.1, 0, 0.28, 0)
+    keyBox.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+    keyBox.BackgroundTransparency = 0.2
+    keyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    keyBox.TextSize = 18
+    keyBox.Font = Enum.Font.GothamBold
+    keyBox.Text = ""
+    keyBox.PlaceholderText = "Cole sua key aqui..."
+    keyBox.ClearTextOnFocus = true
+    keyBox.BorderSizePixel = 0
+    keyBox.Parent = frame
+    
+    local keyCorner = Instance.new("UICorner")
+    keyCorner.CornerRadius = UDim.new(0, 10)
+    keyCorner.Parent = keyBox
+    
+    -- Botão Ativar
+    local btnAtivar = Instance.new("TextButton")
+    btnAtivar.Size = UDim2.new(0.4, 0, 0, 45)
+    btnAtivar.Position = UDim2.new(0.3, 0, 0.48, 0)
+    btnAtivar.Text = "🔓 ATIVAR"
+    btnAtivar.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnAtivar.TextSize = 18
+    btnAtivar.Font = Enum.Font.GothamBold
+    btnAtivar.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+    btnAtivar.BackgroundTransparency = 0.15
+    btnAtivar.BorderSizePixel = 0
+    btnAtivar.Parent = frame
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 10)
+    btnCorner.Parent = btnAtivar
+    
+    -- Status
+    local status = Instance.new("TextLabel")
+    status.Size = UDim2.new(1, 0, 0, 25)
+    status.Position = UDim2.new(0, 0, 0.62, 0)
+    status.Text = "💡 Digite sua key e clique em ATIVAR"
+    status.TextColor3 = Color3.fromRGB(150, 150, 150)
+    status.TextSize = 13
+    status.Font = Enum.Font.Gotham
+    status.BackgroundTransparency = 1
+    status.Parent = frame
+    
+    -- Área para mostrar o link da próxima key
+    local linkFrame = Instance.new("Frame")
+    linkFrame.Size = UDim2.new(0.9, 0, 0, 60)
+    linkFrame.Position = UDim2.new(0.05, 0, 0.72, 0)
+    linkFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+    linkFrame.BackgroundTransparency = 0.2
+    linkFrame.BorderSizePixel = 0
+    linkFrame.Visible = false
+    linkFrame.Parent = frame
+    
+    local linkCorner = Instance.new("UICorner")
+    linkCorner.CornerRadius = UDim.new(0, 8)
+    linkCorner.Parent = linkFrame
+    
+    local linkLabel = Instance.new("TextLabel")
+    linkLabel.Size = UDim2.new(1, 0, 0, 20)
+    linkLabel.Position = UDim2.new(0, 0, 0.05, 0)
+    linkLabel.Text = "🔗 PRÓXIMA KEY DISPONÍVEL:"
+    linkLabel.TextColor3 = Color3.fromRGB(255, 200, 50)
+    linkLabel.TextSize = 13
+    linkLabel.Font = Enum.Font.GothamBold
+    linkLabel.BackgroundTransparency = 1
+    linkLabel.Parent = linkFrame
+    
+    local linkTexto = Instance.new("TextLabel")
+    linkTexto.Size = UDim2.new(1, 0, 0, 25)
+    linkTexto.Position = UDim2.new(0, 0, 0.35, 0)
+    linkTexto.Text = ""
+    linkTexto.TextColor3 = Color3.fromRGB(100, 200, 255)
+    linkTexto.TextSize = 13
+    linkTexto.Font = Enum.Font.Gotham
+    linkTexto.BackgroundTransparency = 1
+    linkTexto.Parent = linkFrame
+    
+    local linkInstrucao = Instance.new("TextLabel")
+    linkInstrucao.Size = UDim2.new(1, 0, 0, 15)
+    linkInstrucao.Position = UDim2.new(0, 0, 0.70, 0)
+    linkInstrucao.Text = "💡 Compartilhe este link com a próxima pessoa!"
+    linkInstrucao.TextColor3 = Color3.fromRGB(150, 150, 150)
+    linkInstrucao.TextSize = 11
+    linkInstrucao.Font = Enum.Font.Gotham
+    linkInstrucao.BackgroundTransparency = 1
+    linkInstrucao.Parent = linkFrame
+    
+    -- Botão para copiar link
+    local btnCopiar = Instance.new("TextButton")
+    btnCopiar.Size = UDim2.new(0.3, 0, 0, 25)
+    btnCopiar.Position = UDim2.new(0.6, 0, 0.35, 0)
+    btnCopiar.Text = "📋 COPIAR LINK"
+    btnCopiar.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnCopiar.TextSize = 12
+    btnCopiar.Font = Enum.Font.GothamBold
+    btnCopiar.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+    btnCopiar.BackgroundTransparency = 0.2
+    btnCopiar.BorderSizePixel = 0
+    btnCopiar.Visible = false
+    btnCopiar.Parent = linkFrame
+    
+    local btnCopiarCorner = Instance.new("UICorner")
+    btnCopiarCorner.CornerRadius = UDim.new(0, 6)
+    btnCopiarCorner.Parent = btnCopiar
+    
+    btnCopiar.MouseButton1Click:Connect(function()
+        if linkTexto.Text ~= "" then
+            setclipboard(linkTexto.Text)
+            btnCopiar.Text = "✅ COPIADO!"
+            task.wait(1)
+            btnCopiar.Text = "📋 COPIAR LINK"
+        end
+    end)
+    
+    -- Função do botão Ativar
+    btnAtivar.MouseButton1Click:Connect(function()
+        local key = keyBox.Text
+        if key == "" then
+            status.Text = "❌ Digite uma key!"
+            status.TextColor3 = Color3.fromRGB(255, 100, 100)
+            return
+        end
+        
+        local valida, mensagem, posicao = verificarKey(key)
+        
+        if valida then
+            status.Text = "✅ KEY VÁLIDA! Ativando DAVI HUB..."
+            status.TextColor3 = Color3.fromRGB(100, 255, 100)
+            btnAtivar.Text = "✅ ATIVADO!"
+            btnAtivar.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+            
+            -- Marca a key como usada e pega o próximo link
+            local proximoLink = marcarKeyUsada(key)
+            
+            -- Salva a key no jogador
+            player:SetAttribute("DAVI_KEY", key)
+            keyValidada = tr
 
 -- ============================================================
 -- CABEÇALHO (ARRASTÁVEL)
