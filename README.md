@@ -15,7 +15,23 @@ if is Developer then
     keyValidada = true
     player:SetAttribute("DAVI_KEY", "DEV_ACCESS")
     print("✅ DAVI HUB iniciado em modo desenvolvedor!")
-    return  -- 👈 O SCRIPT PARA AQUI
+    return
+end
+
+-- Se chegou aqui, é porque NÃO é o desenvolvedor
+if isAtivado() then
+    print("✅ DAVI HUB já está ativado! Continuando...")
+else
+    print("🔑 Aguardando ativação da key...")
+    criarGUIAtivacao()
+
+    while not keyValidada do
+        task.wait(0.5)
+        local guiExists = false
+        for _, v in pairs(player.PlayerGui:GetChildren()) do
+            if v.Name == "KeySystem" or v.Name == "AvisarGUI" then
+                guiExists = true
+                break
 end
 
 -- Se chegou aqui, é porque NÃO é o desenvolvedor
@@ -40,9 +56,6 @@ else
         end
     end
 end
-local function isAtivado()
-    local keySalva = player:GetAttribute("DAVI_KEY")
-    if keySalva then
         for _, item in pairs(KEYS_SEQUENCIA) do
             if item.key == keySalva and not item.usada then
                 item.usada = true
