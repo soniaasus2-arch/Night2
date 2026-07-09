@@ -1,4 +1,3 @@
-
 local player = game.Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
@@ -6,49 +5,16 @@ local Camera = workspace.CurrentCamera
 local UserInputService = game:GetService("UserInputService")
 local RS = game.ReplicatedStorage
 local HttpService = game:GetService("HttpService")
--- Verifica se o jogador atual é o criador
-local isDeveloper = (player.Name == "daviroblox2023r")
+
 -- ============================================================
--- 🔒 BLOQUEIA O SCRIPT ATÉ A KEY SER VALIDADA
+-- SISTEMA DE KEY (COM PASTEBIN + KEY VIP PARA DEVS)
 -- ============================================================
-
-local function isAtivado()
-    local keySalva = player:GetAttribute("DAVI_KEY")
-    if keySalva then
-        for _, item in pairs(KEYS_SEQUENCIA) do
-            if item.key == keySalva and not item.usada then
-                item.usada = true
-                return true
-            end
-        end
-    end
-    return false
-end
-
-if isAtivado() then
-    print("✅ DAVI HUB já está ativado! Continuando...")
-else
-    print("🔑 Aguardando ativação da key...")
-    criarGUIAtivacao()
-
-    while not keyValidada do
-        task.wait(0.5)
-        local guiExists = false
-        for _, v in pairs(player.PlayerGui:GetChildren()) do
-            if v.Name == "KeySystem" or v.Name == "AvisarGUI" then
-                guiExists = true
-                break
-            end
-        end
-        if not guiExists and not keyValidada then
-            print("❌ Ativação cancelada.")
-            return
-        end
-    end
-end
-
 
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1524546983799427194/WyTosfrV6Opc1MPOpmTJmYNlCzBu0gpRSJ89dUnqcNVYbqJ373-tCfTLUMBgOTidUEh3"
+local PASTEBIN_URL = "https://pastebin.com/raw/rFhbk945"
+
+-- KEY VIP ESPECIAL PARA DESENVOLVEDORES
+local VIP_DEV_KEY = "Exp,ri?me?ntd?ave123191717172827181"
 
 local KEYS_SEQUENCIA = {
     {key = "free_10182alapapqaoqkfa", link = "https://link-target.net/5450045/U8UGMFUQ22Uc", usada = false, posicao = 1},
@@ -65,15 +31,58 @@ local KEYS_SEQUENCIA = {
 
 local keyValidada = false
 
--- FUNÇÕES DO SISTEMA DE KEY
+-- Função para baixar lista do Pastebin
+local function baixarListaKeys()
+    local sucesso, conteudo = pcall(function()
+        return game:HttpGet(PASTEBIN_URL)
+    end)
+    if sucesso and conteudo then
+        local keys = {}
+        for key in string.gmatch(conteudo, "%S+") do
+            if key ~= "" then
+                keys[key] = true
+            end
+        end
+        return keys
+    end
+    return nil
+end
+
+-- Função para verificar key (Pastebin + local)
 local function verificarKey(key)
+    -- Verifica se é a KEY VIP de desenvolvedor
+    if key == VIP_DEV_KEY then
+        return true, "KEY VIP DE DESENVOLVEDOR!"
+    end
+    
+    -- Verifica localmente
+    local keyValidaLocal = false
     for _, item in pairs(KEYS_SEQUENCIA) do
         if item.key == key then
-            if item.usada then return false, "❌ KEY JÁ UTILIZADA!" end
-            return true, "✅ KEY VÁLIDA!"
+            if item.usada then 
+                return false, "KEY JÁ UTILIZADA!" 
+            end
+            keyValidaLocal = true
+            break
         end
     end
-    return false, "❌ KEY INVÁLIDA!"
+    
+    if not keyValidaLocal then
+        return false, "KEY INVÁLIDA!"
+    end
+    
+    -- Verifica no Pastebin
+    local keysOnline = baixarListaKeys()
+    if keysOnline then
+        if keysOnline[key] then
+            return true, "KEY VÁLIDA!"
+        else
+            return false, "KEY REVOGADA OU NÃO AUTORIZADA!"
+        end
+    else
+        print("Nao foi possivel baixar a lista de keys. Usando validacao local.")
+        return keyValidaLocal, keyValidaLocal and "KEY VALIDA!" or "KEY INVALIDA!"
+    end
 end
 
 local function marcarKeyUsada(key)
@@ -97,21 +106,21 @@ local function todasKeysAcabaram()
 end
 
 local function avisarCriador(comPing)
-    local content = comPing and "@here 🔥 **TODAS AS KEYS DO DAVI HUB ACABARAM!**" or ""
+    local content = comPing and "@here TODAS AS KEYS DO DAVI HUB ACABARAM!" or ""
     local data = {
         ["content"] = content,
         ["embeds"] = {{
-            ["title"] = "🚨 KEYS ESGOTADAS - DAVI HUB",
+            ["title"] = "KEYS ESGOTADAS - DAVI HUB",
             ["color"] = 16711680,
             ["fields"] = {
-                {["name"] = "📊 Situação", ["value"] = "Todas as **10 keys** foram distribuídas!", ["inline"] = false},
-                {["name"] = "👤 Solicitante", ["value"] = player.Name .. " (ID: " .. player.UserId .. ")", ["inline"] = true},
-                {["name"] = "📅 Data/Hora", ["value"] = os.date("%d/%m/%Y %H:%M:%S"), ["inline"] = true},
-                {["name"] = "🔔 Tipo de Alerta", ["value"] = comPing and "⚡ COM @here" or "🔕 SEM PING", ["inline"] = true},
-                {["name"] = "🌐 Servidor", ["value"] = game.JobId or "N/A", ["inline"] = true},
-                {["name"] = "💡 Ação Necessária", ["value"] = "Criar novas keys e atualizar o sistema.", ["inline"] = false}
+                {["name"] = "Situacao", ["value"] = "Todas as 10 keys foram distribuidas!", ["inline"] = false},
+                {["name"] = "Solicitante", ["value"] = player.Name .. " (ID: " .. player.UserId .. ")", ["inline"] = true},
+                {["name"] = "Data/Hora", ["value"] = os.date("%d/%m/%Y %H:%M:%S"), ["inline"] = true},
+                {["name"] = "Tipo de Alerta", ["value"] = comPing and "COM @here" or "SEM PING", ["inline"] = true},
+                {["name"] = "Servidor", ["value"] = game.JobId or "N/A", ["inline"] = true},
+                {["name"] = "Acao Necessaria", ["value"] = "Criar novas keys e atualizar o sistema.", ["inline"] = false}
             },
-            ["footer"] = {["text"] = "DAVI HUB - Sistema de Distribuição de Keys"},
+            ["footer"] = {["text"] = "DAVI HUB - Sistema de Distribuicao de Keys"},
             ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S.000Z")
         }}
     }
@@ -123,7 +132,7 @@ local function avisarCriador(comPing)
         end
     end)
 end
--- GUI DE AVISO (QUANDO KEYS ACABAM)
+-- GUI DE AVISO
 local function criarGUIAvisar()
     for _, v in pairs(player.PlayerGui:GetChildren()) do if v.Name == "AvisarGUI" then v:Destroy() end end
     local gui = Instance.new("ScreenGui")
@@ -157,7 +166,6 @@ local function criarGUIAvisar()
     border.Transparency = 0.3
     border.Parent = frame
 
-    -- Cabeçalho
     local header = Instance.new("Frame")
     header.Size = UDim2.new(1, 0, 0, 45)
     header.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
@@ -171,7 +179,7 @@ local function criarGUIAvisar()
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, -60, 1, 0)
     title.Position = UDim2.new(0, 15, 0, 0)
-    title.Text = "🚨 KEYS ESGOTADAS!"
+    title.Text = "KEYS ESGOTADAS!"
     title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.TextSize = 18
     title.Font = Enum.Font.GothamBold
@@ -182,7 +190,7 @@ local function criarGUIAvisar()
     local closeBtn = Instance.new("TextButton")
     closeBtn.Size = UDim2.new(0, 30, 0, 30)
     closeBtn.Position = UDim2.new(1, -38, 0, 7.5)
-    closeBtn.Text = "✕"
+    closeBtn.Text = "X"
     closeBtn.TextSize = 18
     closeBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
     closeBtn.BackgroundTransparency = 0.3
@@ -195,14 +203,12 @@ local function criarGUIAvisar()
     closeCorner.Parent = closeBtn
     closeBtn.MouseButton1Click:Connect(function()
         gui:Destroy()
-        print("❌ Ativação cancelada.")
     end)
 
-    -- Conteúdo
     local sub = Instance.new("TextLabel")
     sub.Size = UDim2.new(1, 0, 0, 25)
     sub.Position = UDim2.new(0, 0, 0.2, 0)
-    sub.Text = "Todas as 10 keys foram distribuídas!"
+    sub.Text = "Todas as 10 keys foram distribuidas!"
     sub.TextColor3 = Color3.fromRGB(255, 200, 200)
     sub.TextSize = 14
     sub.Font = Enum.Font.Gotham
@@ -222,7 +228,7 @@ local function criarGUIAvisar()
     local btnPing = Instance.new("TextButton")
     btnPing.Size = UDim2.new(0.4, 0, 0, 45)
     btnPing.Position = UDim2.new(0.05, 0, 0.5, 0)
-    btnPing.Text = "🔔 COM @here"
+    btnPing.Text = "COM @here"
     btnPing.TextColor3 = Color3.fromRGB(255, 255, 255)
     btnPing.TextSize = 16
     btnPing.Font = Enum.Font.GothamBold
@@ -237,7 +243,7 @@ local function criarGUIAvisar()
     local btnSemPing = Instance.new("TextButton")
     btnSemPing.Size = UDim2.new(0.4, 0, 0, 45)
     btnSemPing.Position = UDim2.new(0.55, 0, 0.5, 0)
-    btnSemPing.Text = "🔕 SEM PING"
+    btnSemPing.Text = "SEM PING"
     btnSemPing.TextColor3 = Color3.fromRGB(255, 255, 255)
     btnSemPing.TextSize = 16
     btnSemPing.Font = Enum.Font.GothamBold
@@ -252,7 +258,7 @@ local function criarGUIAvisar()
     local status = Instance.new("TextLabel")
     status.Size = UDim2.new(1, 0, 0, 25)
     status.Position = UDim2.new(0, 0, 0.75, 0)
-    status.Text = "💡 Escolha como deseja avisar o criador"
+    status.Text = "Escolha como deseja avisar o criador"
     status.TextColor3 = Color3.fromRGB(150, 150, 150)
     status.TextSize = 13
     status.Font = Enum.Font.Gotham
@@ -260,30 +266,29 @@ local function criarGUIAvisar()
     status.Parent = frame
 
     btnPing.MouseButton1Click:Connect(function()
-        status.Text = "⏳ Enviando..."
+        status.Text = "Enviando..."
         status.TextColor3 = Color3.fromRGB(255, 255, 100)
         btnPing.Visible = false
         btnSemPing.Visible = false
         avisarCriador(true)
-        status.Text = "✅ Aviso enviado! Criador será notificado."
+        status.Text = "Aviso enviado! Criador sera notificado."
         status.TextColor3 = Color3.fromRGB(100, 255, 100)
-        btnPing.Text = "✅ ENVIADO!"
+        btnPing.Text = "ENVIADO!"
     end)
 
     btnSemPing.MouseButton1Click:Connect(function()
-        status.Text = "⏳ Enviando..."
+        status.Text = "Enviando..."
         status.TextColor3 = Color3.fromRGB(255, 255, 100)
         btnPing.Visible = false
         btnSemPing.Visible = false
         avisarCriador(false)
-        status.Text = "✅ Aviso enviado! Criador será notificado."
+        status.Text = "Aviso enviado! Criador sera notificado."
         status.TextColor3 = Color3.fromRGB(100, 255, 100)
-        btnSemPing.Text = "✅ ENVIADO!"
+        btnSemPing.Text = "ENVIADO!"
     end)
 
     return gui
 end
-
 -- GUI DE ATIVAÇÃO
 local function criarGUIAtivacao()
     for _, v in pairs(player.PlayerGui:GetChildren()) do
@@ -326,7 +331,6 @@ local function criarGUIAtivacao()
     border.Transparency = 0.3
     border.Parent = frame
 
-   -- Cabeçalho
     local header = Instance.new("Frame")
     header.Size = UDim2.new(1, 0, 0, 45)
     header.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
@@ -340,7 +344,7 @@ local function criarGUIAtivacao()
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, -80, 1, 0)
     title.Position = UDim2.new(0, 15, 0, 0)
-    title.Text = "🔑 DISTRIBUIÇÃO DE KEYS"
+    title.Text = "DISTRIBUICAO DE KEYS"
     title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.TextSize = 18
     title.Font = Enum.Font.GothamBold
@@ -348,11 +352,10 @@ local function criarGUIAtivacao()
     title.TextXAlignment = Enum.TextXAlignment.Left
     title.Parent = header
 
-    -- Minimizar
     local minBtn = Instance.new("TextButton")
     minBtn.Size = UDim2.new(0, 30, 0, 30)
     minBtn.Position = UDim2.new(1, -70, 0, 7.5)
-    minBtn.Text = "−"
+    minBtn.Text = "-"
     minBtn.TextSize = 22
     minBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 100)
     minBtn.BackgroundTransparency = 0.4
@@ -365,10 +368,11 @@ local function criarGUIAtivacao()
     minCorner.Parent = minBtn
 
     local minimized = false
+    local conteudo = frame:FindFirstChild("Conteudo")
     minBtn.MouseButton1Click:Connect(function()
         minimized = not minimized
         frame.Size = minimized and UDim2.new(0, 450, 0, 45) or UDim2.new(0, 450, 0, 400)
-        minBtn.Text = minimized and "+" or "−"
+        minBtn.Text = minimized and "+" or "-"
         for _, child in pairs(frame:GetChildren()) do
             if child ~= header then
                 child.Visible = not minimized
@@ -376,11 +380,10 @@ local function criarGUIAtivacao()
         end
     end)
 
-    -- Fechar
     local closeBtn = Instance.new("TextButton")
     closeBtn.Size = UDim2.new(0, 30, 0, 30)
     closeBtn.Position = UDim2.new(1, -38, 0, 7.5)
-    closeBtn.Text = "✕"
+    closeBtn.Text = "X"
     closeBtn.TextSize = 18
     closeBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
     closeBtn.BackgroundTransparency = 0.3
@@ -393,16 +396,14 @@ local function criarGUIAtivacao()
     closeCorner.Parent = closeBtn
     closeBtn.MouseButton1Click:Connect(function()
         gui:Destroy()
-        print("❌ Ativação cancelada.")
     end)
 
-    -- Conteúdo
-    local conteudo = Instance.new("Frame")
-    conteudo.Name = "Conteudo"
-    conteudo.Size = UDim2.new(1, 0, 1, -45)
-    conteudo.Position = UDim2.new(0, 0, 0, 45)
-    conteudo.BackgroundTransparency = 1
-    conteudo.Parent = frame
+    local conteudoFrame = Instance.new("Frame")
+    conteudoFrame.Name = "Conteudo"
+    conteudoFrame.Size = UDim2.new(1, 0, 1, -45)
+    conteudoFrame.Position = UDim2.new(0, 0, 0, 45)
+    conteudoFrame.BackgroundTransparency = 1
+    conteudoFrame.Parent = frame
 
     local keysUsadas = 0
     for _, item in pairs(KEYS_SEQUENCIA) do if item.usada then keysUsadas = keysUsadas + 1 end end
@@ -411,12 +412,12 @@ local function criarGUIAtivacao()
     local sub = Instance.new("TextLabel")
     sub.Size = UDim2.new(1, 0, 0, 25)
     sub.Position = UDim2.new(0, 0, 0.05, 0)
-    sub.Text = "Digite sua key de ativação  |  " .. keysUsadas .. "/" .. totalKeys .. " keys distribuídas"
+    sub.Text = "Digite sua key de ativacao  |  " .. keysUsadas .. "/" .. totalKeys .. " keys distribuidas"
     sub.TextColor3 = Color3.fromRGB(200, 200, 200)
     sub.TextSize = 13
     sub.Font = Enum.Font.Gotham
     sub.BackgroundTransparency = 1
-    sub.Parent = conteudo
+    sub.Parent = conteudoFrame
 
     local keyBox = Instance.new("TextBox")
     keyBox.Size = UDim2.new(0.8, 0, 0, 45)
@@ -430,7 +431,7 @@ local function criarGUIAtivacao()
     keyBox.PlaceholderText = "Cole sua key aqui..."
     keyBox.ClearTextOnFocus = true
     keyBox.BorderSizePixel = 0
-    keyBox.Parent = conteudo
+    keyBox.Parent = conteudoFrame
     local keyCorner = Instance.new("UICorner")
     keyCorner.CornerRadius = UDim.new(0, 10)
     keyCorner.Parent = keyBox
@@ -438,30 +439,29 @@ local function criarGUIAtivacao()
     local btnAtivar = Instance.new("TextButton")
     btnAtivar.Size = UDim2.new(0.35, 0, 0, 45)
     btnAtivar.Position = UDim2.new(0.1, 0, 0.30, 0)
-    btnAtivar.Text = "🔓 ATIVAR"
+    btnAtivar.Text = "ATIVAR"
     btnAtivar.TextColor3 = Color3.fromRGB(255, 255, 255)
     btnAtivar.TextSize = 18
     btnAtivar.Font = Enum.Font.GothamBold
     btnAtivar.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
     btnAtivar.BackgroundTransparency = 0.15
     btnAtivar.BorderSizePixel = 0
-    btnAtivar.Parent = conteudo
+    btnAtivar.Parent = conteudoFrame
     local btnCorner = Instance.new("UICorner")
     btnCorner.CornerRadius = UDim.new(0, 10)
     btnCorner.Parent = btnAtivar
 
-    -- Botão Get Key
     local btnGetKey = Instance.new("TextButton")
     btnGetKey.Size = UDim2.new(0.35, 0, 0, 45)
     btnGetKey.Position = UDim2.new(0.55, 0, 0.30, 0)
-    btnGetKey.Text = "🔗 OBTER KEY"
+    btnGetKey.Text = "OBTER KEY"
     btnGetKey.TextColor3 = Color3.fromRGB(255, 255, 255)
     btnGetKey.TextSize = 16
     btnGetKey.Font = Enum.Font.GothamBold
     btnGetKey.BackgroundColor3 = Color3.fromRGB(45, 150, 200)
     btnGetKey.BackgroundTransparency = 0.15
     btnGetKey.BorderSizePixel = 0
-    btnGetKey.Parent = conteudo
+    btnGetKey.Parent = conteudoFrame
     local btnGetKeyCorner = Instance.new("UICorner")
     btnGetKeyCorner.CornerRadius = UDim.new(0, 10)
     btnGetKeyCorner.Parent = btnGetKey
@@ -480,28 +480,27 @@ local function criarGUIAtivacao()
                 setclipboard(link)
             end)
             if sucesso then
-                status.Text = "✅ Link copiado! Compartilhe com alguém."
+                status.Text = "Link copiado! Compartilhe com alguem."
                 status.TextColor3 = Color3.fromRGB(100, 255, 100)
             else
-                status.Text = "📋 Link: " .. link
+                status.Text = "Link: " .. link
                 status.TextColor3 = Color3.fromRGB(255, 200, 100)
             end
         else
-            status.Text = "❌ Nenhuma key disponível!"
+            status.Text = "Nenhuma key disponivel!"
             status.TextColor3 = Color3.fromRGB(255, 100, 100)
         end
     end)
 
-    -- Status
     local status = Instance.new("TextLabel")
     status.Size = UDim2.new(1, 0, 0, 25)
     status.Position = UDim2.new(0, 0, 0.42, 0)
-    status.Text = "💡 Digite sua key e clique em ATIVAR"
+    status.Text = "Digite sua key e clique em ATIVAR"
     status.TextColor3 = Color3.fromRGB(150, 150, 150)
     status.TextSize = 13
     status.Font = Enum.Font.Gotham
     status.BackgroundTransparency = 1
-    status.Parent = conteudo
+    status.Parent = conteudoFrame
 
     local linkFrame = Instance.new("Frame")
     linkFrame.Size = UDim2.new(0.9, 0, 0, 60)
@@ -510,7 +509,7 @@ local function criarGUIAtivacao()
     linkFrame.BackgroundTransparency = 0.2
     linkFrame.BorderSizePixel = 0
     linkFrame.Visible = false
-    linkFrame.Parent = conteudo
+    linkFrame.Parent = conteudoFrame
     local linkCorner = Instance.new("UICorner")
     linkCorner.CornerRadius = UDim.new(0, 8)
     linkCorner.Parent = linkFrame
@@ -518,7 +517,7 @@ local function criarGUIAtivacao()
     local linkLabel = Instance.new("TextLabel")
     linkLabel.Size = UDim2.new(1, 0, 0, 20)
     linkLabel.Position = UDim2.new(0, 0, 0.05, 0)
-    linkLabel.Text = "🔗 PRÓXIMA KEY DISPONÍVEL:"
+    linkLabel.Text = "PROXIMA KEY DISPONIVEL:"
     linkLabel.TextColor3 = Color3.fromRGB(255, 200, 50)
     linkLabel.TextSize = 13
     linkLabel.Font = Enum.Font.GothamBold
@@ -538,7 +537,7 @@ local function criarGUIAtivacao()
     local linkInstrucao = Instance.new("TextLabel")
     linkInstrucao.Size = UDim2.new(1, 0, 0, 15)
     linkInstrucao.Position = UDim2.new(0, 0, 0.70, 0)
-    linkInstrucao.Text = "💡 Compartilhe este link com a próxima pessoa!"
+    linkInstrucao.Text = "Compartilhe este link com a proxima pessoa!"
     linkInstrucao.TextColor3 = Color3.fromRGB(150, 150, 150)
     linkInstrucao.TextSize = 11
     linkInstrucao.Font = Enum.Font.Gotham
@@ -548,7 +547,7 @@ local function criarGUIAtivacao()
     local btnCopiar = Instance.new("TextButton")
     btnCopiar.Size = UDim2.new(0.3, 0, 0, 25)
     btnCopiar.Position = UDim2.new(0.6, 0, 0.35, 0)
-    btnCopiar.Text = "📋 COPIAR LINK"
+    btnCopiar.Text = "COPIAR LINK"
     btnCopiar.TextColor3 = Color3.fromRGB(255, 255, 255)
     btnCopiar.TextSize = 12
     btnCopiar.Font = Enum.Font.GothamBold
@@ -563,16 +562,16 @@ local function criarGUIAtivacao()
     btnCopiar.MouseButton1Click:Connect(function()
         if linkTexto.Text ~= "" then
             setclipboard(linkTexto.Text)
-            btnCopiar.Text = "✅ COPIADO!"
+            btnCopiar.Text = "COPIADO!"
             task.wait(1)
-            btnCopiar.Text = "📋 COPIAR LINK"
+            btnCopiar.Text = "COPIAR LINK"
         end
     end)
 
     btnAtivar.MouseButton1Click:Connect(function()
         local key = keyBox.Text
         if key == "" then
-            status.Text = "❌ Digite uma key!"
+            status.Text = "Digite uma key!"
             status.TextColor3 = Color3.fromRGB(255, 100, 100)
             return
         end
@@ -580,9 +579,9 @@ local function criarGUIAtivacao()
         local valida, mensagem = verificarKey(key)
 
         if valida then
-            status.Text = "✅ KEY VÁLIDA! Ativando DAVI HUB..."
+            status.Text = "KEY VALIDA! Ativando DAVI HUB..."
             status.TextColor3 = Color3.fromRGB(100, 255, 100)
-            btnAtivar.Text = "✅ ATIVADO!"
+            btnAtivar.Text = "ATIVADO!"
             btnAtivar.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
 
             local proximoLink = marcarKeyUsada(key)
@@ -593,23 +592,24 @@ local function criarGUIAtivacao()
                 linkFrame.Visible = true
                 linkTexto.Text = proximoLink
                 btnCopiar.Visible = true
-                print("🔗 PRÓXIMA KEY: " .. proximoLink)
+                print("PROXIMA KEY: " .. proximoLink)
             else
-                status.Text = "🎉 Todas as keys foram distribuídas!"
+                status.Text = "Todas as keys foram distribuidas!"
                 status.TextColor3 = Color3.fromRGB(255, 200, 50)
                 linkFrame.Visible = true
-                linkTexto.Text = "❌ Nenhuma key disponível!"
+                linkTexto.Text = "Nenhuma key disponivel!"
                 linkTexto.TextColor3 = Color3.fromRGB(255, 100, 100)
                 btnCopiar.Visible = false
-                print("🎉 TODAS AS KEYS FORAM DISTRIBUÍDAS!")
+                print("TODAS AS KEYS FORAM DISTRIBUIDAS!")
             end
+
             task.wait(1.5)
             gui:Destroy()
 
             if todasKeysAcabaram() then
                 criarGUIAvisar()
             else
-                print("✅ DAVI HUB ATIVADO COM SUCESSO!")
+                print("DAVI HUB ATIVADO COM SUCESSO!")
             end
         else
             status.Text = mensagem
@@ -623,20 +623,20 @@ local function criarGUIAtivacao()
             btnAtivar.MouseButton1Click:Fire()
         end
     end)
-
     keyBox.FocusLost:Connect(function()
         local key = keyBox.Text
         if key ~= "" then
             local valida, mensagem = verificarKey(key)
-            status.Text = valida and "✅ KEY VÁLIDA! Clique em ATIVAR." or mensagem
+            status.Text = valida and "KEY VALIDA! Clique em ATIVAR." or mensagem
             status.TextColor3 = valida and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
         end
     end)
 
     return gui
 end
+
 -- ============================================================
--- 🔒 BLOQUEIA O SCRIPT ATÉ A KEY SER VALIDADA
+-- BLOQUEIA O SCRIPT ATE A KEY SER VALIDADA
 -- ============================================================
 
 local function isAtivado()
@@ -653,9 +653,9 @@ local function isAtivado()
 end
 
 if isAtivado() then
-    print("✅ DAVI HUB já está ativado! Continuando...")
+    print("DAVI HUB ja esta ativado! Continuando...")
 else
-    print("🔑 Aguardando ativação da key...")
+    print("Aguardando ativacao da key...")
     criarGUIAtivacao()
 
     while not keyValidada do
@@ -668,19 +668,18 @@ else
             end
         end
         if not guiExists and not keyValidada then
-            print("❌ Ativação cancelada.")
+            print("Ativacao cancelada.")
             return
         end
     end
 end
 
+-- ============================================================
+-- FIM DO SISTEMA DE KEY
+-- ============================================================
 
 -- ============================================================
--- 👆 SISTEMA DE KEY TERMINA AQUI
--- ============================================================
-
--- ============================================================
--- CRIA GUI (SEM FUNDO PRETO)
+-- CRIA GUI
 -- ============================================================
 local gui = Instance.new("ScreenGui")
 gui.Name = "DaviHub"
@@ -688,7 +687,6 @@ gui.Parent = player:WaitForChild("PlayerGui")
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 
--- JANELA PRINCIPAL (CENTRO)
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 480, 0, 500)
 mainFrame.Position = UDim2.new(0.5, -240, 0.15, 0)
@@ -708,16 +706,14 @@ border.Thickness = 2
 border.Transparency = 0.4
 border.Parent = mainFrame
 
--- ============================================================
--- BOTÃO EMBAIXO DA GUI (ALÇA PARA ARRASTAR)
--- ============================================================
+-- BOTAO EMBAIXO DA GUI
 local moverBtn = Instance.new("TextButton")
 moverBtn.Name = "MoverBtn"
 moverBtn.Size = UDim2.new(0.4, 0, 0, 25)
 moverBtn.Position = UDim2.new(0.3, 0, 1, -10)
 moverBtn.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
 moverBtn.BackgroundTransparency = 0.3
-moverBtn.Text = "≡≡≡"
+moverBtn.Text = "==="
 moverBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 moverBtn.TextSize = 14
 moverBtn.Font = Enum.Font.GothamBold
@@ -729,26 +725,8 @@ local btnCorner = Instance.new("UICorner")
 btnCorner.CornerRadius = UDim.new(0, 10)
 btnCorner.Parent = moverBtn
 
-moverBtn.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = mainFrame.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
-
-moverBtn.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
-        dragInput = input
-    end
-end)
 -- ============================================================
--- CABEÇALHO (ARRASTÁVEL)
+-- CABECALHO
 -- ============================================================
 local header = Instance.new("Frame")
 header.Size = UDim2.new(1, 0, 0, 45)
@@ -764,7 +742,7 @@ headerCorner.Parent = header
 local titulo = Instance.new("TextLabel")
 titulo.Size = UDim2.new(1, -80, 1, 0)
 titulo.Position = UDim2.new(0, 15, 0, 0)
-titulo.Text = "✦ DAVI HUB"
+titulo.Text = "DAVI HUB"
 titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
 titulo.TextSize = 18
 titulo.Font = Enum.Font.GothamBold
@@ -772,11 +750,10 @@ titulo.BackgroundTransparency = 1
 titulo.TextXAlignment = Enum.TextXAlignment.Left
 titulo.Parent = header
 
--- MINIMIZAR
 local minBtn = Instance.new("TextButton")
 minBtn.Size = UDim2.new(0, 32, 0, 32)
 minBtn.Position = UDim2.new(1, -70, 0, 6.5)
-minBtn.Text = "−"
+minBtn.Text = "-"
 minBtn.TextSize = 22
 minBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 100)
 minBtn.BackgroundTransparency = 0.5
@@ -793,19 +770,17 @@ local minimized = false
 minBtn.MouseButton1Click:Connect(function()
     minimized = not minimized
     mainFrame.Size = minimized and UDim2.new(0, 480, 0, 45) or UDim2.new(0, 480, 0, 500)
-    minBtn.Text = minimized and "+" or "−"
+    minBtn.Text = minimized and "+" or "-"
     for _, child in pairs(mainFrame:GetChildren()) do
         if child ~= header then
             child.Visible = not minimized
         end
     end
 end)
-
--- FECHAR
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 32, 0, 32)
 closeBtn.Position = UDim2.new(1, -38, 0, 6.5)
-closeBtn.Text = "✕"
+closeBtn.Text = "X"
 closeBtn.TextSize = 18
 closeBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
 closeBtn.BackgroundTransparency = 0.4
@@ -823,7 +798,7 @@ closeBtn.MouseButton1Click:Connect(function()
 end)
 
 -- ============================================================
--- ARRASTAR (CABEÇALHO)
+-- ARRASTAR
 -- ============================================================
 local dragging = false
 local dragInput, dragStart, startPos
@@ -859,14 +834,34 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
+moverBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+moverBtn.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
 -- ============================================================
--- CONTEÚDO
+-- CONTEUDO
 -- ============================================================
 local contentFrame = Instance.new("Frame")
 contentFrame.Size = UDim2.new(1, 0, 1, -45)
 contentFrame.Position = UDim2.new(0, 0, 0, 45)
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = mainFrame
+
 -- ============================================================
 -- ABAS LATERAIS
 -- ============================================================
@@ -886,23 +881,21 @@ sidebarLayout.Padding = UDim.new(0, 6)
 sidebarLayout.SortOrder = Enum.SortOrder.LayoutOrder
 sidebarLayout.Parent = sidebar
 
--- Lista de abas
 local abaButtons = {}
 local abaFrames = {}
 local abas = {
-    {name = "🏠", label = "Menu"},
-    {name = "👤", label = "Char"},
-    {name = "📍", label = "Tele"},
-    {name = "🌙", label = "N1"},
-    {name = "🌙", label = "N2"},
-    {name = "🎯", label = "N3"},
-    {name = "👁️", label = "ESP"},
-    {name = "⚡", label = "Auto"},
+    {name = "Menu", label = "Menu"},
+    {name = "Char", label = "Char"},
+    {name = "Tele", label = "Tele"},
+    {name = "N1", label = "N1"},
+    {name = "N2", label = "N2"},
+    {name = "N3", label = "N3"},
+    {name = "ESP", label = "ESP"},
+    {name = "Auto", label = "Auto"},
+    {name = "Geral", label = "Geral"},
 }
 
--- ============================================================
--- FUNÇÃO PARA CRIAR ABA (COM SCROLL)
--- ============================================================
+-- FUNCAO PARA CRIAR ABA
 local function criarAba(nome, icone)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(0.85, 0, 0, 45)
@@ -920,7 +913,6 @@ local function criarAba(nome, icone)
     btnCorner.CornerRadius = UDim.new(0, 10)
     btnCorner.Parent = btn
 
-    -- SCROLLING FRAME
     local frame = Instance.new("ScrollingFrame")
     frame.Size = UDim2.new(1, -90, 1, 0)
     frame.Position = UDim2.new(0, 90, 0, 0)
@@ -965,7 +957,6 @@ local function criarAba(nome, icone)
     return frame, btn
 end
 
--- Criar todas as abas
 local abaFramesMap = {}
 for i, aba in pairs(abas) do
     local frame, btn = criarAba(aba.label, aba.name)
@@ -979,7 +970,7 @@ for i, aba in pairs(abas) do
 end
 
 -- ============================================================
--- FUNÇÕES AUXILIARES
+-- FUNCOES AUXILIARES
 -- ============================================================
 local function addCard(parent)
     local card = Instance.new("Frame")
@@ -1164,7 +1155,7 @@ local function toggleNoclip(v)
         noclipLoop = nil
     end
     if v then
-        print("🔓 NOCLIP ATIVADO!")
+        print("NOCLIP ATIVADO!")
         noclipLoop = RunService.Stepped:Connect(function()
             local char = player.Character
             if char then
@@ -1176,7 +1167,7 @@ local function toggleNoclip(v)
             end
         end)
     else
-        print("🔒 NOCLIP DESATIVADO!")
+        print("NOCLIP DESATIVADO!")
         local char = player.Character
         if char then
             for _, part in pairs(char:GetDescendants()) do
@@ -1225,7 +1216,7 @@ local function teleportar(cframe)
 end
 
 -- ============================================================
--- FUNÇÕES CHARACTER
+-- FUNCOES CHARACTER
 -- ============================================================
 local origLight = {}
 local function toggleFullbright(v)
@@ -1293,7 +1284,6 @@ local function toggleO2(v)
         end)
     end
 end
-
 -- ============================================================
 -- NIGHT 1
 -- ============================================================
@@ -1370,6 +1360,7 @@ local function GrabJerryCan()
     task.wait(0.25)
     char.HumanoidRootPart.CFrame = OC
 end
+
 -- ============================================================
 -- NIGHT 2
 -- ============================================================
@@ -1606,6 +1597,7 @@ RunService:BindToRenderStep("AimbotNPC", Enum.RenderPriority.Camera.Value + 1, f
         end
     end
 end)
+
 local function AutoMunicao()
     local char = player.Character or player.CharacterAdded:Wait()
     local root = char:WaitForChild("HumanoidRootPart")
@@ -1687,30 +1679,25 @@ workspace.ChildAdded:Connect(function(child)
 end)
 
 -- ============================================================
--- CONSTRUÇÃO DAS ABAS
+-- CONSTRUCAO DAS ABAS
 -- ============================================================
+
 -- ABA: MENU
 local menuFrame = abaFramesMap["Menu"]
 local menuCard = addCard(menuFrame)
-addLabel(menuCard, "✦ BEM-VINDO AO DAVI HUB", Color3.fromRGB(255, 255, 255))
+addLabel(menuCard, "BEM-VINDO AO DAVI HUB", Color3.fromRGB(255, 255, 255))
 addLabel(menuCard, "Selecione uma aba ao lado", Color3.fromRGB(200, 200, 200))
-addLabel(menuCard, "Versão 2.0", Color3.fromRGB(150, 150, 150))
+addLabel(menuCard, "Versao 2.0", Color3.fromRGB(150, 150, 150))
 
--- ABA: FEEDBACK (COM SISTEMA DE FEEDBACK)
-local feedbackFrame = abaFramesMap["Menu"]  -- Adiciona na aba MENU
-addButton(menuCard, "📩 Enviar Feedback", function()
-    abrirFeedback()
-end)
-
--- ABA: CHARACTER (COM NOCLIP)
+-- ABA: CHARACTER
 local charFrame = abaFramesMap["Char"]
 local charCard = addCard(charFrame)
-addLabel(charCard, "⚡ CHARACTER")
+addLabel(charCard, "CHARACTER")
 addToggle(charCard, "Fullbright", toggleFullbright, false)
 addToggle(charCard, "Infinite Stamina", toggleStamina, false)
 addToggle(charCard, "Anti-Frosted", toggleAntiTemp, false)
 addToggle(charCard, "Infinite O2", toggleO2, false)
-addToggle(charCard, "🔓 Noclip", toggleNoclip, false)
+addToggle(charCard, "Noclip", toggleNoclip, false)
 addSlider(charCard, "Sprint Speed", function(v)
     local ch = player.Character
     if ch then
@@ -1723,15 +1710,15 @@ end, 17, 45, 17)
 -- ABA: TELEPORTS
 local teleFrame = abaFramesMap["Tele"]
 local teleCard = addCard(teleFrame)
-addLabel(teleCard, "📍 NIGHT 1")
+addLabel(teleCard, "NIGHT 1")
 for nome, cf in pairs(teleportsN1) do
     addButton(teleCard, nome, function() teleportar(cf) end)
 end
-addLabel(teleCard, "📍 NIGHT 2")
+addLabel(teleCard, "NIGHT 2")
 for nome, cf in pairs(teleportsN2) do
     addButton(teleCard, nome, function() teleportar(cf) end)
 end
-addLabel(teleCard, "📍 NIGHT 3")
+addLabel(teleCard, "NIGHT 3")
 for nome, cf in pairs(teleportsN3) do
     addButton(teleCard, nome, function() teleportar(cf) end)
 end
@@ -1739,7 +1726,7 @@ end
 -- ABA: NIGHT 1
 local n1Frame = abaFramesMap["N1"]
 local n1Card = addCard(n1Frame)
-addLabel(n1Card, "🔥 NIGHT 1")
+addLabel(n1Card, "NIGHT 1")
 addButton(n1Card, "Refill Fireplace", RefillFireplace)
 addButton(n1Card, "Grab Wood", GrabWood)
 addButton(n1Card, "Refill Generator", RefillGenerator)
@@ -1748,679 +1735,215 @@ addButton(n1Card, "Grab JerryCan", GrabJerryCan)
 -- ABA: NIGHT 2
 local n2Frame = abaFramesMap["N2"]
 local n2Card = addCard(n2Frame)
-addLabel(n2Card, "🌙 NIGHT 2")
+addLabel(n2Card, "NIGHT 2")
 addToggle(n2Card, "Auto Scare", function(v) scareActive = v end, false)
 addButton(n2Card, "Anti Vent-Pests", AntiVentPests)
 addButton(n2Card, "Revive", ReviveN2)
 addButton(n2Card, "Escape Snatch", EscapeSnatch)
+addButton(n2Card, "Refill Power", function()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local OCframe = char.HumanoidRootPart.CFrame
+    char.HumanoidRootPart.CFrame = CFrame.new(-318.606567, 82.3999634, 97.8991776)
+    task.wait(0.25)
+    fireclickdetector(workspace.PowerCell.ClickDetector)
+    task.wait(0.25)
+    char.HumanoidRootPart.CFrame = CFrame.new(-271.368439, 82.3999634, 112.977608)
+    task.wait(0.25)
+    fireclickdetector(workspace.Generator.Detector.ClickDetector)
+    task.wait(0.25)
+    char.HumanoidRootPart.CFrame = OCframe
+    print("Power refilled!")
+end)
+addButton(n2Card, "Anti Stalker", function()
+    local remotes = game.ReplicatedStorage:FindFirstChild("Remotes")
+    if remotes and remotes:FindFirstChild("LookAt") then
+        remotes.LookAt:Destroy()
+        print("Anti Stalker ativado! Imune ao dano visual do Stalker.")
+    else
+        print("Remote 'LookAt' nao encontrado.")
+    end
+end)
 
 -- ABA: NIGHT 3
 local n3Frame = abaFramesMap["N3"]
 local n3Card = addCard(n3Frame)
-addLabel(n3Card, "🎯 NIGHT 3")
+addLabel(n3Card, "NIGHT 3")
 addToggle(n3Card, "Ativar Aimbot", function(v) aimbotEnabled = v end, false)
 addSlider(n3Card, "Aimbot Speed", function(v) AIM_SPEED = v end, 30, 150, 80)
 addSlider(n3Card, "Aimbot Distance", function(v) MAX_DISTANCE = v end, 30, 150, 80)
-addButton(n3Card, "Auto Coletar Munição", AutoMunicao)
+addButton(n3Card, "Auto Coletar Municao", AutoMunicao)
 
 -- ABA: ESP
 local espFrame = abaFramesMap["ESP"]
 local espCard = addCard(espFrame)
-addLabel(espCard, "👁️ ESP")
+addLabel(espCard, "ESP")
 addToggle(espCard, "ESP Players", toggleESPPlayers, false)
 addLabel(espCard, "ESP Monsters (Auto)", Color3.fromRGB(200, 200, 200))
+
+-- ESP Players (Botão extra para ativar manualmente)
+addButton(espCard, "ESP Players", function()
+    local players = game:GetService("Players")
+    local localPlayer = players.LocalPlayer
+    
+    local function addESP(player)
+        if player == localPlayer then return end
+        player.CharacterAdded:Connect(function(character)
+            local highlight = Instance.new("Highlight")
+            highlight.Parent = game:GetService("CoreGui")
+            highlight.Adornee = character
+            highlight.OutlineColor = Color3.fromRGB(0, 0, 255)
+            highlight.FillColor = Color3.fromRGB(173, 216, 230)
+            highlight.FillTransparency = 0.85
+        end)
+        if player.Character then
+            local highlight = Instance.new("Highlight")
+            highlight.Parent = game:GetService("CoreGui")
+            highlight.Adornee = player.Character
+            highlight.OutlineColor = Color3.fromRGB(0, 0, 255)
+            highlight.FillColor = Color3.fromRGB(0, 0, 255)
+            highlight.FillTransparency = 0.9
+        end
+    end
+    for _, player in pairs(players:GetPlayers()) do
+        addESP(player)
+    end
+    players.PlayerAdded:Connect(addESP)
+    print("ESP Players ativado!")
+end)
+
+addButton(espCard, "ESP Larry", function()
+    local function addESP_Larry()
+        local larry = workspace:FindFirstChild("Larry")
+        if larry then
+            local highlight = Instance.new("Highlight")
+            highlight.Parent = game:GetService("CoreGui")
+            highlight.Adornee = larry
+            highlight.FillColor = Color3.fromRGB(255, 0, 0)
+            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+            highlight.FillTransparency = 0.7
+        end
+    end
+    addESP_Larry()
+    workspace.ChildAdded:Connect(function(child)
+        if child.Name == "Larry" then
+            task.wait(1)
+            addESP_Larry()
+        end
+    end)
+    print("ESP Larry ativado!")
+end)
+
+addButton(espCard, "ESP Stalker", function()
+    local function addESP_Stalker()
+        local stalker = workspace:FindFirstChild("Stalker")
+        if stalker then
+            local highlight = Instance.new("Highlight")
+            highlight.Parent = game:GetService("CoreGui")
+            highlight.Adornee = stalker
+            highlight.FillColor = Color3.fromRGB(255, 165, 0)
+            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+            highlight.FillTransparency = 0.7
+        end
+    end
+    addESP_Stalker()
+    workspace.ChildAdded:Connect(function(child)
+        if child.Name == "Stalker" then
+            task.wait(1)
+            addESP_Stalker()
+        end
+    end)
+    print("ESP Stalker ativado!")
+end)
+
+addButton(espCard, "ESP Zombies & Skeletons", function()
+    local function addESP_Zombie()
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("Model") and (obj.Name == "Zombie" or obj.Name == "Skeleton") then
+                local highlight = Instance.new("Highlight")
+                highlight.Parent = game:GetService("CoreGui")
+                highlight.Adornee = obj
+                highlight.FillColor = Color3.fromRGB(0, 255, 0)
+                highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                highlight.FillTransparency = 0.7
+            end
+        end
+    end
+    addESP_Zombie()
+    workspace.ChildAdded:Connect(function(child)
+        if child.Name == "Zombie" or child.Name == "Skeleton" then
+            task.wait(1)
+            addESP_Zombie()
+        end
+    end)
+    print("ESP Zombies & Skeletons ativado!")
+end)
 
 -- ABA: AUTO
 local autoFrame = abaFramesMap["Auto"]
 local autoCard = addCard(autoFrame)
-addLabel(autoCard, "⚡ AUTO")
+addLabel(autoCard, "AUTO")
 addToggle(autoCard, "Auto Safe Spot", startAutoSafe, false)
 
--- ============================================================
--- SISTEMA DE FEEDBACK
--- ============================================================
+-- ABA: GERAL (NOVA)
+local geralFrame = abaFramesMap["Geral"]
+local geralCard = addCard(geralFrame)
+addLabel(geralCard, "GERAL")
 
-local WEBHOOK_FEEDBACK = "https://discord.com/api/webhooks/1524546983799427194/WyTosfrV6Opc1MPOpmTJmYNlCzBu0gpRSJ89dUnqcNVYbqJ373-tCfTLUMBgOTidUEh3"
-
-local CATEGORIAS = {
-    {nome = "🐛 Bug Report", cor = 16711680},
-    {nome = "💡 Sugestão", cor = 65280},
-    {nome = "⭐ Elogio", cor = 16776960},
-    {nome = "⚠️ Crítica", cor = 16753920},
-    {nome = "❓ Dúvida", cor = 65535},
-    {nome = "📱 Nova Função", cor = 16711935},
-    {nome = "⚡ Performance", cor = 16777215},
-    {nome = "📖 Tutorial", cor = 16777215},
-    {nome = "🔧 Suporte", cor = 16777215},
-    {nome = "❌ Abuso/Report", cor = 16711680},
-    {nome = "📊 Estatísticas", cor = 16776960},
-    {nome = "🎮 Experiência", cor = 16776960},
-}
-
-local function enviarFeedback(usuario, mensagem, categoria)
-    local data = {
-        ["embeds"] = {{
-            ["title"] = "📩 NOVO FEEDBACK - DAVI HUB",
-            ["color"] = 16753920,
-            ["fields"] = {
-                {["name"] = "👤 Usuário", ["value"] = usuario or "Desconhecido", ["inline"] = true},
-                {["name"] = "📌 Categoria", ["value"] = categoria or "Geral", ["inline"] = true},
-                {["name"] = "📝 Mensagem", ["value"] = mensagem or "Sem mensagem", ["inline"] = false},
-                {["name"] = "🆔 UserID", ["value"] = tostring(player.UserId), ["inline"] = true},
-                {["name"] = "🌐 Servidor", ["value"] = game.JobId or "N/A", ["inline"] = true},
-                {["name"] = "📅 Data", ["value"] = os.date("%d/%m/%Y %H:%M:%S"), ["inline"] = true},
-                {["name"] = "📋 Versão", ["value"] = "DAVI HUB v2.0", ["inline"] = true},
-                {["name"] = "💻 Executor", ["value"] = identifyexecutor and identifyexecutor() or "Desconhecido", ["inline"] = true},
-            },
-            ["footer"] = {["text"] = "DAVI HUB - Sistema de Feedback v2.0"},
-            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S.000Z")
-        }}
-    }
-    local json = HttpService:JSONEncode(data)
-    pcall(function()
-        local request = syn and syn.request or request or http_request
-        if request then
-            request({Url = WEBHOOK_FEEDBACK, Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = json})
-        end
-    end)
-end
-
-local function criarGUIFeedback()
-    for _, v in pairs(player.PlayerGui:GetChildren()) do if v.Name == "FeedbackGUI" then v:Destroy() end end
-    local gui = Instance.new("ScreenGui")
-    gui.Name = "FeedbackGUI"
-    gui.Parent = player.PlayerGui
-    gui.ResetOnSpawn = false
-    gui.IgnoreGuiInset = true
-
-    local fundo = Instance.new("Frame")
-    fundo.Size = UDim2.new(1, 0, 1, 0)
-    fundo.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    fundo.BackgroundTransparency = 0.5
-    fundo.Parent = gui
-
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 480, 0, 420)
-    frame.Position = UDim2.new(0.5, -240, 0.5, -210)
-    frame.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
-    frame.BackgroundTransparency = 0.05
-    frame.BorderSizePixel = 0
-    frame.ClipsDescendants = true
-    frame.Parent = fundo
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 16)
-    corner.Parent = frame
-
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 50)
-    title.Text = "📩 Enviar Feedback"
-    title.TextColor3 = Color3.fromRGB(255, 200, 50)
-    title.TextSize = 22
-    title.Font = Enum.Font.GothamBold
-    title.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
-    title.BackgroundTransparency = 0.2
-    title.Parent = frame
-    local titleCorner = Instance.new("UICorner")
-    titleCorner.CornerRadius = UDim.new(0, 16)
-    titleCorner.Parent = title
-
-    local close = Instance.new("TextButton")
-    close.Size = UDim2.new(0, 30, 0, 30)
-    close.Position = UDim2.new(1, -40, 0, 10)
-    close.Text = "✕"
-    close.TextColor3 = Color3.fromRGB(255, 255, 255)
-    close.TextSize = 18
-    close.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
-    close.BackgroundTransparency = 0.3
-    close.BorderSizePixel = 0
-    close.Parent = title
-    local closeCorner = Instance.new("UICorner")
-    closeCorner.CornerRadius = UDim.new(0, 8)
-    closeCorner.Parent = close
-    close.MouseButton1Click:Connect(function() gui:Destroy() end)
-
-    local labelCategoria = Instance.new("TextLabel")
-    labelCategoria.Size = UDim2.new(0.35, 0, 0, 25)
-    labelCategoria.Position = UDim2.new(0.05, 0, 0.16, 0)
-    labelCategoria.Text = "📌 Categoria:"
-    labelCategoria.TextColor3 = Color3.fromRGB(200, 200, 200)
-    labelCategoria.TextSize = 14
-    labelCategoria.Font = Enum.Font.GothamBold
-    labelCategoria.BackgroundTransparency = 1
-    labelCategoria.TextXAlignment = Enum.TextXAlignment.Left
-    labelCategoria.Parent = frame
-
-    local categoriaAtual = 1
-    local dropdownVisible = false
-
-    local dropBtn = Instance.new("TextButton")
-    dropBtn.Size = UDim2.new(0.50, 0, 0, 30)
-    dropBtn.Position = UDim2.new(0.45, 0, 0.16, 0)
-    dropBtn.Text = CATEGORIAS[1].nome
-    dropBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    dropBtn.TextSize = 13
-    dropBtn.Font = Enum.Font.GothamBold
-    dropBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
-    dropBtn.BackgroundTransparency = 0.2
-    dropBtn.BorderSizePixel = 0
-    dropBtn.Parent = frame
-    local dropCorner = Instance.new("UICorner")
-    dropCorner.CornerRadius = UDim.new(0, 8)
-    dropCorner.Parent = dropBtn
-
-    local dropMenu = Instance.new("ScrollingFrame")
-    dropMenu.Size = UDim2.new(0.50, 0, 0, 0)
-    dropMenu.Position = UDim2.new(0.45, 0, 0.22, 0)
-    dropMenu.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
-    dropMenu.BackgroundTransparency = 0.1
-    dropMenu.BorderSizePixel = 0
-    dropMenu.ClipsDescendants = true
-    dropMenu.Visible = false
-    dropMenu.ScrollBarThickness = 4
-    dropMenu.Parent = frame
-    local dropCorner2 = Instance.new("UICorner")
-    dropCorner2.CornerRadius = UDim.new(0, 8)
-    dropCorner2.Parent = dropMenu
-
-    local dropLayout = Instance.new("UIListLayout")
-    dropLayout.Padding = UDim.new(0, 2)
-    dropLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    dropLayout.Parent = dropMenu
-
-    for i, cat in pairs(CATEGORIAS) do
-        local opt = Instance.new("TextButton")
-        opt.Size = UDim2.new(1, 0, 0, 30)
-        opt.Text = cat.nome
-        opt.TextColor3 = Color3.fromRGB(255, 255, 255)
-        opt.TextSize = 13
-        opt.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
-        opt.BackgroundTransparency = 0.2
-        opt.BorderSizePixel = 0
-        opt.Parent = dropMenu
-        local optCorner = Instance.new("UICorner")
-        optCorner.CornerRadius = UDim.new(0, 6)
-        optCorner.Parent = opt
-        opt.MouseButton1Click:Connect(function()
-            categoriaAtual = i
-            dropBtn.Text = CATEGORIAS[i].nome
-            dropdownVisible = false
-            dropMenu.Visible = false
-            dropMenu.Size = UDim2.new(0.50, 0, 0, 0)
-        end)
+addButton(geralCard, "Bypass Anti-Cheat", function()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local hum = char:FindFirstChild("Humanoid")
+    if hum then
+        hum:SetAttribute("AntiCheatBypass", true)
+        print("Anti-Cheat bypassado!")
     end
+end)
 
-    dropBtn.MouseButton1Click:Connect(function()
-        dropdownVisible = not dropdownVisible
-        dropMenu.Visible = dropdownVisible
-        if dropdownVisible then
-            local totalHeight = #CATEGORIAS * 32
-            local maxHeight = 160
-            dropMenu.Size = UDim2.new(0.50, 0, 0, math.min(totalHeight, maxHeight))
-            dropMenu.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
-        else
-            dropMenu.Size = UDim2.new(0.50, 0, 0, 0)
-        end
-    end)
-
-    local labelMsg = Instance.new("TextLabel")
-    labelMsg.Size = UDim2.new(0.9, 0, 0, 25)
-    labelMsg.Position = UDim2.new(0.05, 0, 0.30, 0)
-    labelMsg.Text = "📝 Mensagem:"
-    labelMsg.TextColor3 = Color3.fromRGB(200, 200, 200)
-    labelMsg.TextSize = 14
-    labelMsg.Font = Enum.Font.GothamBold
-    labelMsg.BackgroundTransparency = 1
-    labelMsg.TextXAlignment = Enum.TextXAlignment.Left
-    labelMsg.Parent = frame
-
-    local msgBox = Instance.new("TextBox")
-    msgBox.Size = UDim2.new(0.9, 0, 0, 110)
-    msgBox.Position = UDim2.new(0.05, 0, 0.37, 0)
-    msgBox.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
-    msgBox.BackgroundTransparency = 0.2
-    msgBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    msgBox.TextSize = 14
-    msgBox.Font = Enum.Font.Gotham
-    msgBox.Text = "Escreva sua mensagem aqui..."
-    msgBox.TextWrapped = true
-    msgBox.TextXAlignment = Enum.TextXAlignment.Left
-    msgBox.TextYAlignment = Enum.TextYAlignment.Top
-    msgBox.ClearTextOnFocus = true
-    msgBox.BorderSizePixel = 0
-    msgBox.Parent = frame
-    local msgCorner = Instance.new("UICorner")
-    msgCorner.CornerRadius = UDim.new(0, 8)
-    msgCorner.Parent = msgBox
-
-    local btnEnviar = Instance.new("TextButton")
-    btnEnviar.Size = UDim2.new(0.4, 0, 0, 40)
-    btnEnviar.Position = UDim2.new(0.05, 0, 0.75, 0)
-    btnEnviar.Text = "📤 Enviar"
-    btnEnviar.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btnEnviar.TextSize = 16
-    btnEnviar.Font = Enum.Font.GothamBold
-    btnEnviar.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
-    btnEnviar.BackgroundTransparency = 0.2
-    btnEnviar.BorderSizePixel = 0
-    btnEnviar.Parent = frame
-    local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 8)
-    btnCorner.Parent = btnEnviar
-
-    local btnCancelar = Instance.new("TextButton")
-    btnCancelar.Size = UDim2.new(0.4, 0, 0, 40)
-    btnCancelar.Position = UDim2.new(0.55, 0, 0.75, 0)
-    btnCancelar.Text = "❌ Cancelar"
-    btnCancelar.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btnCancelar.TextSize = 16
-    btnCancelar.Font = Enum.Font.GothamBold
-    btnCancelar.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
-    btnCancelar.BackgroundTransparency = 0.2
-    btnCancelar.BorderSizePixel = 0
-    btnCancelar.Parent = frame
-    local btnCancelarCorner = Instance.new("UICorner")
-    btnCancelarCorner.CornerRadius = UDim.new(0, 8)
-    btnCancelarCorner.Parent = btnCancelar
-    btnCancelar.MouseButton1Click:Connect(function() gui:Destroy() end)
-
-    local statusLabel = Instance.new("TextLabel")
-    statusLabel.Size = UDim2.new(0.9, 0, 0, 25)
-    statusLabel.Position = UDim2.new(0.05, 0, 0.88, 0)
-    statusLabel.Text = "✅ Selecione uma categoria e escreva sua mensagem!"
-    statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-    statusLabel.TextSize = 13
-    statusLabel.Font = Enum.Font.Gotham
-    statusLabel.BackgroundTransparency = 1
-    statusLabel.Parent = frame
-
-    btnEnviar.MouseButton1Click:Connect(function()
-        local mensagem = msgBox.Text
-        if mensagem == "" or mensagem == "Escreva sua mensagem aqui..." then
-            statusLabel.Text = "❌ Digite uma mensagem!"
-            statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-            return
-        end
-        local categoria = CATEGORIAS[categoriaAtual].nome
-        statusLabel.Text = "⏳ Enviando..."
-        statusLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
-        enviarFeedback(player.Name, mensagem, categoria)
-        statusLabel.Text = "✅ Feedback enviado! Obrigado! 🙏"
-        statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
-        msgBox.Text = ""
-        btnEnviar.Text = "✅ Enviado!"
-        btnEnviar.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-        task.wait(2)
-        gui:Destroy()
-    end)
-
-    msgBox.FocusLost:Connect(function(enterPressed)
-        if enterPressed then
-            btnEnviar.MouseButton1Click:Fire()
-        end
-    end)
-end
-
-local function abrirFeedback()
-    criarGUIFeedback()
-end
--- ============================================================
--- SISTEMA DE IDENTIFICAÇÃO DE USUÁRIOS DO DAVI HUB
--- ============================================================
-
--- ============================================================
--- FUNÇÃO PARA IDENTIFICAR USUÁRIOS DO DAVI HUB
--- ============================================================
-local function identificarUsuarios()
-    local usuarios = {}
-    local jogadores = game.Players:GetPlayers()
-    
-    for _, jogador in pairs(jogadores) do
-        if jogador ~= player then
-            -- Verifica se o jogador tem a GUI do DAVI HUB
-            local sucesso, resultado = pcall(function()
-                local playerGui = jogador:FindFirstChild("PlayerGui")
-                if playerGui then
-                    -- Procura por qualquer GUI com nome relacionado ao DAVI HUB
-                    for _, gui in pairs(playerGui:GetChildren()) do
-                        if gui:IsA("ScreenGui") then
-                            local nome = gui.Name:lower()
-                            if nome:find("davi") or nome:find("hub") or nome:find("davihub") then
-                                table.insert(usuarios, {
-                                    nome = jogador.Name,
-                                    userId = jogador.UserId,
-                                    gui = gui.Name
-                                })
-                                break
-                            end
-                        end
-                    end
-                end
-            end)
-        end
-    end
-    
-    return usuarios
-end
-
--- ============================================================
--- FUNÇÃO PARA MOSTRAR USUÁRIOS NO CONSOLE
--- ============================================================
-local function mostrarUsuariosConsole()
-    local usuarios = identificarUsuarios()
-    print("")
-    print("===== 👥 USUÁRIOS DO DAVI HUB NO SERVIDOR =====")
-    
-    if #usuarios == 0 then
-        print("📌 Nenhum outro usuário do DAVI HUB encontrado.")
-        print("💡 Você é o único usando o HUB neste servidor!")
+addButton(geralCard, "Disable Static", function()
+    local static = workspace:FindFirstChild("Static")
+    if static then
+        static:Destroy()
+        print("Estatica removida!")
     else
-        print("📊 Total de usuários: " .. #usuarios)
-        print("")
-        for i, usuario in pairs(usuarios) do
-            print("🔹 " .. i .. ". " .. usuario.nome .. " (ID: " .. usuario.userId .. ")")
-            print("   📌 GUI: " .. usuario.gui)
-        end
-    end
-    print("================================================")
-    print("")
-end
-
--- ============================================================
--- FUNÇÃO PARA CRIAR UMA GUI COM A LISTA DE USUÁRIOS
--- ============================================================
-local function criarGUIUsuarios()
-    -- Fecha a GUI antiga se existir
-    for _, v in pairs(player.PlayerGui:GetChildren()) do
-        if v.Name == "UsuariosDAVI" then v:Destroy() end
-    end
-    
-    local usuarios = identificarUsuarios()
-    
-    local gui = Instance.new("ScreenGui")
-    gui.Name = "UsuariosDAVI"
-    gui.Parent = player.PlayerGui
-    gui.ResetOnSpawn = false
-    gui.IgnoreGuiInset = true
-    
-    -- Fundo semi-transparente
-    local fundo = Instance.new("Frame")
-    fundo.Size = UDim2.new(1, 0, 1, 0)
-    fundo.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    fundo.BackgroundTransparency = 0.5
-    fundo.Parent = gui
-    
-    -- Janela principal
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 350, 0, 300)
-    frame.Position = UDim2.new(0.5, -175, 0.5, -150)
-    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
-    frame.BackgroundTransparency = 0.05
-    frame.BorderSizePixel = 0
-    frame.ClipsDescendants = true
-    frame.Parent = fundo
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 16)
-    corner.Parent = frame
-    
-    -- Contorno
-    local border = Instance.new("UIStroke")
-    border.Color = Color3.fromRGB(255, 140, 0)
-    border.Thickness = 2
-    border.Transparency = 0.3
-    border.Parent = frame
-    
-    -- Título
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 45)
-    title.Text = "👥 USUÁRIOS DO DAVI HUB"
-    title.TextColor3 = Color3.fromRGB(255, 200, 50)
-    title.TextSize = 18
-    title.Font = Enum.Font.GothamBold
-    title.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
-    title.BackgroundTransparency = 0.15
-    title.Parent = frame
-    
-    local titleCorner = Instance.new("UICorner")
-    titleCorner.CornerRadius = UDim.new(0, 16)
-    titleCorner.Parent = title
-    
-    -- Botão Fechar
-    local close = Instance.new("TextButton")
-    close.Size = UDim2.new(0, 30, 0, 30)
-    close.Position = UDim2.new(1, -38, 0, 7)
-    close.Text = "✕"
-    close.TextColor3 = Color3.fromRGB(255, 255, 255)
-    close.TextSize = 18
-    close.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
-    close.BackgroundTransparency = 0.3
-    close.BorderSizePixel = 0
-    close.Parent = title
-    
-    local closeCorner = Instance.new("UICorner")
-    closeCorner.CornerRadius = UDim.new(0, 8)
-    closeCorner.Parent = close
-    close.MouseButton1Click:Connect(function() gui:Destroy() end)
-    
-    -- Lista de usuários (ScrollingFrame)
-    local lista = Instance.new("ScrollingFrame")
-    lista.Size = UDim2.new(1, -20, 1, -80)
-    lista.Position = UDim2.new(0, 10, 0, 55)
-    lista.BackgroundTransparency = 1
-    lista.BorderSizePixel = 0
-    lista.ScrollBarThickness = 6
-    lista.ScrollBarImageColor3 = Color3.fromRGB(255, 140, 0)
-    lista.Parent = frame
-    
-    local listaLayout = Instance.new("UIListLayout")
-    listaLayout.Padding = UDim.new(0, 4)
-    listaLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    listaLayout.Parent = lista
-    
-    -- Contador
-    local contador = Instance.new("TextLabel")
-    contador.Size = UDim2.new(1, 0, 0, 25)
-    contador.Position = UDim2.new(0, 0, 1, -35)
-    contador.Text = "📊 Total: " .. #usuarios .. " usuário(s)"
-    contador.TextColor3 = Color3.fromRGB(200, 200, 200)
-    contador.TextSize = 14
-    contador.Font = Enum.Font.Gotham
-    contador.BackgroundTransparency = 1
-    contador.Parent = frame
-    
-    -- Adiciona os usuários na lista
-    if #usuarios == 0 then
-        local nenhum = Instance.new("TextLabel")
-        nenhum.Size = UDim2.new(1, 0, 0, 35)
-        nenhum.Text = "🔹 Nenhum outro usuário do DAVI HUB encontrado."
-        nenhum.TextColor3 = Color3.fromRGB(200, 200, 200)
-        nenhum.TextSize = 14
-        nenhum.Font = Enum.Font.Gotham
-        nenhum.BackgroundTransparency = 1
-        nenhum.Parent = lista
-    else
-        for _, usuario in pairs(usuarios) do
-            local item = Instance.new("TextLabel")
-            item.Size = UDim2.new(1, 0, 0, 30)
-            item.Text = "🔹 " .. usuario.nome
-            item.TextColor3 = Color3.fromRGB(255, 255, 255)
-            item.TextSize = 14
-            item.Font = Enum.Font.GothamBold
-            item.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
-            item.BackgroundTransparency = 0.2
-            item.BorderSizePixel = 0
-            item.Parent = lista
-            
-            local itemCorner = Instance.new("UICorner")
-            itemCorner.CornerRadius = UDim.new(0, 6)
-            itemCorner.Parent = item
-        end
-    end
-    
-    -- Atualiza o CanvasSize da lista
-    task.wait(0.1)
-    local totalHeight = #usuarios * 34 + 10
-    if #usuarios == 0 then totalHeight = 50 end
-    lista.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
-end
-
--- ============================================================
--- COMANDO NO CHAT PARA VER USUÁRIOS (/davi ou /hub)
--- ============================================================
-game:GetService("Players").LocalPlayer.Chatted:Connect(function(msg)
-    if msg:lower() == "/davi" or msg:lower() == "/hub" then
-        criarGUIUsuarios()
-        mostrarUsuariosConsole()
+        print("Estatica nao encontrada.")
     end
 end)
 
--- ============================================================
--- FUNÇÃO PARA ATUALIZAR AUTOMATICAMENTE A CADA 30 SEGUNDOS
--- ============================================================
-spawn(function()
-    while true do
-        task.wait(30)
-        -- Mostra no console a cada 30 segundos (opcional)
-        -- mostrarUsuariosConsole()
-    end
-end)
-
--- ============================================================
--- ADICIONAR BOTÃO NA ABA MENU
--- ============================================================
--- Adicione na aba MENU (depois do menuCard)
-addButton(menuCard, "👥 Ver Usuários do HUB", function()
-    criarGUIUsuarios()
-    mostrarUsuariosConsole()
-end)
-
-print("✅ Sistema de identificação de usuários carregado!")
-print("💡 Digite /davi ou /hub no chat para ver quem está usando o DAVI HUB")
--- ============================================================
--- TAG LARANJA NO CHAT PARA USUÁRIOS DO DAVI HUB
--- ============================================================
-
--- Verifica se o jogador que falou está usando o DAVI HUB
-local function isDaviUser(jogador)
-    local sucesso, resultado = pcall(function()
-        local playerGui = jogador:FindFirstChild("PlayerGui")
-        if playerGui then
-            for _, gui in pairs(playerGui:GetChildren()) do
-                if gui:IsA("ScreenGui") then
-                    local nome = gui.Name:lower()
-                    if nome:find("davi") or nome:find("hub") or nome:find("davihub") then
-                        return true
-                    end
-                end
-            end
-        end
-    end)
-    return false
-end
-
--- Cria um TextLabel na tela para exibir o chat personalizado
-local function criarChatCustomizado()
-    -- Remove chat antigo se existir
-    for _, v in pairs(player.PlayerGui:GetChildren()) do
-        if v.Name == "DaviChat" then v:Destroy() end
-    end
-    
-    local chatGui = Instance.new("ScreenGui")
-    chatGui.Name = "DaviChat"
-    chatGui.Parent = player.PlayerGui
-    chatGui.ResetOnSpawn = false
-    chatGui.IgnoreGuiInset = true
-    
-    -- Frame que vai conter as mensagens (ScrollingFrame)
-    local chatFrame = Instance.new("ScrollingFrame")
-    chatFrame.Size = UDim2.new(0, 400, 0, 200)
-    chatFrame.Position = UDim2.new(0.02, 0, 0.5, -100) -- Canto inferior esquerdo
-    chatFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    chatFrame.BackgroundTransparency = 0.5
-    chatFrame.BorderSizePixel = 0
-    chatFrame.ClipsDescendants = true
-    chatFrame.ScrollBarThickness = 4
-    chatFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 140, 0)
-    chatFrame.Parent = chatGui
-    
-    -- Layout para organizar as mensagens
-    local chatLayout = Instance.new("UIListLayout")
-    chatLayout.Padding = UDim.new(0, 2)
-    chatLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    chatLayout.Parent = chatFrame
-    
-    -- Mantém as últimas 20 mensagens
-    local mensagens = {}
-    
-    -- Função para adicionar mensagem ao chat
-    local function adicionarMensagem(jogador, mensagem, isDavi)
+addButton(geralCard, "Events Notifier", function()
+    local function showNotification(text)
+        local gui = Instance.new("ScreenGui")
+        gui.Parent = player.PlayerGui
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(0, 300, 0, 50)
+        frame.Position = UDim2.new(0.5, -150, 0.05, 0)
+        frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        frame.BackgroundTransparency = 0.5
+        frame.Parent = gui
         local label = Instance.new("TextLabel")
-        label.Size = UDim2.new(1, 0, 0, 20)
-        label.Text = ""
+        label.Size = UDim2.new(1, 0, 1, 0)
+        label.Text = text
         label.TextColor3 = Color3.fromRGB(255, 255, 255)
-        label.TextSize = 14
-        label.Font = Enum.Font.Gotham
+        label.TextScaled = true
+        label.Font = Enum.Font.GothamBold
         label.BackgroundTransparency = 1
-        label.TextXAlignment = Enum.TextXAlignment.Left
-        label.Parent = chatFrame
-        
-        -- Define o texto com ou sem tag
-        if isDavi then
-            label.Text = "🔥 " .. jogador.Name .. ": " .. mensagem
-            -- Só a tag é laranja, o resto é branco
-            -- Vamos usar TextLabel com RichText
-            label.RichText = true
-            label.Text = '<font color="#FF8C00">[DAVI]</font> <font color="#FFFFFF">' .. jogador.Name .. ': ' .. mensagem .. '</font>'
-        else
-            label.Text = jogador.Name .. ": " .. mensagem
-        end
-        
-        -- Limita a quantidade de mensagens
-        table.insert(mensagens, label)
-        if #mensagens > 20 then
-            local remover = table.remove(mensagens, 1)
-            remover:Destroy()
-        end
-        
-        -- Atualiza o scroll para a última mensagem
-        task.wait(0.05)
-        chatFrame.CanvasSize = UDim2.new(0, 0, 0, #mensagens * 22 + 10)
-        chatFrame.ScrollPosition = Vector2.new(0, chatFrame.CanvasSize.Y.Offset)
+        label.Parent = frame
+        game:GetService("Debris"):AddItem(gui, 3)
     end
-    
-    -- Escuta as mensagens de todos os jogadores
-    game:GetService("Players").PlayerAdded:Connect(function(novoJogador)
-        novoJogador.Chatted:Connect(function(mensagem)
-            local isDavi = isDaviUser(novoJogador)
-            adicionarMensagem(novoJogador, mensagem, isDavi)
-        end)
-    end)
-    
-    -- Para jogadores já existentes
-    for _, jogador in pairs(game.Players:GetPlayers()) do
-        if jogador ~= player then
-            jogador.Chatted:Connect(function(mensagem)
-                local isDavi = isDaviUser(jogador)
-                adicionarMensagem(jogador, mensagem, isDavi)
-            end)
+
+    workspace.ChildAdded:Connect(function(child)
+        if child.Name == "Larry" then
+            showNotification("Larry apareceu!")
         end
-    end
-    
-    -- O próprio jogador também
-    player.Chatted:Connect(function(mensagem)
-        adicionarMensagem(player, mensagem, true) -- Sempre true para o próprio
     end)
-    
-    return chatGui
-end
+    workspace.ChildRemoved:Connect(function(child)
+        if child.Name == "Larry" then
+            showNotification("Larry desapareceu!")
+        end
+    end)
+    print("Events Notifier ativado!")
+end)
 
--- Inicia o chat customizado
-criarChatCustomizado()
-
-print("✅ Chat com tag laranja para usuários do DAVI HUB ativado!")
 -- ============================================================
--- FORÇA ATUALIZAÇÃO DO SCROLL
+-- FORCA ATUALIZACAO DO SCROLL
 -- ============================================================
 task.wait(0.5)
 for _, frame in pairs(abaFrames) do
