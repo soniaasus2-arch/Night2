@@ -1,7 +1,3 @@
--- ==========================================
--- DAVI HUB - RESIDENCE MASSACRE (COMPLETO)
--- ==========================================
-
 local player = game.Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
@@ -9,97 +5,29 @@ local Camera = workspace.CurrentCamera
 local UserInputService = game:GetService("UserInputService")
 local RS = game.ReplicatedStorage
 local HttpService = game:GetService("HttpService")
+
 -- ============================================================
--- SISTEMA DE KEY (BLOQUEIA O HUB) - ATUALIZADO
+-- SISTEMA DE KEY (BLOQUEIA O HUB)
 -- ============================================================
 
-local HttpService = game:GetService("HttpService")
-
--- WEBHOOK PARA AVISAR O CRIADOR
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1524546983799427194/WyTosfrV6Opc1MPOpmTJmYNlCzBu0gpRSJ89dUnqcNVYbqJ373-tCfTLUMBgOTidUEh3"
 
--- ============================================================
--- LISTA DE 10 KEYS ATUALIZADA COM AS SUAS KEYS
--- ============================================================
 local KEYS_SEQUENCIA = {
-    -- Key 1
-    {
-        key = "free_10182alapapqaoqkfa",
-        link = "https://link-target.net/5450045/U8UGMFUQ22Uc",
-        usada = false,
-        posicao = 1
-    },
-    -- Key 2
-    {
-        key = "free_20394blbqbqbrbrlsb",
-        link = "https://direct-link.net/5450045/QykQLu41Fp2x",
-        usada = false,
-        posicao = 2
-    },
-    -- Key 3
-    {
-        key = "free_30567cmcrcrcscsmtc",
-        link = "https://direct-link.net/5450045/m1aASokV7pIF",
-        usada = false,
-        posicao = 3
-    },
-    -- Key 4
-    {
-        key = "free_40821dndsdtdudunud",
-        link = "https://direct-link.net/5450045/glVLfwhKt4et",
-        usada = false,
-        posicao = 4
-    },
-    -- Key 5
-    {
-        key = "free_50943eoeuevevevove",
-        link = "https://link-center.net/5450045/l1peI74weA4g",
-        usada = false,
-        posicao = 5
-    },
-    -- Key 6
-    {
-        key = "free_61054fpfwfwfwfwpwf",
-        link = "https://direct-link.net/5450045/eaCiSMyybd74",
-        usada = false,
-        posicao = 6
-    },
-    -- Key 7
-    {
-        key = "free_71265gqgxgxgxgxqgx",
-        link = "https://link-hub.net/5450045/TGIbYBsV7EcU",
-        usada = false,
-        posicao = 7
-    },
-    -- Key 8
-    {
-        key = "free_81376hrhyhyhyhyrhy",
-        link = "https://link-hub.net/5450045/IkJsx7RSCwyp",
-        usada = false,
-        posicao = 8
-    },
-    -- Key 9
-    {
-        key = "free_91487isizizizizsiz",
-        link = "https://link-center.net/5450045/YR4NQ7ewNSkJ",
-        usada = false,
-        posicao = 9
-    },
-    -- Key 10
-    {
-        key = "free_101598jtjajajajataj",
-        link = "https://link-target.net/5450045/gdChsmYq0rb5",
-        usada = false,
-        posicao = 10
-    },
+    {key = "free_10182alapapqaoqkfa", link = "https://link-target.net/5450045/U8UGMFUQ22Uc", usada = false, posicao = 1},
+    {key = "free_20394blbqbqbrbrlsb", link = "https://direct-link.net/5450045/QykQLu41Fp2x", usada = false, posicao = 2},
+    {key = "free_30567cmcrcrcscsmtc", link = "https://direct-link.net/5450045/m1aASokV7pIF", usada = false, posicao = 3},
+    {key = "free_40821dndsdtdudunud", link = "https://direct-link.net/5450045/glVLfwhKt4et", usada = false, posicao = 4},
+    {key = "free_50943eoeuevevevove", link = "https://link-center.net/5450045/l1peI74weA4g", usada = false, posicao = 5},
+    {key = "free_61054fpfwfwfwfwpwf", link = "https://direct-link.net/5450045/eaCiSMyybd74", usada = false, posicao = 6},
+    {key = "free_71265gqgxgxgxgxqgx", link = "https://link-hub.net/5450045/TGIbYBsV7EcU", usada = false, posicao = 7},
+    {key = "free_81376hrhyhyhyhyrhy", link = "https://link-hub.net/5450045/IkJsx7RSCwyp", usada = false, posicao = 8},
+    {key = "free_91487isizizizizsiz", link = "https://link-center.net/5450045/YR4NQ7ewNSkJ", usada = false, posicao = 9},
+    {key = "free_101598jtjajajajataj", link = "https://link-target.net/5450045/gdChsmYq0rb5", usada = false, posicao = 10},
 }
 
 local keyValidada = false
 
--- ============================================================
--- FUNÇÕES DO SISTEMA
--- ============================================================
-
+-- FUNÇÕES DO SISTEMA DE KEY
 local function verificarKey(key)
     for _, item in pairs(KEYS_SEQUENCIA) do
         if item.key == key then
@@ -157,11 +85,7 @@ local function avisarCriador(comPing)
         end
     end)
 end
-
--- ============================================================
 -- GUI DE AVISO (QUANDO KEYS ACABAM)
--- ============================================================
-
 local function criarGUIAvisar()
     for _, v in pairs(player.PlayerGui:GetChildren()) do if v.Name == "AvisarGUI" then v:Destroy() end end
     local gui = Instance.new("ScreenGui")
@@ -169,13 +93,13 @@ local function criarGUIAvisar()
     gui.Parent = player.PlayerGui
     gui.ResetOnSpawn = false
     gui.IgnoreGuiInset = true
-    
+
     local fundo = Instance.new("Frame")
     fundo.Size = UDim2.new(1, 0, 1, 0)
     fundo.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     fundo.BackgroundTransparency = 0.6
     fundo.Parent = gui
-    
+
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(0, 450, 0, 280)
     frame.Position = UDim2.new(0.5, -225, 0.5, -140)
@@ -184,30 +108,59 @@ local function criarGUIAvisar()
     frame.BorderSizePixel = 0
     frame.ClipsDescendants = true
     frame.Parent = fundo
-    
+
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 16)
     corner.Parent = frame
-    
+
     local border = Instance.new("UIStroke")
     border.Color = Color3.fromRGB(255, 140, 0)
     border.Thickness = 2
     border.Transparency = 0.3
     border.Parent = frame
-    
+
+    -- Cabeçalho
+    local header = Instance.new("Frame")
+    header.Size = UDim2.new(1, 0, 0, 45)
+    header.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+    header.BackgroundTransparency = 0.2
+    header.BorderSizePixel = 0
+    header.Parent = frame
+    local headerCorner = Instance.new("UICorner")
+    headerCorner.CornerRadius = UDim.new(0, 16)
+    headerCorner.Parent = header
+
     local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 55)
+    title.Size = UDim2.new(1, -60, 1, 0)
+    title.Position = UDim2.new(0, 15, 0, 0)
     title.Text = "🚨 KEYS ESGOTADAS!"
-    title.TextColor3 = Color3.fromRGB(255, 50, 50)
-    title.TextSize = 24
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextSize = 18
     title.Font = Enum.Font.GothamBold
-    title.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
-    title.BackgroundTransparency = 0.15
-    title.Parent = frame
-    local titleCorner = Instance.new("UICorner")
-    titleCorner.CornerRadius = UDim.new(0, 16)
-    titleCorner.Parent = title
-    
+    title.BackgroundTransparency = 1
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Parent = header
+
+    local closeBtn = Instance.new("TextButton")
+    closeBtn.Size = UDim2.new(0, 30, 0, 30)
+    closeBtn.Position = UDim2.new(1, -38, 0, 7.5)
+    closeBtn.Text = "✕"
+    closeBtn.TextSize = 18
+    closeBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+    closeBtn.BackgroundTransparency = 0.3
+    closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeBtn.Font = Enum.Font.GothamBold
+    closeBtn.BorderSizePixel = 0
+    closeBtn.Parent = header
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 8)
+    closeCorner.Parent = closeBtn
+    closeBtn.MouseButton1Click:Connect(function()
+        gui:Destroy()
+        print("❌ Ativação cancelada.")
+    end)
+
+    -- Conteúdo
     local sub = Instance.new("TextLabel")
     sub.Size = UDim2.new(1, 0, 0, 25)
     sub.Position = UDim2.new(0, 0, 0.2, 0)
@@ -217,7 +170,7 @@ local function criarGUIAvisar()
     sub.Font = Enum.Font.Gotham
     sub.BackgroundTransparency = 1
     sub.Parent = frame
-    
+
     local instrucao = Instance.new("TextLabel")
     instrucao.Size = UDim2.new(1, 0, 0, 25)
     instrucao.Position = UDim2.new(0, 0, 0.32, 0)
@@ -227,7 +180,7 @@ local function criarGUIAvisar()
     instrucao.Font = Enum.Font.Gotham
     instrucao.BackgroundTransparency = 1
     instrucao.Parent = frame
-    
+
     local btnPing = Instance.new("TextButton")
     btnPing.Size = UDim2.new(0.4, 0, 0, 45)
     btnPing.Position = UDim2.new(0.05, 0, 0.5, 0)
@@ -242,7 +195,7 @@ local function criarGUIAvisar()
     local btnPingCorner = Instance.new("UICorner")
     btnPingCorner.CornerRadius = UDim.new(0, 10)
     btnPingCorner.Parent = btnPing
-    
+
     local btnSemPing = Instance.new("TextButton")
     btnSemPing.Size = UDim2.new(0.4, 0, 0, 45)
     btnSemPing.Position = UDim2.new(0.55, 0, 0.5, 0)
@@ -257,7 +210,7 @@ local function criarGUIAvisar()
     local btnSemPingCorner = Instance.new("UICorner")
     btnSemPingCorner.CornerRadius = UDim.new(0, 10)
     btnSemPingCorner.Parent = btnSemPing
-    
+
     local status = Instance.new("TextLabel")
     status.Size = UDim2.new(1, 0, 0, 25)
     status.Position = UDim2.new(0, 0, 0.75, 0)
@@ -267,7 +220,7 @@ local function criarGUIAvisar()
     status.Font = Enum.Font.Gotham
     status.BackgroundTransparency = 1
     status.Parent = frame
-    
+
     btnPing.MouseButton1Click:Connect(function()
         status.Text = "⏳ Enviando..."
         status.TextColor3 = Color3.fromRGB(255, 255, 100)
@@ -278,7 +231,7 @@ local function criarGUIAvisar()
         status.TextColor3 = Color3.fromRGB(100, 255, 100)
         btnPing.Text = "✅ ENVIADO!"
     end)
-    
+
     btnSemPing.MouseButton1Click:Connect(function()
         status.Text = "⏳ Enviando..."
         status.TextColor3 = Color3.fromRGB(255, 255, 100)
@@ -289,36 +242,33 @@ local function criarGUIAvisar()
         status.TextColor3 = Color3.fromRGB(100, 255, 100)
         btnSemPing.Text = "✅ ENVIADO!"
     end)
-    
+
     return gui
 end
 
--- ============================================================
 -- GUI DE ATIVAÇÃO
--- ============================================================
-
 local function criarGUIAtivacao()
     for _, v in pairs(player.PlayerGui:GetChildren()) do
         if v.Name == "KeySystem" then v:Destroy() end
     end
-    
+
     if todasKeysAcabaram() then
         criarGUIAvisar()
         return
     end
-    
+
     local gui = Instance.new("ScreenGui")
     gui.Name = "KeySystem"
     gui.Parent = player.PlayerGui
     gui.ResetOnSpawn = false
     gui.IgnoreGuiInset = true
-    
+
     local fundo = Instance.new("Frame")
     fundo.Size = UDim2.new(1, 0, 1, 0)
     fundo.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     fundo.BackgroundTransparency = 0.6
     fundo.Parent = gui
-    
+
     local frame = Instance.new("Frame")
     frame.Size = UDim2.new(0, 450, 0, 400)
     frame.Position = UDim2.new(0.5, -225, 0.5, -200)
@@ -327,47 +277,112 @@ local function criarGUIAtivacao()
     frame.BorderSizePixel = 0
     frame.ClipsDescendants = true
     frame.Parent = fundo
-    
+
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 16)
     corner.Parent = frame
-    
+
     local border = Instance.new("UIStroke")
     border.Color = Color3.fromRGB(255, 140, 0)
     border.Thickness = 2
     border.Transparency = 0.3
     border.Parent = frame
-    
+
+   -- Cabeçalho
+    local header = Instance.new("Frame")
+    header.Size = UDim2.new(1, 0, 0, 45)
+    header.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+    header.BackgroundTransparency = 0.2
+    header.BorderSizePixel = 0
+    header.Parent = frame
+    local headerCorner = Instance.new("UICorner")
+    headerCorner.CornerRadius = UDim.new(0, 16)
+    headerCorner.Parent = header
+
     local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 55)
+    title.Size = UDim2.new(1, -80, 1, 0)
+    title.Position = UDim2.new(0, 15, 0, 0)
     title.Text = "🔑 DISTRIBUIÇÃO DE KEYS"
-    title.TextColor3 = Color3.fromRGB(255, 200, 50)
-    title.TextSize = 22
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextSize = 18
     title.Font = Enum.Font.GothamBold
-    title.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
-    title.BackgroundTransparency = 0.15
-    title.Parent = frame
-    local titleCorner = Instance.new("UICorner")
-    titleCorner.CornerRadius = UDim.new(0, 16)
-    titleCorner.Parent = title
-    
+    title.BackgroundTransparency = 1
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Parent = header
+
+    -- Minimizar
+    local minBtn = Instance.new("TextButton")
+    minBtn.Size = UDim2.new(0, 30, 0, 30)
+    minBtn.Position = UDim2.new(1, -70, 0, 7.5)
+    minBtn.Text = "−"
+    minBtn.TextSize = 22
+    minBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 100)
+    minBtn.BackgroundTransparency = 0.4
+    minBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    minBtn.Font = Enum.Font.GothamBold
+    minBtn.BorderSizePixel = 0
+    minBtn.Parent = header
+    local minCorner = Instance.new("UICorner")
+    minCorner.CornerRadius = UDim.new(0, 8)
+    minCorner.Parent = minBtn
+
+    local minimized = false
+    minBtn.MouseButton1Click:Connect(function()
+        minimized = not minimized
+        frame.Size = minimized and UDim2.new(0, 450, 0, 45) or UDim2.new(0, 450, 0, 400)
+        minBtn.Text = minimized and "+" or "−"
+        for _, child in pairs(frame:GetChildren()) do
+            if child ~= header then
+                child.Visible = not minimized
+            end
+        end
+    end)
+
+    -- Fechar
+    local closeBtn = Instance.new("TextButton")
+    closeBtn.Size = UDim2.new(0, 30, 0, 30)
+    closeBtn.Position = UDim2.new(1, -38, 0, 7.5)
+    closeBtn.Text = "✕"
+    closeBtn.TextSize = 18
+    closeBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+    closeBtn.BackgroundTransparency = 0.3
+    closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeBtn.Font = Enum.Font.GothamBold
+    closeBtn.BorderSizePixel = 0
+    closeBtn.Parent = header
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 8)
+    closeCorner.Parent = closeBtn
+    closeBtn.MouseButton1Click:Connect(function()
+        gui:Destroy()
+        print("❌ Ativação cancelada.")
+    end)
+
+    -- Conteúdo
+    local conteudo = Instance.new("Frame")
+    conteudo.Name = "Conteudo"
+    conteudo.Size = UDim2.new(1, 0, 1, -45)
+    conteudo.Position = UDim2.new(0, 0, 0, 45)
+    conteudo.BackgroundTransparency = 1
+    conteudo.Parent = frame
+
     local keysUsadas = 0
     for _, item in pairs(KEYS_SEQUENCIA) do if item.usada then keysUsadas = keysUsadas + 1 end end
     local totalKeys = #KEYS_SEQUENCIA
-    
+
     local sub = Instance.new("TextLabel")
     sub.Size = UDim2.new(1, 0, 0, 25)
-    sub.Position = UDim2.new(0, 0, 0.18, 0)
+    sub.Position = UDim2.new(0, 0, 0.05, 0)
     sub.Text = "Digite sua key de ativação  |  " .. keysUsadas .. "/" .. totalKeys .. " keys distribuídas"
     sub.TextColor3 = Color3.fromRGB(200, 200, 200)
     sub.TextSize = 13
     sub.Font = Enum.Font.Gotham
     sub.BackgroundTransparency = 1
-    sub.Parent = frame
-    
+    sub.Parent = conteudo
+
     local keyBox = Instance.new("TextBox")
     keyBox.Size = UDim2.new(0.8, 0, 0, 45)
-    keyBox.Position = UDim2.new(0.1, 0, 0.28, 0)
+    keyBox.Position = UDim2.new(0.1, 0, 0.15, 0)
     keyBox.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
     keyBox.BackgroundTransparency = 0.2
     keyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -377,14 +392,14 @@ local function criarGUIAtivacao()
     keyBox.PlaceholderText = "Cole sua key aqui..."
     keyBox.ClearTextOnFocus = true
     keyBox.BorderSizePixel = 0
-    keyBox.Parent = frame
+    keyBox.Parent = conteudo
     local keyCorner = Instance.new("UICorner")
     keyCorner.CornerRadius = UDim.new(0, 10)
     keyCorner.Parent = keyBox
-    
+
     local btnAtivar = Instance.new("TextButton")
-    btnAtivar.Size = UDim2.new(0.4, 0, 0, 45)
-    btnAtivar.Position = UDim2.new(0.3, 0, 0.48, 0)
+    btnAtivar.Size = UDim2.new(0.35, 0, 0, 45)
+    btnAtivar.Position = UDim2.new(0.1, 0, 0.30, 0)
     btnAtivar.Text = "🔓 ATIVAR"
     btnAtivar.TextColor3 = Color3.fromRGB(255, 255, 255)
     btnAtivar.TextSize = 18
@@ -392,33 +407,76 @@ local function criarGUIAtivacao()
     btnAtivar.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
     btnAtivar.BackgroundTransparency = 0.15
     btnAtivar.BorderSizePixel = 0
-    btnAtivar.Parent = frame
+    btnAtivar.Parent = conteudo
     local btnCorner = Instance.new("UICorner")
     btnCorner.CornerRadius = UDim.new(0, 10)
     btnCorner.Parent = btnAtivar
-    
+
+    -- Botão Get Key
+    local btnGetKey = Instance.new("TextButton")
+    btnGetKey.Size = UDim2.new(0.35, 0, 0, 45)
+    btnGetKey.Position = UDim2.new(0.55, 0, 0.30, 0)
+    btnGetKey.Text = "🔗 OBTER KEY"
+    btnGetKey.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnGetKey.TextSize = 16
+    btnGetKey.Font = Enum.Font.GothamBold
+    btnGetKey.BackgroundColor3 = Color3.fromRGB(45, 150, 200)
+    btnGetKey.BackgroundTransparency = 0.15
+    btnGetKey.BorderSizePixel = 0
+    btnGetKey.Parent = conteudo
+    local btnGetKeyCorner = Instance.new("UICorner")
+    btnGetKeyCorner.CornerRadius = UDim.new(0, 10)
+    btnGetKeyCorner.Parent = btnGetKey
+
+    btnGetKey.MouseButton1Click:Connect(function()
+        local proxKey = nil
+        for _, item in pairs(KEYS_SEQUENCIA) do
+            if not item.usada then
+                proxKey = item
+                break
+            end
+        end
+        if proxKey then
+            local link = proxKey.link
+            local sucesso = pcall(function()
+                setclipboard(link)
+            end)
+            if sucesso then
+                status.Text = "✅ Link copiado! Compartilhe com alguém."
+                status.TextColor3 = Color3.fromRGB(100, 255, 100)
+            else
+                status.Text = "📋 Link: " .. link
+                status.TextColor3 = Color3.fromRGB(255, 200, 100)
+            end
+        else
+            status.Text = "❌ Nenhuma key disponível!"
+            status.TextColor3 = Color3.fromRGB(255, 100, 100)
+        end
+    end)
+
+    -- Status
     local status = Instance.new("TextLabel")
     status.Size = UDim2.new(1, 0, 0, 25)
-    status.Position = UDim2.new(0, 0, 0.62, 0)
+    status.Position = UDim2.new(0, 0, 0.42, 0)
     status.Text = "💡 Digite sua key e clique em ATIVAR"
     status.TextColor3 = Color3.fromRGB(150, 150, 150)
     status.TextSize = 13
     status.Font = Enum.Font.Gotham
     status.BackgroundTransparency = 1
-    status.Parent = frame
-    
+    status.Parent = conteudo
+
     local linkFrame = Instance.new("Frame")
     linkFrame.Size = UDim2.new(0.9, 0, 0, 60)
-    linkFrame.Position = UDim2.new(0.05, 0, 0.72, 0)
+    linkFrame.Position = UDim2.new(0.05, 0, 0.50, 0)
     linkFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
     linkFrame.BackgroundTransparency = 0.2
     linkFrame.BorderSizePixel = 0
     linkFrame.Visible = false
-    linkFrame.Parent = frame
+    linkFrame.Parent = conteudo
     local linkCorner = Instance.new("UICorner")
     linkCorner.CornerRadius = UDim.new(0, 8)
     linkCorner.Parent = linkFrame
-    
+
     local linkLabel = Instance.new("TextLabel")
     linkLabel.Size = UDim2.new(1, 0, 0, 20)
     linkLabel.Position = UDim2.new(0, 0, 0.05, 0)
@@ -428,7 +486,7 @@ local function criarGUIAtivacao()
     linkLabel.Font = Enum.Font.GothamBold
     linkLabel.BackgroundTransparency = 1
     linkLabel.Parent = linkFrame
-    
+
     local linkTexto = Instance.new("TextLabel")
     linkTexto.Size = UDim2.new(1, 0, 0, 25)
     linkTexto.Position = UDim2.new(0, 0, 0.35, 0)
@@ -438,7 +496,7 @@ local function criarGUIAtivacao()
     linkTexto.Font = Enum.Font.Gotham
     linkTexto.BackgroundTransparency = 1
     linkTexto.Parent = linkFrame
-    
+
     local linkInstrucao = Instance.new("TextLabel")
     linkInstrucao.Size = UDim2.new(1, 0, 0, 15)
     linkInstrucao.Position = UDim2.new(0, 0, 0.70, 0)
@@ -448,7 +506,7 @@ local function criarGUIAtivacao()
     linkInstrucao.Font = Enum.Font.Gotham
     linkInstrucao.BackgroundTransparency = 1
     linkInstrucao.Parent = linkFrame
-    
+
     local btnCopiar = Instance.new("TextButton")
     btnCopiar.Size = UDim2.new(0.3, 0, 0, 25)
     btnCopiar.Position = UDim2.new(0.6, 0, 0.35, 0)
@@ -472,7 +530,7 @@ local function criarGUIAtivacao()
             btnCopiar.Text = "📋 COPIAR LINK"
         end
     end)
-    
+
     btnAtivar.MouseButton1Click:Connect(function()
         local key = keyBox.Text
         if key == "" then
@@ -480,19 +538,19 @@ local function criarGUIAtivacao()
             status.TextColor3 = Color3.fromRGB(255, 100, 100)
             return
         end
-        
+
         local valida, mensagem = verificarKey(key)
-        
+
         if valida then
             status.Text = "✅ KEY VÁLIDA! Ativando DAVI HUB..."
             status.TextColor3 = Color3.fromRGB(100, 255, 100)
             btnAtivar.Text = "✅ ATIVADO!"
             btnAtivar.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
-            
+
             local proximoLink = marcarKeyUsada(key)
             player:SetAttribute("DAVI_KEY", key)
             keyValidada = true
-            
+
             if proximoLink then
                 linkFrame.Visible = true
                 linkTexto.Text = proximoLink
@@ -507,10 +565,9 @@ local function criarGUIAtivacao()
                 btnCopiar.Visible = false
                 print("🎉 TODAS AS KEYS FORAM DISTRIBUÍDAS!")
             end
-            
             task.wait(1.5)
             gui:Destroy()
-            
+
             if todasKeysAcabaram() then
                 criarGUIAvisar()
             else
@@ -522,18 +579,22 @@ local function criarGUIAtivacao()
             keyBox.Text = ""
         end
     end)
-    
+
     keyBox.FocusLost:Connect(function(enterPressed)
         if enterPressed then
-            local key = keyBox.Text
-            if key ~= "" then
-                local valida, mensagem = verificarKey(key)
-                status.Text = valida and "✅ KEY VÁLIDA! Clique em ATIVAR." or mensagem
-                status.TextColor3 = valida and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
-            end
+            btnAtivar.MouseButton1Click:Fire()
         end
     end)
-    
+
+    keyBox.FocusLost:Connect(function()
+        local key = keyBox.Text
+        if key ~= "" then
+            local valida, mensagem = verificarKey(key)
+            status.Text = valida and "✅ KEY VÁLIDA! Clique em ATIVAR." or mensagem
+            status.TextColor3 = valida and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+        end
+    end)
+
     return gui
 end
 
@@ -559,8 +620,7 @@ if isAtivado() then
 else
     print("🔑 Aguardando ativação da key...")
     criarGUIAtivacao()
-    
-    -- 🔒 TRAVA O SCRIPT ATÉ A KEY SER VALIDADA
+
     while not keyValidada do
         task.wait(0.5)
         local guiExists = false
@@ -572,15 +632,83 @@ else
         end
         if not guiExists and not keyValidada then
             print("❌ Ativação cancelada.")
-            return -- SAI DO SCRIPT
+            return
         end
     end
 end
 
 -- ============================================================
 -- 👆 SISTEMA DE KEY TERMINA AQUI
--- =====================
- 
+-- ============================================================
+
+-- ============================================================
+-- CRIA GUI (SEM FUNDO PRETO)
+-- ============================================================
+local gui = Instance.new("ScreenGui")
+gui.Name = "DaviHub"
+gui.Parent = player:WaitForChild("PlayerGui")
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+
+-- JANELA PRINCIPAL (CENTRO)
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 480, 0, 500)
+mainFrame.Position = UDim2.new(0.5, -240, 0.15, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+mainFrame.BackgroundTransparency = 0.1
+mainFrame.BorderSizePixel = 0
+mainFrame.ClipsDescendants = true
+mainFrame.Parent = gui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 16)
+corner.Parent = mainFrame
+
+local border = Instance.new("UIStroke")
+border.Color = Color3.fromRGB(255, 140, 0)
+border.Thickness = 2
+border.Transparency = 0.4
+border.Parent = mainFrame
+
+-- ============================================================
+-- BOTÃO EMBAIXO DA GUI (ALÇA PARA ARRASTAR)
+-- ============================================================
+local moverBtn = Instance.new("TextButton")
+moverBtn.Name = "MoverBtn"
+moverBtn.Size = UDim2.new(0.4, 0, 0, 25)
+moverBtn.Position = UDim2.new(0.3, 0, 1, -10)
+moverBtn.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+moverBtn.BackgroundTransparency = 0.3
+moverBtn.Text = "≡≡≡"
+moverBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+moverBtn.TextSize = 14
+moverBtn.Font = Enum.Font.GothamBold
+moverBtn.BorderSizePixel = 0
+moverBtn.ZIndex = 10
+moverBtn.Parent = mainFrame
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 10)
+btnCorner.Parent = moverBtn
+
+moverBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+moverBtn.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
 -- ============================================================
 -- CABEÇALHO (ARRASTÁVEL)
 -- ============================================================
@@ -657,7 +785,7 @@ closeBtn.MouseButton1Click:Connect(function()
 end)
 
 -- ============================================================
--- ARRASTAR
+-- ARRASTAR (CABEÇALHO)
 -- ============================================================
 local dragging = false
 local dragInput, dragStart, startPos
@@ -701,7 +829,6 @@ contentFrame.Size = UDim2.new(1, 0, 1, -45)
 contentFrame.Position = UDim2.new(0, 0, 0, 45)
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = mainFrame
-
 -- ============================================================
 -- ABAS LATERAIS
 -- ============================================================
@@ -975,7 +1102,6 @@ local function addSlider(parent, text, callback, min, max, default)
         callback(val)
         l.Text = text .. " (" .. tostring(val) .. ")"
     end
-
     sb.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             dragging = true
@@ -1206,7 +1332,6 @@ local function GrabJerryCan()
     task.wait(0.25)
     char.HumanoidRootPart.CFrame = OC
 end
-
 -- ============================================================
 -- NIGHT 2
 -- ============================================================
@@ -1275,6 +1400,7 @@ spawn(function()
         end
     end
 end)
+
 local function AntiVentPests()
     local grids = workspace:FindFirstChild("Grids")
     if not grids then return end
@@ -1301,7 +1427,6 @@ local function EscapeSnatch()
         RS.Remotes.EscapeSnatch:FireServer()
     end
 end
-
 -- ============================================================
 -- AUTO SAFE SPOT
 -- ============================================================
@@ -1358,6 +1483,7 @@ local function startAutoSafe(v)
         autoSafeLoop = RunService.Stepped:Connect(checkAndTeleport)
     end
 end
+
 -- ============================================================
 -- AIMBOT
 -- ============================================================
@@ -1442,7 +1568,6 @@ RunService:BindToRenderStep("AimbotNPC", Enum.RenderPriority.Camera.Value + 1, f
         end
     end
 end)
-
 local function AutoMunicao()
     local char = player.Character or player.CharacterAdded:Wait()
     local root = char:WaitForChild("HumanoidRootPart")
@@ -1470,7 +1595,7 @@ end
 -- ============================================================
 local espPlayers = {}
 local espMonster = {}
-       
+
 local function toggleESPPlayers(v)
     for _, h in pairs(espPlayers) do if h then h:Destroy() end end
     espPlayers = {}
@@ -1522,16 +1647,22 @@ workspace.ChildAdded:Connect(function(child)
         task.wait(0.5); refreshMonsters()
     end
 end)
+
 -- ============================================================
 -- CONSTRUÇÃO DAS ABAS
 -- ============================================================
-
 -- ABA: MENU
 local menuFrame = abaFramesMap["Menu"]
 local menuCard = addCard(menuFrame)
 addLabel(menuCard, "✦ BEM-VINDO AO DAVI HUB", Color3.fromRGB(255, 255, 255))
 addLabel(menuCard, "Selecione uma aba ao lado", Color3.fromRGB(200, 200, 200))
 addLabel(menuCard, "Versão 2.0", Color3.fromRGB(150, 150, 150))
+
+-- ABA: FEEDBACK (COM SISTEMA DE FEEDBACK)
+local feedbackFrame = abaFramesMap["Menu"]  -- Adiciona na aba MENU
+addButton(menuCard, "📩 Enviar Feedback", function()
+    abrirFeedback()
+end)
 
 -- ABA: CHARACTER (COM NOCLIP)
 local charFrame = abaFramesMap["Char"]
@@ -1608,101 +1739,81 @@ addLabel(autoCard, "⚡ AUTO")
 addToggle(autoCard, "Auto Safe Spot", startAutoSafe, false)
 
 -- ============================================================
--- FORÇA ATUALIZAÇÃO DO SCROLL
--- ============================================================
-task.wait(0.5)
-for _, frame in pairs(abaFrames) do
-    local flayout = frame:FindFirstChildWhichIsA("UIListLayout")
-    if flayout then
-        frame.CanvasSize = UDim2.new(0, 0, 0, flayout.AbsoluteContentSize.Y + 20)
-    end
-end
--- ============================================================
--- SISTEMA DE FEEDBACK - DAVI HUB
+-- SISTEMA DE FEEDBACK
 -- ============================================================
 
-local player = game.Players.LocalPlayer
-local UserInputService = game:GetService("UserInputService")
+local WEBHOOK_FEEDBACK = "https://discord.com/api/webhooks/1524546983799427194/WyTosfrV6Opc1MPOpmTJmYNlCzBu0gpRSJ89dUnqcNVYbqJ373-tCfTLUMBgOTidUEh3"
 
--- ============================================================
--- CONFIGURAÇÃO (SEU WEBHOOK DO DISCORD)
--- ============================================================
-local WEBHOOK_URL = "https://discord.com/api/webhooks/1524546983799427194/WyTosfrV6Opc1MPOpmTJmYNlCzBu0gpRSJ89dUnqcNVYbqJ373-tCfTLUMBgOTidUEh3"
+local CATEGORIAS = {
+    {nome = "🐛 Bug Report", cor = 16711680},
+    {nome = "💡 Sugestão", cor = 65280},
+    {nome = "⭐ Elogio", cor = 16776960},
+    {nome = "⚠️ Crítica", cor = 16753920},
+    {nome = "❓ Dúvida", cor = 65535},
+    {nome = "📱 Nova Função", cor = 16711935},
+    {nome = "⚡ Performance", cor = 16777215},
+    {nome = "📖 Tutorial", cor = 16777215},
+    {nome = "🔧 Suporte", cor = 16777215},
+    {nome = "❌ Abuso/Report", cor = 16711680},
+    {nome = "📊 Estatísticas", cor = 16776960},
+    {nome = "🎮 Experiência", cor = 16776960},
+}
 
--- ============================================================
--- FUNÇÃO PARA ENVIAR FEEDBACK
--- ============================================================
-local function enviarFeedback(usuario, mensagem, tipo)
+local function enviarFeedback(usuario, mensagem, categoria)
     local data = {
         ["embeds"] = {{
             ["title"] = "📩 NOVO FEEDBACK - DAVI HUB",
             ["color"] = 16753920,
             ["fields"] = {
                 {["name"] = "👤 Usuário", ["value"] = usuario or "Desconhecido", ["inline"] = true},
-                {["name"] = "📌 Tipo", ["value"] = tipo or "Geral", ["inline"] = true},
+                {["name"] = "📌 Categoria", ["value"] = categoria or "Geral", ["inline"] = true},
                 {["name"] = "📝 Mensagem", ["value"] = mensagem or "Sem mensagem", ["inline"] = false},
                 {["name"] = "🆔 UserID", ["value"] = tostring(player.UserId), ["inline"] = true},
                 {["name"] = "🌐 Servidor", ["value"] = game.JobId or "N/A", ["inline"] = true},
-                {["name"] = "📅 Data", ["value"] = os.date("%d/%m/%Y %H:%M:%S"), ["inline"] = true}
+                {["name"] = "📅 Data", ["value"] = os.date("%d/%m/%Y %H:%M:%S"), ["inline"] = true},
+                {["name"] = "📋 Versão", ["value"] = "DAVI HUB v2.0", ["inline"] = true},
+                {["name"] = "💻 Executor", ["value"] = identifyexecutor and identifyexecutor() or "Desconhecido", ["inline"] = true},
             },
-            ["footer"] = {["text"] = "DAVI HUB - Sistema de Feedback"},
+            ["footer"] = {["text"] = "DAVI HUB - Sistema de Feedback v2.0"},
             ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S.000Z")
         }}
     }
-
-    local json = game:GetService("HttpService"):JSONEncode(data)
-    
+    local json = HttpService:JSONEncode(data)
     pcall(function()
         local request = syn and syn.request or request or http_request
         if request then
-            request({
-                Url = WEBHOOK_URL,
-                Method = "POST",
-                Headers = {["Content-Type"] = "application/json"},
-                Body = json
-            })
-            print("✅ Feedback enviado com sucesso!")
+            request({Url = WEBHOOK_FEEDBACK, Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = json})
         end
     end)
 end
 
--- ============================================================
--- CRIAR GUI DE FEEDBACK
--- ============================================================
 local function criarGUIFeedback()
-    -- Remove GUI antiga se existir
-    for _, v in pairs(player.PlayerGui:GetChildren()) do
-        if v.Name == "FeedbackGUI" then v:Destroy() end
-    end
-    
+    for _, v in pairs(player.PlayerGui:GetChildren()) do if v.Name == "FeedbackGUI" then v:Destroy() end end
     local gui = Instance.new("ScreenGui")
     gui.Name = "FeedbackGUI"
     gui.Parent = player.PlayerGui
     gui.ResetOnSpawn = false
     gui.IgnoreGuiInset = true
-    
-    -- Fundo
+
     local fundo = Instance.new("Frame")
     fundo.Size = UDim2.new(1, 0, 1, 0)
     fundo.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     fundo.BackgroundTransparency = 0.5
     fundo.Parent = gui
-    
-    -- Janela
+
     local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 450, 0, 400)
-    frame.Position = UDim2.new(0.5, -225, 0.5, -200)
+    frame.Size = UDim2.new(0, 480, 0, 420)
+    frame.Position = UDim2.new(0.5, -240, 0.5, -210)
     frame.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
     frame.BackgroundTransparency = 0.05
     frame.BorderSizePixel = 0
     frame.ClipsDescendants = true
     frame.Parent = fundo
-    
+
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 16)
     corner.Parent = frame
-    
-    -- Título
+
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, 0, 0, 50)
     title.Text = "📩 Enviar Feedback"
@@ -1712,12 +1823,10 @@ local function criarGUIFeedback()
     title.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
     title.BackgroundTransparency = 0.2
     title.Parent = frame
-    
     local titleCorner = Instance.new("UICorner")
     titleCorner.CornerRadius = UDim.new(0, 16)
     titleCorner.Parent = title
-    
-    -- Fechar
+
     local close = Instance.new("TextButton")
     close.Size = UDim2.new(0, 30, 0, 30)
     close.Position = UDim2.new(1, -40, 0, 10)
@@ -1728,88 +1837,97 @@ local function criarGUIFeedback()
     close.BackgroundTransparency = 0.3
     close.BorderSizePixel = 0
     close.Parent = title
-    
     local closeCorner = Instance.new("UICorner")
     closeCorner.CornerRadius = UDim.new(0, 8)
     closeCorner.Parent = close
     close.MouseButton1Click:Connect(function() gui:Destroy() end)
-    
-    -- Tipo de Feedback
-    local labelTipo = Instance.new("TextLabel")
-    labelTipo.Size = UDim2.new(0.4, 0, 0, 25)
-    labelTipo.Position = UDim2.new(0.05, 0, 0.16, 0)
-    labelTipo.Text = "📌 Tipo:"
-    labelTipo.TextColor3 = Color3.fromRGB(200, 200, 200)
-    labelTipo.TextSize = 14
-    labelTipo.Font = Enum.Font.GothamBold
-    labelTipo.BackgroundTransparency = 1
-    labelTipo.TextXAlignment = Enum.TextXAlignment.Left
-    labelTipo.Parent = frame
-    
-    local tipos = {"Sugestão", "Bug Report", "Elogio", "Crítica", "Dúvida", "Outro"}
-    local tipoAtual = 1
-    
+
+    local labelCategoria = Instance.new("TextLabel")
+    labelCategoria.Size = UDim2.new(0.35, 0, 0, 25)
+    labelCategoria.Position = UDim2.new(0.05, 0, 0.16, 0)
+    labelCategoria.Text = "📌 Categoria:"
+    labelCategoria.TextColor3 = Color3.fromRGB(200, 200, 200)
+    labelCategoria.TextSize = 14
+    labelCategoria.Font = Enum.Font.GothamBold
+    labelCategoria.BackgroundTransparency = 1
+    labelCategoria.TextXAlignment = Enum.TextXAlignment.Left
+    labelCategoria.Parent = frame
+
+    local categoriaAtual = 1
+    local dropdownVisible = false
+
     local dropBtn = Instance.new("TextButton")
-    dropBtn.Size = UDim2.new(0.45, 0, 0, 30)
-    dropBtn.Position = UDim2.new(0.50, 0, 0.16, 0)
-    dropBtn.Text = tipos[1]
+    dropBtn.Size = UDim2.new(0.50, 0, 0, 30)
+    dropBtn.Position = UDim2.new(0.45, 0, 0.16, 0)
+    dropBtn.Text = CATEGORIAS[1].nome
     dropBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    dropBtn.TextSize = 14
+    dropBtn.TextSize = 13
+    dropBtn.Font = Enum.Font.GothamBold
     dropBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
     dropBtn.BackgroundTransparency = 0.2
     dropBtn.BorderSizePixel = 0
     dropBtn.Parent = frame
-    
     local dropCorner = Instance.new("UICorner")
     dropCorner.CornerRadius = UDim.new(0, 8)
     dropCorner.Parent = dropBtn
-    
-    local dropMenu = Instance.new("Frame")
-    dropMenu.Size = UDim2.new(0.45, 0, 0, 0)
-    dropMenu.Position = UDim2.new(0.50, 0, 0.22, 0)
+
+    local dropMenu = Instance.new("ScrollingFrame")
+    dropMenu.Size = UDim2.new(0.50, 0, 0, 0)
+    dropMenu.Position = UDim2.new(0.45, 0, 0.22, 0)
     dropMenu.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
     dropMenu.BackgroundTransparency = 0.1
     dropMenu.BorderSizePixel = 0
     dropMenu.ClipsDescendants = true
     dropMenu.Visible = false
+    dropMenu.ScrollBarThickness = 4
     dropMenu.Parent = frame
-    
     local dropCorner2 = Instance.new("UICorner")
     dropCorner2.CornerRadius = UDim.new(0, 8)
     dropCorner2.Parent = dropMenu
-    
-    for i, tipo in pairs(tipos) do
+
+    local dropLayout = Instance.new("UIListLayout")
+    dropLayout.Padding = UDim.new(0, 2)
+    dropLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    dropLayout.Parent = dropMenu
+
+    for i, cat in pairs(CATEGORIAS) do
         local opt = Instance.new("TextButton")
         opt.Size = UDim2.new(1, 0, 0, 30)
-        opt.Text = tipo
+        opt.Text = cat.nome
         opt.TextColor3 = Color3.fromRGB(255, 255, 255)
-        opt.TextSize = 14
+        opt.TextSize = 13
         opt.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
         opt.BackgroundTransparency = 0.2
         opt.BorderSizePixel = 0
         opt.Parent = dropMenu
-        
         local optCorner = Instance.new("UICorner")
         optCorner.CornerRadius = UDim.new(0, 6)
         optCorner.Parent = opt
-        
         opt.MouseButton1Click:Connect(function()
-            tipoAtual = i
-            dropBtn.Text = tipos[i]
+            categoriaAtual = i
+            dropBtn.Text = CATEGORIAS[i].nome
+            dropdownVisible = false
             dropMenu.Visible = false
-            dropMenu.Size = UDim2.new(0.45, 0, 0, 0)
+            dropMenu.Size = UDim2.new(0.50, 0, 0, 0)
         end)
     end
-    
+
     dropBtn.MouseButton1Click:Connect(function()
-        dropMenu.Visible = not dropMenu.Visible
-        dropMenu.Size = dropMenu.Visible and UDim2.new(0.45, 0, 0, #tipos * 32) or UDim2.new(0.45, 0, 0, 0)
+        dropdownVisible = not dropdownVisible
+        dropMenu.Visible = dropdownVisible
+        if dropdownVisible then
+            local totalHeight = #CATEGORIAS * 32
+            local maxHeight = 160
+            dropMenu.Size = UDim2.new(0.50, 0, 0, math.min(totalHeight, maxHeight))
+            dropMenu.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+        else
+            dropMenu.Size = UDim2.new(0.50, 0, 0, 0)
+        end
     end)
-    
-    -- Mensagem
+
     local labelMsg = Instance.new("TextLabel")
     labelMsg.Size = UDim2.new(0.9, 0, 0, 25)
-    labelMsg.Position = UDim2.new(0.05, 0, 0.28, 0)
+    labelMsg.Position = UDim2.new(0.05, 0, 0.30, 0)
     labelMsg.Text = "📝 Mensagem:"
     labelMsg.TextColor3 = Color3.fromRGB(200, 200, 200)
     labelMsg.TextSize = 14
@@ -1817,10 +1935,10 @@ local function criarGUIFeedback()
     labelMsg.BackgroundTransparency = 1
     labelMsg.TextXAlignment = Enum.TextXAlignment.Left
     labelMsg.Parent = frame
-    
+
     local msgBox = Instance.new("TextBox")
     msgBox.Size = UDim2.new(0.9, 0, 0, 110)
-    msgBox.Position = UDim2.new(0.05, 0, 0.35, 0)
+    msgBox.Position = UDim2.new(0.05, 0, 0.37, 0)
     msgBox.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
     msgBox.BackgroundTransparency = 0.2
     msgBox.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -1833,15 +1951,13 @@ local function criarGUIFeedback()
     msgBox.ClearTextOnFocus = true
     msgBox.BorderSizePixel = 0
     msgBox.Parent = frame
-    
     local msgCorner = Instance.new("UICorner")
     msgCorner.CornerRadius = UDim.new(0, 8)
     msgCorner.Parent = msgBox
-    
-    -- Botões
+
     local btnEnviar = Instance.new("TextButton")
     btnEnviar.Size = UDim2.new(0.4, 0, 0, 40)
-    btnEnviar.Position = UDim2.new(0.05, 0, 0.72, 0)
+    btnEnviar.Position = UDim2.new(0.05, 0, 0.75, 0)
     btnEnviar.Text = "📤 Enviar"
     btnEnviar.TextColor3 = Color3.fromRGB(255, 255, 255)
     btnEnviar.TextSize = 16
@@ -1850,14 +1966,13 @@ local function criarGUIFeedback()
     btnEnviar.BackgroundTransparency = 0.2
     btnEnviar.BorderSizePixel = 0
     btnEnviar.Parent = frame
-    
     local btnCorner = Instance.new("UICorner")
     btnCorner.CornerRadius = UDim.new(0, 8)
     btnCorner.Parent = btnEnviar
-    
+
     local btnCancelar = Instance.new("TextButton")
     btnCancelar.Size = UDim2.new(0.4, 0, 0, 40)
-    btnCancelar.Position = UDim2.new(0.55, 0, 0.72, 0)
+    btnCancelar.Position = UDim2.new(0.55, 0, 0.75, 0)
     btnCancelar.Text = "❌ Cancelar"
     btnCancelar.TextColor3 = Color3.fromRGB(255, 255, 255)
     btnCancelar.TextSize = 16
@@ -1866,23 +1981,21 @@ local function criarGUIFeedback()
     btnCancelar.BackgroundTransparency = 0.2
     btnCancelar.BorderSizePixel = 0
     btnCancelar.Parent = frame
-    
     local btnCancelarCorner = Instance.new("UICorner")
     btnCancelarCorner.CornerRadius = UDim.new(0, 8)
     btnCancelarCorner.Parent = btnCancelar
     btnCancelar.MouseButton1Click:Connect(function() gui:Destroy() end)
-    
-    -- Status
+
     local statusLabel = Instance.new("TextLabel")
     statusLabel.Size = UDim2.new(0.9, 0, 0, 25)
-    statusLabel.Position = UDim2.new(0.05, 0, 0.85, 0)
-    statusLabel.Text = "✅ Pronto para enviar!"
+    statusLabel.Position = UDim2.new(0.05, 0, 0.88, 0)
+    statusLabel.Text = "✅ Selecione uma categoria e escreva sua mensagem!"
     statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
     statusLabel.TextSize = 13
     statusLabel.Font = Enum.Font.Gotham
     statusLabel.BackgroundTransparency = 1
     statusLabel.Parent = frame
-    
+
     btnEnviar.MouseButton1Click:Connect(function()
         local mensagem = msgBox.Text
         if mensagem == "" or mensagem == "Escreva sua mensagem aqui..." then
@@ -1890,10 +2003,10 @@ local function criarGUIFeedback()
             statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
             return
         end
-        
+        local categoria = CATEGORIAS[categoriaAtual].nome
         statusLabel.Text = "⏳ Enviando..."
         statusLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
-        enviarFeedback(player.Name, mensagem, tipos[tipoAtual])
+        enviarFeedback(player.Name, mensagem, categoria)
         statusLabel.Text = "✅ Feedback enviado! Obrigado! 🙏"
         statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
         msgBox.Text = ""
@@ -1902,18 +2015,25 @@ local function criarGUIFeedback()
         task.wait(2)
         gui:Destroy()
     end)
+
+    msgBox.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            btnEnviar.MouseButton1Click:Fire()
+        end
+    end)
 end
 
--- ============================================================
--- FUNÇÃO PARA ABRIR FEEDBACK
--- ============================================================
 local function abrirFeedback()
     criarGUIFeedback()
 end
 
 -- ============================================================
--- ADICIONAR BOTÃO NA ABA MENU
+-- FORÇA ATUALIZAÇÃO DO SCROLL
 -- ============================================================
-addButton(menuCard, "📩 Enviar Feedback", abrirFeedback)
-
-print("✅ Sistema de Feedback carregado!")
+task.wait(0.5)
+for _, frame in pairs(abaFrames) do
+    local flayout = frame:FindFirstChildWhichIsA("UIListLayout")
+    if flayout then
+        frame.CanvasSize = UDim2.new(0, 0, 0, flayout.AbsoluteContentSize.Y + 20)
+    end
+end
