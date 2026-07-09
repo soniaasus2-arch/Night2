@@ -9,8 +9,7 @@ local HttpService = game:GetService("HttpService")
 -- Verifica se o jogador atual é o criador
 local isDeveloper = (player.Name == "daviroblox2023r")
 
-if is Developer then
-    -- Se for o criador, pula o sistema de key
+if isDeveloper then
     print("👑 Desenvolvedor detectado! Pulando sistema de key...")
     keyValidada = true
     player:SetAttribute("DAVI_KEY", "DEV_ACCESS")
@@ -32,27 +31,14 @@ else
             if v.Name == "KeySystem" or v.Name == "AvisarGUI" then
                 guiExists = true
                 break
-end
-
--- Se chegou aqui, é porque NÃO é o desenvolvedor
-if isAtivado() then
-    print("✅ DAVI HUB já está ativado! Continuando...")
-else
-    print("🔑 Aguardando ativação da key...")
-    criarGUIAtivacao()
-
-    while not keyValidada do
-        task.wait(0.5)
-        local guiExists = false
-        for _, v in pairs(player.PlayerGui:GetChildren()) do
-            if v.Name == "KeySystem" or v.Name == "AvisarGUI" then
-                guiExists = true
-                break
             end
         end
         if not guiExists and not keyValidada then
             print("❌ Ativação cancelada.")
             return
+        end
+    end
+end
         end
     end
 end
