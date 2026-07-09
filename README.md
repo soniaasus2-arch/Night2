@@ -36,7 +36,7 @@ else
     -- Se não for o criador, executa o sistema de key normalmente
     if isAtivado() then
         print("✅ DAVI HUB já está ativado! Continuando...")
-    else
+    retorn
         print("🔑 Aguardando ativação da key...")
         criarGUIAtivacao()
 
