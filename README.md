@@ -8,16 +8,23 @@ local RS = game.ReplicatedStorage
 local HttpService = game:GetService("HttpService")
 -- Verifica se o jogador atual é o criador
 local isDeveloper = (player.Name == "daviroblox2023r")
+-- ============================================================
+-- 🔒 BLOQUEIA O SCRIPT ATÉ A KEY SER VALIDADA
+-- ============================================================
 
-if isDeveloper then
-    print("👑 Desenvolvedor detectado! Pulando sistema de key...")
-    keyValidada = true
-    player:SetAttribute("DAVI_KEY", "DEV_ACCESS")
-    print("✅ DAVI HUB iniciado em modo desenvolvedor!")
-    return
+local function isAtivado()
+    local keySalva = player:GetAttribute("DAVI_KEY")
+    if keySalva then
+        for _, item in pairs(KEYS_SEQUENCIA) do
+            if item.key == keySalva and not item.usada then
+                item.usada = true
+                return true
+            end
+        end
+    end
+    return false
 end
 
--- Se chegou aqui, é porque NÃO é o desenvolvedor
 if isAtivado() then
     print("✅ DAVI HUB já está ativado! Continuando...")
 else
@@ -39,19 +46,6 @@ else
         end
     end
 end
-        end
-    end
-end
-        for _, item in pairs(KEYS_SEQUENCIA) do
-            if item.key == keySalva and not item.usada then
-                item.usada = true
-                return true
-            end
-        end
-    end
-    return false
-end
-
 
 
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1524546983799427194/WyTosfrV6Opc1MPOpmTJmYNlCzBu0gpRSJ89dUnqcNVYbqJ373-tCfTLUMBgOTidUEh3"
