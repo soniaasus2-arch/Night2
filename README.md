@@ -1546,6 +1546,324 @@ local function toggleESPPlayers(v)
         end
     end
 end
+-- ============================================================
+-- SISTEMA DE FEEDBACK (ENVIA PARA O WEBHOOK DO DISCORD)
+-- ============================================================
+
+local CATEGORIAS_FEEDBACK = {
+    "🐛 Bug Report",
+    "💡 Sugestão",
+    "⭐ Elogio",
+    "⚠️ Crítica",
+    "❓ Dúvida",
+    "📱 Nova Função",
+    "⚡ Performance",
+    "📖 Tutorial",
+    "🔧 Suporte",
+    "❌ Abuso/Report",
+    "📊 Estatísticas",
+    "🎮 Experiência",
+}
+
+local function enviarFeedback(usuario, mensagem, categoria)
+    local data = {
+        ["embeds"] = {{
+            ["title"] = "📩 NOVO FEEDBACK - DAVI HUB",
+            ["color"] = 16753920,
+            ["fields"] = {
+                {["name"] = "👤 Usuário", ["value"] = usuario or "Desconhecido", ["inline"] = true},
+                {["name"] = "📌 Categoria", ["value"] = categoria or "Geral", ["inline"] = true},
+                {["name"] = "📝 Mensagem", ["value"] = mensagem or "Sem mensagem", ["inline"] = false},
+                {["name"] = "🆔 UserID", ["value"] = tostring(player.UserId), ["inline"] = true},
+                {["name"] = "🌐 Servidor", ["value"] = game.JobId or "N/A", ["inline"] = true},
+                {["name"] = "📅 Data", ["value"] = os.date("%d/%m/%Y %H:%M:%S"), ["inline"] = true},
+            },
+            ["footer"] = {["text"] = "DAVI HUB - Sistema de Feedback"},
+            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S.000Z")
+        }}
+    }
+    local json = HttpService:JSONEncode(data)
+    pcall(function()
+        local request = syn and syn.request or request or http_request
+        if request then
+            request({Url = WEBHOOK_URL, Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = json})
+        end
+    end)
+end
+
+local function criarGUIFeedback()
+    for _, v in pairs(player.PlayerGui:GetChildren()) do
+        if v.Name == "FeedbackGUI" then v:Destroy() end
+    end
+
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "FeedbackGUI"
+    gui.Parent = player.PlayerGui
+    gui.ResetOnSpawn = false
+    gui.IgnoreGuiInset = true
+
+    local fundo = Instance.new("Frame")
+    fundo.Size = UDim2.new(1, 0, 1, 0)
+    fundo.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    fundo.BackgroundTransparency = 0.5
+    fundo.Parent = gui
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 450, 0, 380)
+    frame.Position = UDim2.new(0.5, -225, 0.5, -190)
+    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
+    frame.BackgroundTransparency = 0.05
+    frame.BorderSizePixel = 0
+    frame.ClipsDescendants = true
+    frame.Parent = fundo
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 16)
+    corner.Parent = frame
+
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(255, 140, 0)
+    border.Thickness = 2
+    border.Transparency = 0.3
+    border.Parent = frame
+
+    -- Título
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 45)
+    title.Text = "📩 ENVIAR FEEDBACK"
+    title.TextColor3 = Color3.fromRGB(255, 200, 50)
+    title.TextSize = 20
+    title.Font = Enum.Font.GothamBold
+    title.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+    title.BackgroundTransparency = 0.15
+    title.Parent = frame
+    
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 16)
+    titleCorner.Parent = title
+
+    -- Fechar
+    local close = Instance.new("TextButton")
+    close.Size = UDim2.new(0, 30, 0, 30)
+    close.Position = UDim2.new(1, -38, 0, 7)
+    close.Text = "✕"
+    close.TextColor3 = Color3.fromRGB(255, 255, 255)
+    close.TextSize = 18
+    close.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+    close.BackgroundTransparency = 0.3
+    close.BorderSizePixel = 0
+    close.Parent = title
+    
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 8)
+    closeCorner.Parent = close
+    close.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+    -- Label: Categoria
+    local labelCategoria = Instance.new("TextLabel")
+    labelCategoria.Size = UDim2.new(0.35, 0, 0, 25)
+    labelCategoria.Position = UDim2.new(0.05, 0, 0.15, 0)
+    labelCategoria.Text = "📌 Categoria:"
+    labelCategoria.TextColor3 = Color3.fromRGB(200, 200, 200)
+    labelCategoria.TextSize = 14
+    labelCategoria.Font = Enum.Font.GothamBold
+    labelCategoria.BackgroundTransparency = 1
+    labelCategoria.TextXAlignment = Enum.TextXAlignment.Left
+    labelCategoria.Parent = frame
+
+    -- Dropdown de categorias
+    local categoriaAtual = 1
+    local dropdownVisible = false
+
+    local dropBtn = Instance.new("TextButton")
+    dropBtn.Size = UDim2.new(0.50, 0, 0, 30)
+    dropBtn.Position = UDim2.new(0.45, 0, 0.15, 0)
+    dropBtn.Text = CATEGORIAS_FEEDBACK[1]
+    dropBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    dropBtn.TextSize = 13
+    dropBtn.Font = Enum.Font.GothamBold
+    dropBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+    dropBtn.BackgroundTransparency = 0.2
+    dropBtn.BorderSizePixel = 0
+    dropBtn.Parent = frame
+    
+    local dropCorner = Instance.new("UICorner")
+    dropCorner.CornerRadius = UDim.new(0, 8)
+    dropCorner.Parent = dropBtn
+
+    local dropMenu = Instance.new("ScrollingFrame")
+    dropMenu.Size = UDim2.new(0.50, 0, 0, 0)
+    dropMenu.Position = UDim2.new(0.45, 0, 0.22, 0)
+    dropMenu.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+    dropMenu.BackgroundTransparency = 0.1
+    dropMenu.BorderSizePixel = 0
+    dropMenu.ClipsDescendants = true
+    dropMenu.Visible = false
+    dropMenu.ScrollBarThickness = 4
+    dropMenu.Parent = frame
+    
+    local dropCorner2 = Instance.new("UICorner")
+    dropCorner2.CornerRadius = UDim.new(0, 8)
+    dropCorner2.Parent = dropMenu
+
+    local dropLayout = Instance.new("UIListLayout")
+    dropLayout.Padding = UDim.new(0, 2)
+    dropLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    dropLayout.Parent = dropMenu
+
+    for i, cat in pairs(CATEGORIAS_FEEDBACK) do
+        local opt = Instance.new("TextButton")
+        opt.Size = UDim2.new(1, 0, 0, 30)
+        opt.Text = cat
+        opt.TextColor3 = Color3.fromRGB(255, 255, 255)
+        opt.TextSize = 13
+        opt.Font = Enum.Font.Gotham
+        opt.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+        opt.BackgroundTransparency = 0.2
+        opt.BorderSizePixel = 0
+        opt.Parent = dropMenu
+        
+        local optCorner = Instance.new("UICorner")
+        optCorner.CornerRadius = UDim.new(0, 6)
+        optCorner.Parent = opt
+        
+        opt.MouseButton1Click:Connect(function()
+            categoriaAtual = i
+            dropBtn.Text = CATEGORIAS_FEEDBACK[i]
+            dropdownVisible = false
+            dropMenu.Visible = false
+            dropMenu.Size = UDim2.new(0.50, 0, 0, 0)
+        end)
+    end
+
+    dropBtn.MouseButton1Click:Connect(function()
+        dropdownVisible = not dropdownVisible
+        dropMenu.Visible = dropdownVisible
+        if dropdownVisible then
+            local totalHeight = #CATEGORIAS_FEEDBACK * 32
+            local maxHeight = 150
+            dropMenu.Size = UDim2.new(0.50, 0, 0, math.min(totalHeight, maxHeight))
+            dropMenu.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+        else
+            dropMenu.Size = UDim2.new(0.50, 0, 0, 0)
+        end
+    end)
+
+    -- Label: Mensagem
+    local labelMsg = Instance.new("TextLabel")
+    labelMsg.Size = UDim2.new(0.9, 0, 0, 25)
+    labelMsg.Position = UDim2.new(0.05, 0, 0.30, 0)
+    labelMsg.Text = "📝 Mensagem:"
+    labelMsg.TextColor3 = Color3.fromRGB(200, 200, 200)
+    labelMsg.TextSize = 14
+    labelMsg.Font = Enum.Font.GothamBold
+    labelMsg.BackgroundTransparency = 1
+    labelMsg.TextXAlignment = Enum.TextXAlignment.Left
+    labelMsg.Parent = frame
+
+    -- Campo de mensagem
+    local msgBox = Instance.new("TextBox")
+    msgBox.Size = UDim2.new(0.9, 0, 0, 100)
+    msgBox.Position = UDim2.new(0.05, 0, 0.37, 0)
+    msgBox.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+    msgBox.BackgroundTransparency = 0.2
+    msgBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    msgBox.TextSize = 14
+    msgBox.Font = Enum.Font.Gotham
+    msgBox.Text = "Escreva sua mensagem aqui..."
+    msgBox.TextWrapped = true
+    msgBox.TextXAlignment = Enum.TextXAlignment.Left
+    msgBox.TextYAlignment = Enum.TextYAlignment.Top
+    msgBox.ClearTextOnFocus = true
+    msgBox.BorderSizePixel = 0
+    msgBox.Parent = frame
+    
+    local msgCorner = Instance.new("UICorner")
+    msgCorner.CornerRadius = UDim.new(0, 8)
+    msgCorner.Parent = msgBox
+
+    -- Botão Enviar
+    local btnEnviar = Instance.new("TextButton")
+    btnEnviar.Size = UDim2.new(0.4, 0, 0, 40)
+    btnEnviar.Position = UDim2.new(0.05, 0, 0.72, 0)
+    btnEnviar.Text = "📤 Enviar"
+    btnEnviar.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnEnviar.TextSize = 16
+    btnEnviar.Font = Enum.Font.GothamBold
+    btnEnviar.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+    btnEnviar.BackgroundTransparency = 0.2
+    btnEnviar.BorderSizePixel = 0
+    btnEnviar.Parent = frame
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 8)
+    btnCorner.Parent = btnEnviar
+
+    -- Botão Cancelar
+    local btnCancelar = Instance.new("TextButton")
+    btnCancelar.Size = UDim2.new(0.4, 0, 0, 40)
+    btnCancelar.Position = UDim2.new(0.55, 0, 0.72, 0)
+    btnCancelar.Text = "❌ Cancelar"
+    btnCancelar.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnCancelar.TextSize = 16
+    btnCancelar.Font = Enum.Font.GothamBold
+    btnCancelar.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+    btnCancelar.BackgroundTransparency = 0.2
+    btnCancelar.BorderSizePixel = 0
+    btnCancelar.Parent = frame
+    
+    local btnCancelarCorner = Instance.new("UICorner")
+    btnCancelarCorner.CornerRadius = UDim.new(0, 8)
+    btnCancelarCorner.Parent = btnCancelar
+    btnCancelar.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+    -- Status
+    local statusLabel = Instance.new("TextLabel")
+    statusLabel.Size = UDim2.new(0.9, 0, 0, 25)
+    statusLabel.Position = UDim2.new(0.05, 0, 0.86, 0)
+    statusLabel.Text = "✅ Selecione uma categoria e escreva sua mensagem!"
+    statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+    statusLabel.TextSize = 13
+    statusLabel.Font = Enum.Font.Gotham
+    statusLabel.BackgroundTransparency = 1
+    statusLabel.Parent = frame
+
+    -- Função do botão Enviar
+    btnEnviar.MouseButton1Click:Connect(function()
+        local mensagem = msgBox.Text
+        if mensagem == "" or mensagem == "Escreva sua mensagem aqui..." then
+            statusLabel.Text = "❌ Digite uma mensagem!"
+            statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+            return
+        end
+        
+        local categoria = CATEGORIAS_FEEDBACK[categoriaAtual]
+        statusLabel.Text = "⏳ Enviando..."
+        statusLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
+        
+        enviarFeedback(player.Name, mensagem, categoria)
+        
+        statusLabel.Text = "✅ Feedback enviado! Obrigado! 🙏"
+        statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+        msgBox.Text = ""
+        btnEnviar.Text = "✅ Enviado!"
+        btnEnviar.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+        
+        task.wait(2)
+        gui:Destroy()
+    end)
+
+    -- Enter para enviar
+    msgBox.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            btnEnviar.MouseButton1Click:Fire()
+        end
+    end)
+end
+
+local function abrirFeedback()
+    criarGUIFeedback()
+end
 
 -- ============================================================
 -- CONSTRUÇÃO DAS ABAS
@@ -1578,6 +1896,23 @@ addLabel(menuCard, "Bem-vindo ao DAVI HUB", Color3.fromRGB(255, 255, 255))
 addLabel(menuCard, "Selecione uma aba ao lado", Color3.fromRGB(200, 200, 200))
 addLabel(menuCard, "Versão 2.0", Color3.fromRGB(150, 150, 150))
 
+-- ABA: MENU
+local menuFrame = abaFramesMap["Menu"]
+local menuCard = addCard(menuFrame)
+addLabel(menuCard, "MENU")
+addLabel(menuCard, "Bem-vindo ao DAVI HUB", Color3.fromRGB(255, 255, 255))
+addLabel(menuCard, "Selecione uma aba ao lado", Color3.fromRGB(200, 200, 200))
+addLabel(menuCard, "Versão 2.0", Color3.fromRGB(150, 150, 150))
+
+-- Botão para ver usuários
+addButton(menuCard, "Ver Usuários do HUB", function()
+    criarGUIUsuarios()
+    mostrarUsuariosConsole()
+end)
+
+addButton(menuCard, "📩 Enviar Feedback", function()
+    abrirFeedback()
+end)
 -- Botão para ver usuários
 addButton(menuCard, "Ver Usuários do HUB", function()
     criarGUIUsuarios()
