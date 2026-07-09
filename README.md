@@ -2026,7 +2026,361 @@ end
 local function abrirFeedback()
     criarGUIFeedback()
 end
+-- ============================================================
+-- SISTEMA DE IDENTIFICAÇÃO DE USUÁRIOS DO DAVI HUB
+-- ============================================================
 
+-- ============================================================
+-- FUNÇÃO PARA IDENTIFICAR USUÁRIOS DO DAVI HUB
+-- ============================================================
+local function identificarUsuarios()
+    local usuarios = {}
+    local jogadores = game.Players:GetPlayers()
+    
+    for _, jogador in pairs(jogadores) do
+        if jogador ~= player then
+            -- Verifica se o jogador tem a GUI do DAVI HUB
+            local sucesso, resultado = pcall(function()
+                local playerGui = jogador:FindFirstChild("PlayerGui")
+                if playerGui then
+                    -- Procura por qualquer GUI com nome relacionado ao DAVI HUB
+                    for _, gui in pairs(playerGui:GetChildren()) do
+                        if gui:IsA("ScreenGui") then
+                            local nome = gui.Name:lower()
+                            if nome:find("davi") or nome:find("hub") or nome:find("davihub") then
+                                table.insert(usuarios, {
+                                    nome = jogador.Name,
+                                    userId = jogador.UserId,
+                                    gui = gui.Name
+                                })
+                                break
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+    
+    return usuarios
+end
+
+-- ============================================================
+-- FUNÇÃO PARA MOSTRAR USUÁRIOS NO CONSOLE
+-- ============================================================
+local function mostrarUsuariosConsole()
+    local usuarios = identificarUsuarios()
+    print("")
+    print("===== 👥 USUÁRIOS DO DAVI HUB NO SERVIDOR =====")
+    
+    if #usuarios == 0 then
+        print("📌 Nenhum outro usuário do DAVI HUB encontrado.")
+        print("💡 Você é o único usando o HUB neste servidor!")
+    else
+        print("📊 Total de usuários: " .. #usuarios)
+        print("")
+        for i, usuario in pairs(usuarios) do
+            print("🔹 " .. i .. ". " .. usuario.nome .. " (ID: " .. usuario.userId .. ")")
+            print("   📌 GUI: " .. usuario.gui)
+        end
+    end
+    print("================================================")
+    print("")
+end
+
+-- ============================================================
+-- FUNÇÃO PARA CRIAR UMA GUI COM A LISTA DE USUÁRIOS
+-- ============================================================
+local function criarGUIUsuarios()
+    -- Fecha a GUI antiga se existir
+    for _, v in pairs(player.PlayerGui:GetChildren()) do
+        if v.Name == "UsuariosDAVI" then v:Destroy() end
+    end
+    
+    local usuarios = identificarUsuarios()
+    
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "UsuariosDAVI"
+    gui.Parent = player.PlayerGui
+    gui.ResetOnSpawn = false
+    gui.IgnoreGuiInset = true
+    
+    -- Fundo semi-transparente
+    local fundo = Instance.new("Frame")
+    fundo.Size = UDim2.new(1, 0, 1, 0)
+    fundo.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    fundo.BackgroundTransparency = 0.5
+    fundo.Parent = gui
+    
+    -- Janela principal
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 350, 0, 300)
+    frame.Position = UDim2.new(0.5, -175, 0.5, -150)
+    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
+    frame.BackgroundTransparency = 0.05
+    frame.BorderSizePixel = 0
+    frame.ClipsDescendants = true
+    frame.Parent = fundo
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 16)
+    corner.Parent = frame
+    
+    -- Contorno
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(255, 140, 0)
+    border.Thickness = 2
+    border.Transparency = 0.3
+    border.Parent = frame
+    
+    -- Título
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 45)
+    title.Text = "👥 USUÁRIOS DO DAVI HUB"
+    title.TextColor3 = Color3.fromRGB(255, 200, 50)
+    title.TextSize = 18
+    title.Font = Enum.Font.GothamBold
+    title.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+    title.BackgroundTransparency = 0.15
+    title.Parent = frame
+    
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 16)
+    titleCorner.Parent = title
+    
+    -- Botão Fechar
+    local close = Instance.new("TextButton")
+    close.Size = UDim2.new(0, 30, 0, 30)
+    close.Position = UDim2.new(1, -38, 0, 7)
+    close.Text = "✕"
+    close.TextColor3 = Color3.fromRGB(255, 255, 255)
+    close.TextSize = 18
+    close.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+    close.BackgroundTransparency = 0.3
+    close.BorderSizePixel = 0
+    close.Parent = title
+    
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 8)
+    closeCorner.Parent = close
+    close.MouseButton1Click:Connect(function() gui:Destroy() end)
+    
+    -- Lista de usuários (ScrollingFrame)
+    local lista = Instance.new("ScrollingFrame")
+    lista.Size = UDim2.new(1, -20, 1, -80)
+    lista.Position = UDim2.new(0, 10, 0, 55)
+    lista.BackgroundTransparency = 1
+    lista.BorderSizePixel = 0
+    lista.ScrollBarThickness = 6
+    lista.ScrollBarImageColor3 = Color3.fromRGB(255, 140, 0)
+    lista.Parent = frame
+    
+    local listaLayout = Instance.new("UIListLayout")
+    listaLayout.Padding = UDim.new(0, 4)
+    listaLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    listaLayout.Parent = lista
+    
+    -- Contador
+    local contador = Instance.new("TextLabel")
+    contador.Size = UDim2.new(1, 0, 0, 25)
+    contador.Position = UDim2.new(0, 0, 1, -35)
+    contador.Text = "📊 Total: " .. #usuarios .. " usuário(s)"
+    contador.TextColor3 = Color3.fromRGB(200, 200, 200)
+    contador.TextSize = 14
+    contador.Font = Enum.Font.Gotham
+    contador.BackgroundTransparency = 1
+    contador.Parent = frame
+    
+    -- Adiciona os usuários na lista
+    if #usuarios == 0 then
+        local nenhum = Instance.new("TextLabel")
+        nenhum.Size = UDim2.new(1, 0, 0, 35)
+        nenhum.Text = "🔹 Nenhum outro usuário do DAVI HUB encontrado."
+        nenhum.TextColor3 = Color3.fromRGB(200, 200, 200)
+        nenhum.TextSize = 14
+        nenhum.Font = Enum.Font.Gotham
+        nenhum.BackgroundTransparency = 1
+        nenhum.Parent = lista
+    else
+        for _, usuario in pairs(usuarios) do
+            local item = Instance.new("TextLabel")
+            item.Size = UDim2.new(1, 0, 0, 30)
+            item.Text = "🔹 " .. usuario.nome
+            item.TextColor3 = Color3.fromRGB(255, 255, 255)
+            item.TextSize = 14
+            item.Font = Enum.Font.GothamBold
+            item.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+            item.BackgroundTransparency = 0.2
+            item.BorderSizePixel = 0
+            item.Parent = lista
+            
+            local itemCorner = Instance.new("UICorner")
+            itemCorner.CornerRadius = UDim.new(0, 6)
+            itemCorner.Parent = item
+        end
+    end
+    
+    -- Atualiza o CanvasSize da lista
+    task.wait(0.1)
+    local totalHeight = #usuarios * 34 + 10
+    if #usuarios == 0 then totalHeight = 50 end
+    lista.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+end
+
+-- ============================================================
+-- COMANDO NO CHAT PARA VER USUÁRIOS (/davi ou /hub)
+-- ============================================================
+game:GetService("Players").LocalPlayer.Chatted:Connect(function(msg)
+    if msg:lower() == "/davi" or msg:lower() == "/hub" then
+        criarGUIUsuarios()
+        mostrarUsuariosConsole()
+    end
+end)
+
+-- ============================================================
+-- FUNÇÃO PARA ATUALIZAR AUTOMATICAMENTE A CADA 30 SEGUNDOS
+-- ============================================================
+spawn(function()
+    while true do
+        task.wait(30)
+        -- Mostra no console a cada 30 segundos (opcional)
+        -- mostrarUsuariosConsole()
+    end
+end)
+
+-- ============================================================
+-- ADICIONAR BOTÃO NA ABA MENU
+-- ============================================================
+-- Adicione na aba MENU (depois do menuCard)
+addButton(menuCard, "👥 Ver Usuários do HUB", function()
+    criarGUIUsuarios()
+    mostrarUsuariosConsole()
+end)
+
+print("✅ Sistema de identificação de usuários carregado!")
+print("💡 Digite /davi ou /hub no chat para ver quem está usando o DAVI HUB")
+-- ============================================================
+-- TAG LARANJA NO CHAT PARA USUÁRIOS DO DAVI HUB
+-- ============================================================
+
+-- Verifica se o jogador que falou está usando o DAVI HUB
+local function isDaviUser(jogador)
+    local sucesso, resultado = pcall(function()
+        local playerGui = jogador:FindFirstChild("PlayerGui")
+        if playerGui then
+            for _, gui in pairs(playerGui:GetChildren()) do
+                if gui:IsA("ScreenGui") then
+                    local nome = gui.Name:lower()
+                    if nome:find("davi") or nome:find("hub") or nome:find("davihub") then
+                        return true
+                    end
+                end
+            end
+        end
+    end)
+    return false
+end
+
+-- Cria um TextLabel na tela para exibir o chat personalizado
+local function criarChatCustomizado()
+    -- Remove chat antigo se existir
+    for _, v in pairs(player.PlayerGui:GetChildren()) do
+        if v.Name == "DaviChat" then v:Destroy() end
+    end
+    
+    local chatGui = Instance.new("ScreenGui")
+    chatGui.Name = "DaviChat"
+    chatGui.Parent = player.PlayerGui
+    chatGui.ResetOnSpawn = false
+    chatGui.IgnoreGuiInset = true
+    
+    -- Frame que vai conter as mensagens (ScrollingFrame)
+    local chatFrame = Instance.new("ScrollingFrame")
+    chatFrame.Size = UDim2.new(0, 400, 0, 200)
+    chatFrame.Position = UDim2.new(0.02, 0, 0.5, -100) -- Canto inferior esquerdo
+    chatFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    chatFrame.BackgroundTransparency = 0.5
+    chatFrame.BorderSizePixel = 0
+    chatFrame.ClipsDescendants = true
+    chatFrame.ScrollBarThickness = 4
+    chatFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 140, 0)
+    chatFrame.Parent = chatGui
+    
+    -- Layout para organizar as mensagens
+    local chatLayout = Instance.new("UIListLayout")
+    chatLayout.Padding = UDim.new(0, 2)
+    chatLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    chatLayout.Parent = chatFrame
+    
+    -- Mantém as últimas 20 mensagens
+    local mensagens = {}
+    
+    -- Função para adicionar mensagem ao chat
+    local function adicionarMensagem(jogador, mensagem, isDavi)
+        local label = Instance.new("TextLabel")
+        label.Size = UDim2.new(1, 0, 0, 20)
+        label.Text = ""
+        label.TextColor3 = Color3.fromRGB(255, 255, 255)
+        label.TextSize = 14
+        label.Font = Enum.Font.Gotham
+        label.BackgroundTransparency = 1
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        label.Parent = chatFrame
+        
+        -- Define o texto com ou sem tag
+        if isDavi then
+            label.Text = "🔥 " .. jogador.Name .. ": " .. mensagem
+            -- Só a tag é laranja, o resto é branco
+            -- Vamos usar TextLabel com RichText
+            label.RichText = true
+            label.Text = '<font color="#FF8C00">[DAVI]</font> <font color="#FFFFFF">' .. jogador.Name .. ': ' .. mensagem .. '</font>'
+        else
+            label.Text = jogador.Name .. ": " .. mensagem
+        end
+        
+        -- Limita a quantidade de mensagens
+        table.insert(mensagens, label)
+        if #mensagens > 20 then
+            local remover = table.remove(mensagens, 1)
+            remover:Destroy()
+        end
+        
+        -- Atualiza o scroll para a última mensagem
+        task.wait(0.05)
+        chatFrame.CanvasSize = UDim2.new(0, 0, 0, #mensagens * 22 + 10)
+        chatFrame.ScrollPosition = Vector2.new(0, chatFrame.CanvasSize.Y.Offset)
+    end
+    
+    -- Escuta as mensagens de todos os jogadores
+    game:GetService("Players").PlayerAdded:Connect(function(novoJogador)
+        novoJogador.Chatted:Connect(function(mensagem)
+            local isDavi = isDaviUser(novoJogador)
+            adicionarMensagem(novoJogador, mensagem, isDavi)
+        end)
+    end)
+    
+    -- Para jogadores já existentes
+    for _, jogador in pairs(game.Players:GetPlayers()) do
+        if jogador ~= player then
+            jogador.Chatted:Connect(function(mensagem)
+                local isDavi = isDaviUser(jogador)
+                adicionarMensagem(jogador, mensagem, isDavi)
+            end)
+        end
+    end
+    
+    -- O próprio jogador também
+    player.Chatted:Connect(function(mensagem)
+        adicionarMensagem(player, mensagem, true) -- Sempre true para o próprio
+    end)
+    
+    return chatGui
+end
+
+-- Inicia o chat customizado
+criarChatCustomizado()
+
+print("✅ Chat com tag laranja para usuários do DAVI HUB ativado!")
 -- ============================================================
 -- FORÇA ATUALIZAÇÃO DO SCROLL
 -- ============================================================
