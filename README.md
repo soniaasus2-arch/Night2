@@ -464,19 +464,35 @@ local function criarGUIAtivacao()
         ["free_81376hrhyhyhyhyrhy"] = "https://link-hub.net/5450045/IkJsx7RSCwyp",
         ["free_91487isizizizizsiz"] = "https://link-center.net/5450045/YR4NQ7ewNSkJ",
         ["free_101598jtjajajajataj"] = "https://link-target.net/5450045/gdChsmYq0rb5",
-    }
-    -- CONTADOR DE KEYS
-    local function contarKeysDisponiveis()
-        local keysOnline = baixarListaKeys()
-        if keysOnline then
-            local count = 0
-            for key, _ in pairs(keysOnline) do
+-- CONTADOR DE KEYS (VERSÃO CORRIGIDA)
+local function contarKeysDisponiveis()
+    local sucesso, resultado = pcall(function()
+        return game:HttpGet(PASTEBIN_URL)
+    end)
+    if sucesso and resultado then
+        local count = 0
+        for key in string.gmatch(resultado, "%S+") do
+            if key ~= "" then
                 count = count + 1
             end
-            return count
         end
-        return 0
+        return count
+    else
+        -- Se falhar, mostra "?" para indicar erro
+        return "?"
     end
+end
+
+local totalKeys = contarKeysDisponiveis()
+local sub = Instance.new("TextLabel")
+sub.Size = UDim2.new(1, 0, 0, 25)
+sub.Position = UDim2.new(0, 0, 0.05, 0)
+sub.Text = "Digite sua key de ativação  |  " .. totalKeys .. " keys disponíveis"
+sub.TextColor3 = Color3.fromRGB(200, 200, 200)
+sub.TextSize = 13
+sub.Font = Enum.Font.Gotham
+sub.BackgroundTransparency = 1
+sub.Parent = conteudoFrame
 
     local totalKeys = contarKeysDisponiveis()
     local sub = Instance.new("TextLabel")
