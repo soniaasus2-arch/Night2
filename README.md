@@ -6,10 +6,40 @@ local Camera = workspace.CurrentCamera
 local UserInputService = game:GetService("UserInputService")
 local RS = game.ReplicatedStorage
 local HttpService = game:GetService("HttpService")
--- ============================================================
--- BYPASS PARA O CRIADOR (daviroblox2023r) + SISTEMA DE KEY
--- ============================================================
+-- Verifica se o jogador atual é o criador
+local isDeveloper = (player.Name == "daviroblox2023r")
 
+if is Developer then
+    -- Se for o criador, pula o sistema de key
+    print("👑 Desenvolvedor detectado! Pulando sistema de key...")
+    keyValidada = true
+    player:SetAttribute("DAVI_KEY", "DEV_ACCESS")
+    print("✅ DAVI HUB iniciado em modo desenvolvedor!")
+    return  -- 👈 O SCRIPT PARA AQUI
+end
+
+-- Se chegou aqui, é porque NÃO é o desenvolvedor
+if isAtivado() then
+    print("✅ DAVI HUB já está ativado! Continuando...")
+else
+    print("🔑 Aguardando ativação da key...")
+    criarGUIAtivacao()
+
+    while not keyValidada do
+        task.wait(0.5)
+        local guiExists = false
+        for _, v in pairs(player.PlayerGui:GetChildren()) do
+            if v.Name == "KeySystem" or v.Name == "AvisarGUI" then
+                guiExists = true
+                break
+            end
+        end
+        if not guiExists and not keyValidada then
+            print("❌ Ativação cancelada.")
+            return
+        end
+    end
+end
 local function isAtivado()
     local keySalva = player:GetAttribute("DAVI_KEY")
     if keySalva then
@@ -23,39 +53,7 @@ local function isAtivado()
     return false
 end
 
--- Verifica se o jogador atual é o criador
-local isDeveloper = (player.Name == "daviroblox2023r")
 
-if isDeveloper then
-    -- Se for o criador, pula o sistema de key
-    print("👑 Desenvolvedor detectado! Pulando sistema de key...")
-    keyValidada = true
-    player:SetAttribute("DAVI_KEY", "DEV_ACCESS")
-    print("✅ DAVI HUB iniciado em modo desenvolvedor!")
-else
-    -- Se não for o criador, executa o sistema de key normalmente
-    if isAtivado() then
-        print("✅ DAVI HUB já está ativado! Continuando...")
-    retorn
-        print("🔑 Aguardando ativação da key...")
-        criarGUIAtivacao()
-
-        while not keyValidada do
-            task.wait(0.5)
-            local guiExists = false
-            for _, v in pairs(player.PlayerGui:GetChildren()) do
-                if v.Name == "KeySystem" or v.Name == "AvisarGUI" then
-                    guiExists = true
-                    break
-                end
-            end
-            if not guiExists and not keyValidada then
-                print("❌ Ativação cancelada.")
-                return
-            end
-        end
-    end
-end
 
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1524546983799427194/WyTosfrV6Opc1MPOpmTJmYNlCzBu0gpRSJ89dUnqcNVYbqJ373-tCfTLUMBgOTidUEh3"
 
