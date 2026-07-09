@@ -234,7 +234,7 @@ game:GetService("Players").LocalPlayer.Chatted:Connect(function(msg)
 end)
 
 -- ============================================================
--- TAG LARANJA NO CHAT PARA USUÁRIOS DO DAVI HUB
+-- TAG LARANJA NO CHAT (SEM CRIAR CHAT NOVO)
 -- ============================================================
 
 local function isDaviUser(jogador)
@@ -254,86 +254,38 @@ local function isDaviUser(jogador)
     return false
 end
 
-local function criarChatCustomizado()
-    for _, v in pairs(player.PlayerGui:GetChildren()) do
-        if v.Name == "DaviChat" then v:Destroy() end
-    end
-    
-    local chatGui = Instance.new("ScreenGui")
-    chatGui.Name = "DaviChat"
-    chatGui.Parent = player.PlayerGui
-    chatGui.ResetOnSpawn = false
-    chatGui.IgnoreGuiInset = true
-    
-    local chatFrame = Instance.new("ScrollingFrame")
-    chatFrame.Size = UDim2.new(0, 400, 0, 200)
-    chatFrame.Position = UDim2.new(0.02, 0, 0.5, -100)
-    chatFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    chatFrame.BackgroundTransparency = 0.5
-    chatFrame.BorderSizePixel = 0
-    chatFrame.ClipsDescendants = true
-    chatFrame.ScrollBarThickness = 4
-    chatFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 140, 0)
-    chatFrame.Parent = chatGui
-    
-    local chatLayout = Instance.new("UIListLayout")
-    chatLayout.Padding = UDim.new(0, 2)
-    chatLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    chatLayout.Parent = chatFrame
-    
-    local mensagens = {}
-    
-    local function adicionarMensagem(jogador, mensagem, isDavi)
-        local label = Instance.new("TextLabel")
-        label.Size = UDim2.new(1, 0, 0, 20)
-        label.TextColor3 = Color3.fromRGB(255, 255, 255)
-        label.TextSize = 14
-        label.Font = Enum.Font.Gotham
-        label.BackgroundTransparency = 1
-        label.TextXAlignment = Enum.TextXAlignment.Left
-        label.Parent = chatFrame
-if isDavi then
-            label.RichText = true
-            label.Text = '<font color="#FF8C00">[DAVI]</font> <font color="#FFFFFF">' .. jogador.Name .. ': ' .. mensagem .. '</font>'
-        else
-            label.Text = jogador.Name .. ": " .. mensagem
+-- Hook no chat do Roblox para adicionar a tag
+local function hookChat()
+    local chatService = game:GetService("Chat")
+    if chatService and chatService:FindFirstChild("ChatWindow") then
+        local chatWindow = chatService.ChatWindow
+        
+        -- Função que será chamada quando uma mensagem for enviada
+        local function onMessagePosted(messageData)
+            if not messageData or not messageData.FromSpeaker then return end
+            
+            local jogador = game.Players:FindFirstChild(messageData.FromSpeaker)
+            if jogador and isDaviUser(jogador) then
+                -- Modifica a mensagem para adicionar a tag
+                messageData.Message = "<font color='#FF8C00'>[DAVI]</font> " .. messageData.Message
+            end
+            return messageData
         end
         
-        table.insert(mensagens, label)
-        if #mensagens > 20 then
-            local remover = table.remove(mensagens, 1)
-            remover:Destroy()
-        end
-        
-        task.wait(0.05)
-        chatFrame.CanvasSize = UDim2.new(0, 0, 0, #mensagens * 22 + 10)
-        chatFrame.ScrollPosition = Vector2.new(0, chatFrame.CanvasSize.Y.Offset)
-    end
-    
-    game:GetService("Players").PlayerAdded:Connect(function(novoJogador)
-        novoJogador.Chatted:Connect(function(mensagem)
-            local isDavi = isDaviUser(novoJogador)
-            adicionarMensagem(novoJogador, mensagem, isDavi)
-        end)
-    end)
-    
-    for _, jogador in pairs(game.Players:GetPlayers()) do
-        if jogador ~= player then
-            jogador.Chatted:Connect(function(mensagem)
-                local isDavi = isDaviUser(jogador)
-                adicionarMensagem(jogador, mensagem, isDavi)
-            end)
+        -- Hook no sistema de chat
+        local originalFunction = chatWindow.AddMessageToChannel
+        if originalFunction then
+            chatWindow.AddMessageToChannel = function(self, messageData, channel)
+                messageData = onMessagePosted(messageData) or messageData
+                return originalFunction(self, messageData, channel)
+            end
         end
     end
-    
-    player.Chatted:Connect(function(mensagem)
-        adicionarMensagem(player, mensagem, true)
-    end)
-    
-    return chatGui
 end
 
-criarChatCustomizado()
+-- Executa o hook
+pcall(hookChat)
+print("✅ Chat com tag laranja ativado!")
 
 -- ============================================================
 -- GUI DE ATIVAÇÃO (COMPLETA)
