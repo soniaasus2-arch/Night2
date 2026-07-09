@@ -350,7 +350,48 @@ local function criarGUIAtivacao()
     sub.Font = Enum.Font.Gotham
     sub.BackgroundTransparency = 1
     sub.Parent = conteudoFrame
+local function contarKeysDisponiveis()
+    local keysOnline = baixarListaKeys()
+    if keysOnline then
+        local count = 0
+        for key, _ in pairs(keysOnline) do
+            count = count + 1
+        end
+        return count
+    end
+    return 0
+end
 
+local totalKeys = contarKeysDisponiveis()
+local sub = Instance.new("TextLabel")
+sub.Size = UDim2.new(1, 0, 0, 25)
+sub.Position = UDim2.new(0, 0, 0.05, 0)
+sub.Text = "Digite sua key de ativação  |  " .. totalKeys .. " keys disponíveis"
+sub.TextColor3 = Color3.fromRGB(200, 200, 200)
+sub.TextSize = 13
+sub.Font = Enum.Font.Gotham
+sub.BackgroundTransparency = 1
+ 
+local LINKS_KEYS = {
+    ["free_10182alapapqaoqkfa"] = "https://link-target.net/5450045/U8UGMFUQ22Uc",
+    ["free_20394blbqbqbrbrlsb"] = "https://direct-link.net/5450045/QykQLu41Fp2x",
+    ["free_30567cmcrcrcscsmtc"] = "https://direct-link.net/5450045/m1aASokV7pIF",
+    ["free_40821dndsdtdudunud"] = "https://direct-link.net/5450045/glVLfwhKt4et",
+    ["free_50943eoeuevevevove"] = "https://link-center.net/5450045/l1peI74weA4g",
+    ["free_61054fpfwfwfwfwpwf"] = "https://direct-link.net/5450045/eaCiSMyybd74",
+    ["free_71265gqgxgxgxgxqgx"] = "https://link-hub.net/5450045/TGIbYBsV7EcU",
+    ["free_81376hrhyhyhyhyrhy"] = "https://link-hub.net/5450045/IkJsx7RSCwyp",
+    ["free_91487isizizizizsiz"] = "https://link-center.net/5450045/YR4NQ7ewNSkJ",
+    ["free_101598jtjajajajataj"] = "https://link-target.net/5450045/gdChsmYq0rb5",
+}
+
+-- Função para contar keys disponíveis no Pastebin
+local function contarKeysDisponiveis()
+    local keysOnline = baixarListaKeys()
+    if keysOnline then
+       sub.Parent = conteudoFrame
+
+    -- Campo da Key
     local keyBox = Instance.new("TextBox")
     keyBox.Size = UDim2.new(0.8, 0, 0, 45)
     keyBox.Position = UDim2.new(0.1, 0, 0.15, 0)
@@ -368,9 +409,10 @@ local function criarGUIAtivacao()
     keyCorner.CornerRadius = UDim.new(0, 10)
     keyCorner.Parent = keyBox
 
+    -- Botão ATIVAR
     local btnAtivar = Instance.new("TextButton")
-    btnAtivar.Size = UDim2.new(0.4, 0, 0, 45)
-    btnAtivar.Position = UDim2.new(0.3, 0, 0.30, 0)
+    btnAtivar.Size = UDim2.new(0.35, 0, 0, 45)
+    btnAtivar.Position = UDim2.new(0.1, 0, 0.30, 0)
     btnAtivar.Text = "ATIVAR"
     btnAtivar.TextColor3 = Color3.fromRGB(255, 255, 255)
     btnAtivar.TextSize = 18
@@ -383,6 +425,49 @@ local function criarGUIAtivacao()
     btnCorner.CornerRadius = UDim.new(0, 10)
     btnCorner.Parent = btnAtivar
 
+    -- Botão OBTER KEY
+    local btnGetKey = Instance.new("TextButton")
+    btnGetKey.Size = UDim2.new(0.35, 0, 0, 45)
+    btnGetKey.Position = UDim2.new(0.55, 0, 0.30, 0)
+    btnGetKey.Text = "OBTER KEY"
+    btnGetKey.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnGetKey.TextSize = 16
+    btnGetKey.Font = Enum.Font.GothamBold
+    btnGetKey.BackgroundColor3 = Color3.fromRGB(45, 150, 200)
+    btnGetKey.BackgroundTransparency = 0.15
+    btnGetKey.BorderSizePixel = 0
+    btnGetKey.Parent = conteudoFrame
+    local btnGetKeyCorner = Instance.new("UICorner")
+    btnGetKeyCorner.CornerRadius = UDim.new(0, 10)
+    btnGetKeyCorner.Parent = btnGetKey
+
+    btnGetKey.MouseButton1Click:Connect(function()
+        local key = keyBox.Text
+        if key == "" then
+            status.Text = "Digite uma key primeiro!"
+            status.TextColor3 = Color3.fromRGB(255, 100, 100)
+            return
+        end
+        
+        local link = LINKS_KEYS[key]
+        if link then
+            local sucesso = pcall(function()
+                setclipboard(link)
+            end)
+            if sucesso then
+                status.Text = "Link do Linkvertise copiado!"
+                status.TextColor3 = Color3.fromRGB(100, 255, 100)
+            else
+                status.Text = "Link: " .. link
+                status.TextColor3 = Color3.fromRGB(255, 200, 100)
+            end
+        else
+            status.Text = "Nenhum link encontrado para esta key."
+            status.TextColor3 = Color3.fromRGB(255, 100, 100)
+        end
+    end)
+
+    -- Status
     local status = Instance.new("TextLabel")
     status.Size = UDim2.new(1, 0, 0, 25)
     status.Position = UDim2.new(0, 0, 0.45, 0)
@@ -393,6 +478,7 @@ local function criarGUIAtivacao()
     status.BackgroundTransparency = 1
     status.Parent = conteudoFrame
 
+    -- FUNÇÃO DO BOTÃO ATIVAR
     btnAtivar.MouseButton1Click:Connect(function()
         local key = keyBox.Text
         if key == "" then
@@ -430,33 +516,13 @@ local function criarGUIAtivacao()
 
     keyBox.FocusLost:Connect(function()
         local key = keyBox.Text
-        if key ~= "" then
-            local valida, mensagem = verificarKey(key)
-            status.Text = valida and "KEY VÁLIDA! Clique em ATIVAR." or mensagem
-            status.TextColor3 = valida and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+        if key == "" then
+            keyBox.Text = ""
         end
     end)
 
     return gui
-end 
-local LINKS_KEYS = {
-    ["free_10182alapapqaoqkfa"] = "https://link-target.net/5450045/U8UGMFUQ22Uc",
-    ["free_20394blbqbqbrbrlsb"] = "https://direct-link.net/5450045/QykQLu41Fp2x",
-    ["free_30567cmcrcrcscsmtc"] = "https://direct-link.net/5450045/m1aASokV7pIF",
-    ["free_40821dndsdtdudunud"] = "https://direct-link.net/5450045/glVLfwhKt4et",
-    ["free_50943eoeuevevevove"] = "https://link-center.net/5450045/l1peI74weA4g",
-    ["free_61054fpfwfwfwfwpwf"] = "https://direct-link.net/5450045/eaCiSMyybd74",
-    ["free_71265gqgxgxgxgxqgx"] = "https://link-hub.net/5450045/TGIbYBsV7EcU",
-    ["free_81376hrhyhyhyhyrhy"] = "https://link-hub.net/5450045/IkJsx7RSCwyp",
-    ["free_91487isizizizizsiz"] = "https://link-center.net/5450045/YR4NQ7ewNSkJ",
-    ["free_101598jtjajajajataj"] = "https://link-target.net/5450045/gdChsmYq0rb5",
-}
-
--- Função para contar keys disponíveis no Pastebin
-local function contarKeysDisponiveis()
-    local keysOnline = baixarListaKeys()
-    if keysOnline then
-        local count = 0
+end     local count = 0
         for key, _ in pairs(keysOnline) do
             count = count + 1
         end
