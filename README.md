@@ -7,7 +7,7 @@ local RS = game.ReplicatedStorage
 local HttpService = game:GetService("HttpService")
 
 -- ============================================================
--- BYPASS PARA O CRIADOR (daviroblox2023r)
+-- BYPASS PARA O CRIADOR (daviroblox2023r) + SISTEMA DE KEY
 -- ============================================================
 
 local function isAtivado()
@@ -23,17 +23,23 @@ local function isAtivado()
     return false
 end
 
--- Verifica se é o criador
-if player.Name == "daviroblox2023r" then
+-- Verifica se o jogador atual é o criador
+local isDeveloper = (player.Name == "daviroblox2023r")
+
+if isDeveloper then
+    -- Se for o criador, pula o sistema de key
     print("👑 Desenvolvedor detectado! Pulando sistema de key...")
     keyValidada = true
     player:SetAttribute("DAVI_KEY", "DEV_ACCESS")
+    print("✅ DAVI HUB iniciado em modo desenvolvedor!")
 else
+    -- Se não for o criador, executa o sistema de key normalmente
     if isAtivado() then
         print("✅ DAVI HUB já está ativado! Continuando...")
     else
         print("🔑 Aguardando ativação da key...")
         criarGUIAtivacao()
+
         while not keyValidada do
             task.wait(0.5)
             local guiExists = false
