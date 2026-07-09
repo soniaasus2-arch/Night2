@@ -438,6 +438,31 @@ local function criarGUIAtivacao()
     end)
 
     return gui
+end 
+local LINKS_KEYS = {
+    ["free_10182alapapqaoqkfa"] = "https://link-target.net/5450045/U8UGMFUQ22Uc",
+    ["free_20394blbqbqbrbrlsb"] = "https://direct-link.net/5450045/QykQLu41Fp2x",
+    ["free_30567cmcrcrcscsmtc"] = "https://direct-link.net/5450045/m1aASokV7pIF",
+    ["free_40821dndsdtdudunud"] = "https://direct-link.net/5450045/glVLfwhKt4et",
+    ["free_50943eoeuevevevove"] = "https://link-center.net/5450045/l1peI74weA4g",
+    ["free_61054fpfwfwfwfwpwf"] = "https://direct-link.net/5450045/eaCiSMyybd74",
+    ["free_71265gqgxgxgxgxqgx"] = "https://link-hub.net/5450045/TGIbYBsV7EcU",
+    ["free_81376hrhyhyhyhyrhy"] = "https://link-hub.net/5450045/IkJsx7RSCwyp",
+    ["free_91487isizizizizsiz"] = "https://link-center.net/5450045/YR4NQ7ewNSkJ",
+    ["free_101598jtjajajajataj"] = "https://link-target.net/5450045/gdChsmYq0rb5",
+}
+
+-- Função para contar keys disponíveis no Pastebin
+local function contarKeysDisponiveis()
+    local keysOnline = baixarListaKeys()
+    if keysOnline then
+        local count = 0
+        for key, _ in pairs(keysOnline) do
+            count = count + 1
+        end
+        return count
+    end
+    return 0
 end
 -- ============================================================
 -- BLOQUEIA O SCRIPT ATÉ A KEY SER VALIDADA
