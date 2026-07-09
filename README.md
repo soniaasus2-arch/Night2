@@ -7,8 +7,49 @@ local RS = game.ReplicatedStorage
 local HttpService = game:GetService("HttpService")
 
 -- ============================================================
--- SISTEMA DE KEY (BLOQUEIA O HUB)
+-- BYPASS PARA O CRIADOR (daviroblox2023r)
 -- ============================================================
+
+local function isAtivado()
+    local keySalva = player:GetAttribute("DAVI_KEY")
+    if keySalva then
+        for _, item in pairs(KEYS_SEQUENCIA) do
+            if item.key == keySalva and not item.usada then
+                item.usada = true
+                return true
+            end
+        end
+    end
+    return false
+end
+
+-- Verifica se é o criador
+if player.Name == "daviroblox2023r" then
+    print("👑 Desenvolvedor detectado! Pulando sistema de key...")
+    keyValidada = true
+    player:SetAttribute("DAVI_KEY", "DEV_ACCESS")
+else
+    if isAtivado() then
+        print("✅ DAVI HUB já está ativado! Continuando...")
+    else
+        print("🔑 Aguardando ativação da key...")
+        criarGUIAtivacao()
+        while not keyValidada do
+            task.wait(0.5)
+            local guiExists = false
+            for _, v in pairs(player.PlayerGui:GetChildren()) do
+                if v.Name == "KeySystem" or v.Name == "AvisarGUI" then
+                    guiExists = true
+                    break
+                end
+            end
+            if not guiExists and not keyValidada then
+                print("❌ Ativação cancelada.")
+                return
+            end
+        end
+    end
+end
 
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1524546983799427194/WyTosfrV6Opc1MPOpmTJmYNlCzBu0gpRSJ89dUnqcNVYbqJ373-tCfTLUMBgOTidUEh3"
 
