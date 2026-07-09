@@ -597,7 +597,6 @@ local function criarGUIAtivacao()
 
     return gui
 end
-
 -- ============================================================
 -- 🔒 BLOQUEIA O SCRIPT ATÉ A KEY SER VALIDADA
 -- ============================================================
@@ -636,6 +635,7 @@ else
         end
     end
 end
+
 
 -- ============================================================
 -- 👆 SISTEMA DE KEY TERMINA AQUI
