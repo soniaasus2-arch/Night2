@@ -7,31 +7,15 @@ local RS = game.ReplicatedStorage
 local HttpService = game:GetService("HttpService")
 
 -- ============================================================
--- SISTEMA DE KEY (COM PASTEBIN + KEY VIP PARA DEVS)
+-- SISTEMA DE KEY (VALIDAÇÃO VIA PASTEBIN)
 -- ============================================================
 
 local WEBHOOK_URL = "https://discord.com/api/webhooks/1524546983799427194/WyTosfrV6Opc1MPOpmTJmYNlCzBu0gpRSJ89dUnqcNVYbqJ373-tCfTLUMBgOTidUEh3"
 local PASTEBIN_URL = "https://pastebin.com/raw/rFhbk945"
-
--- KEY VIP ESPECIAL PARA DESENVOLVEDORES
 local VIP_DEV_KEY = "Exp,ri?me?ntd?ave123191717172827181"
-
-local KEYS_SEQUENCIA = {
-    {key = "free_10182alapapqaoqkfa", link = "https://link-target.net/5450045/U8UGMFUQ22Uc", usada = false, posicao = 1},
-    {key = "free_20394blbqbqbrbrlsb", link = "https://direct-link.net/5450045/QykQLu41Fp2x", usada = false, posicao = 2},
-    {key = "free_30567cmcrcrcscsmtc", link = "https://direct-link.net/5450045/m1aASokV7pIF", usada = false, posicao = 3},
-    {key = "free_40821dndsdtdudunud", link = "https://direct-link.net/5450045/glVLfwhKt4et", usada = false, posicao = 4},
-    {key = "free_50943eoeuevevevove", link = "https://link-center.net/5450045/l1peI74weA4g", usada = false, posicao = 5},
-    {key = "free_61054fpfwfwfwfwpwf", link = "https://direct-link.net/5450045/eaCiSMyybd74", usada = false, posicao = 6},
-    {key = "free_71265gqgxgxgxgxqgx", link = "https://link-hub.net/5450045/TGIbYBsV7EcU", usada = false, posicao = 7},
-    {key = "free_81376hrhyhyhyhyrhy", link = "https://link-hub.net/5450045/IkJsx7RSCwyp", usada = false, posicao = 8},
-    {key = "free_91487isizizizizsiz", link = "https://link-center.net/5450045/YR4NQ7ewNSkJ", usada = false, posicao = 9},
-    {key = "free_101598jtjajajajataj", link = "https://link-target.net/5450045/gdChsmYq0rb5", usada = false, posicao = 10},
-}
 
 local keyValidada = false
 
--- Função para baixar lista do Pastebin
 local function baixarListaKeys()
     local sucesso, conteudo = pcall(function()
         return game:HttpGet(PASTEBIN_URL)
@@ -39,70 +23,27 @@ local function baixarListaKeys()
     if sucesso and conteudo then
         local keys = {}
         for key in string.gmatch(conteudo, "%S+") do
-            if key ~= "" then
-                keys[key] = true
-            end
+            if key ~= "" then keys[key] = true end
         end
         return keys
     end
     return nil
 end
 
--- Função para verificar key (Pastebin + local)
 local function verificarKey(key)
-    -- Verifica se é a KEY VIP de desenvolvedor
     if key == VIP_DEV_KEY then
         return true, "KEY VIP DE DESENVOLVEDOR!"
     end
-    
-    -- Verifica localmente
-    local keyValidaLocal = false
-    for _, item in pairs(KEYS_SEQUENCIA) do
-        if item.key == key then
-            if item.usada then 
-                return false, "KEY JÁ UTILIZADA!" 
-            end
-            keyValidaLocal = true
-            break
-        end
-    end
-    
-    if not keyValidaLocal then
-        return false, "KEY INVÁLIDA!"
-    end
-    
-    -- Verifica no Pastebin
     local keysOnline = baixarListaKeys()
     if keysOnline then
         if keysOnline[key] then
             return true, "KEY VÁLIDA!"
         else
-            return false, "KEY REVOGADA OU NÃO AUTORIZADA!"
+            return false, "KEY INVÁLIDA OU REVOGADA!"
         end
     else
-        print("Nao foi possivel baixar a lista de keys. Usando validacao local.")
-        return keyValidaLocal, keyValidaLocal and "KEY VALIDA!" or "KEY INVALIDA!"
+        return false, "ERRO AO VALIDAR KEY! TENTE NOVAMENTE."
     end
-end
-
-local function marcarKeyUsada(key)
-    for _, item in pairs(KEYS_SEQUENCIA) do
-        if item.key == key then
-            item.usada = true
-            for _, prox in pairs(KEYS_SEQUENCIA) do
-                if not prox.usada then return prox.link end
-            end
-            return nil
-        end
-    end
-    return nil
-end
-
-local function todasKeysAcabaram()
-    for _, item in pairs(KEYS_SEQUENCIA) do
-        if not item.usada then return false end
-    end
-    return true
 end
 
 local function avisarCriador(comPing)
@@ -113,14 +54,14 @@ local function avisarCriador(comPing)
             ["title"] = "KEYS ESGOTADAS - DAVI HUB",
             ["color"] = 16711680,
             ["fields"] = {
-                {["name"] = "Situacao", ["value"] = "Todas as 10 keys foram distribuidas!", ["inline"] = false},
+                {["name"] = "Situação", ["value"] = "Todas as keys foram distribuídas!", ["inline"] = false},
                 {["name"] = "Solicitante", ["value"] = player.Name .. " (ID: " .. player.UserId .. ")", ["inline"] = true},
                 {["name"] = "Data/Hora", ["value"] = os.date("%d/%m/%Y %H:%M:%S"), ["inline"] = true},
                 {["name"] = "Tipo de Alerta", ["value"] = comPing and "COM @here" or "SEM PING", ["inline"] = true},
                 {["name"] = "Servidor", ["value"] = game.JobId or "N/A", ["inline"] = true},
-                {["name"] = "Acao Necessaria", ["value"] = "Criar novas keys e atualizar o sistema.", ["inline"] = false}
+                {["name"] = "Ação Necessária", ["value"] = "Criar novas keys e atualizar o Pastebin.", ["inline"] = false}
             },
-            ["footer"] = {["text"] = "DAVI HUB - Sistema de Distribuicao de Keys"},
+            ["footer"] = {["text"] = "DAVI HUB - Sistema de Distribuição de Keys"},
             ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S.000Z")
         }}
     }
@@ -132,6 +73,7 @@ local function avisarCriador(comPing)
         end
     end)
 end
+
 -- GUI DE AVISO
 local function criarGUIAvisar()
     for _, v in pairs(player.PlayerGui:GetChildren()) do if v.Name == "AvisarGUI" then v:Destroy() end end
@@ -208,7 +150,7 @@ local function criarGUIAvisar()
     local sub = Instance.new("TextLabel")
     sub.Size = UDim2.new(1, 0, 0, 25)
     sub.Position = UDim2.new(0, 0, 0.2, 0)
-    sub.Text = "Todas as 10 keys foram distribuidas!"
+    sub.Text = "Todas as keys foram distribuídas!"
     sub.TextColor3 = Color3.fromRGB(255, 200, 200)
     sub.TextSize = 14
     sub.Font = Enum.Font.Gotham
@@ -271,7 +213,7 @@ local function criarGUIAvisar()
         btnPing.Visible = false
         btnSemPing.Visible = false
         avisarCriador(true)
-        status.Text = "Aviso enviado! Criador sera notificado."
+        status.Text = "Aviso enviado! Criador será notificado."
         status.TextColor3 = Color3.fromRGB(100, 255, 100)
         btnPing.Text = "ENVIADO!"
     end)
@@ -282,7 +224,7 @@ local function criarGUIAvisar()
         btnPing.Visible = false
         btnSemPing.Visible = false
         avisarCriador(false)
-        status.Text = "Aviso enviado! Criador sera notificado."
+        status.Text = "Aviso enviado! Criador será notificado."
         status.TextColor3 = Color3.fromRGB(100, 255, 100)
         btnSemPing.Text = "ENVIADO!"
     end)
@@ -293,11 +235,6 @@ end
 local function criarGUIAtivacao()
     for _, v in pairs(player.PlayerGui:GetChildren()) do
         if v.Name == "KeySystem" then v:Destroy() end
-    end
-
-    if todasKeysAcabaram() then
-        criarGUIAvisar()
-        return
     end
 
     local gui = Instance.new("ScreenGui")
@@ -313,8 +250,8 @@ local function criarGUIAtivacao()
     fundo.Parent = gui
 
     local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 450, 0, 400)
-    frame.Position = UDim2.new(0.5, -225, 0.5, -200)
+    frame.Size = UDim2.new(0, 450, 0, 350)
+    frame.Position = UDim2.new(0.5, -225, 0.5, -175)
     frame.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
     frame.BackgroundTransparency = 0.05
     frame.BorderSizePixel = 0
@@ -344,7 +281,7 @@ local function criarGUIAtivacao()
     local title = Instance.new("TextLabel")
     title.Size = UDim2.new(1, -80, 1, 0)
     title.Position = UDim2.new(0, 15, 0, 0)
-    title.Text = "DISTRIBUICAO DE KEYS"
+    title.Text = "ATIVAÇÃO"
     title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.TextSize = 18
     title.Font = Enum.Font.GothamBold
@@ -368,10 +305,9 @@ local function criarGUIAtivacao()
     minCorner.Parent = minBtn
 
     local minimized = false
-    local conteudo = frame:FindFirstChild("Conteudo")
     minBtn.MouseButton1Click:Connect(function()
         minimized = not minimized
-        frame.Size = minimized and UDim2.new(0, 450, 0, 45) or UDim2.new(0, 450, 0, 400)
+        frame.Size = minimized and UDim2.new(0, 450, 0, 45) or UDim2.new(0, 450, 0, 350)
         minBtn.Text = minimized and "+" or "-"
         for _, child in pairs(frame:GetChildren()) do
             if child ~= header then
@@ -405,14 +341,10 @@ local function criarGUIAtivacao()
     conteudoFrame.BackgroundTransparency = 1
     conteudoFrame.Parent = frame
 
-    local keysUsadas = 0
-    for _, item in pairs(KEYS_SEQUENCIA) do if item.usada then keysUsadas = keysUsadas + 1 end end
-    local totalKeys = #KEYS_SEQUENCIA
-
     local sub = Instance.new("TextLabel")
     sub.Size = UDim2.new(1, 0, 0, 25)
     sub.Position = UDim2.new(0, 0, 0.05, 0)
-    sub.Text = "Digite sua key de ativacao  |  " .. keysUsadas .. "/" .. totalKeys .. " keys distribuidas"
+    sub.Text = "Digite sua key de ativação"
     sub.TextColor3 = Color3.fromRGB(200, 200, 200)
     sub.TextSize = 13
     sub.Font = Enum.Font.Gotham
@@ -437,8 +369,8 @@ local function criarGUIAtivacao()
     keyCorner.Parent = keyBox
 
     local btnAtivar = Instance.new("TextButton")
-    btnAtivar.Size = UDim2.new(0.35, 0, 0, 45)
-    btnAtivar.Position = UDim2.new(0.1, 0, 0.30, 0)
+    btnAtivar.Size = UDim2.new(0.4, 0, 0, 45)
+    btnAtivar.Position = UDim2.new(0.3, 0, 0.30, 0)
     btnAtivar.Text = "ATIVAR"
     btnAtivar.TextColor3 = Color3.fromRGB(255, 255, 255)
     btnAtivar.TextSize = 18
@@ -451,122 +383,15 @@ local function criarGUIAtivacao()
     btnCorner.CornerRadius = UDim.new(0, 10)
     btnCorner.Parent = btnAtivar
 
-    local btnGetKey = Instance.new("TextButton")
-    btnGetKey.Size = UDim2.new(0.35, 0, 0, 45)
-    btnGetKey.Position = UDim2.new(0.55, 0, 0.30, 0)
-    btnGetKey.Text = "OBTER KEY"
-    btnGetKey.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btnGetKey.TextSize = 16
-    btnGetKey.Font = Enum.Font.GothamBold
-    btnGetKey.BackgroundColor3 = Color3.fromRGB(45, 150, 200)
-    btnGetKey.BackgroundTransparency = 0.15
-    btnGetKey.BorderSizePixel = 0
-    btnGetKey.Parent = conteudoFrame
-    local btnGetKeyCorner = Instance.new("UICorner")
-    btnGetKeyCorner.CornerRadius = UDim.new(0, 10)
-    btnGetKeyCorner.Parent = btnGetKey
-
-    btnGetKey.MouseButton1Click:Connect(function()
-        local proxKey = nil
-        for _, item in pairs(KEYS_SEQUENCIA) do
-            if not item.usada then
-                proxKey = item
-                break
-            end
-        end
-        if proxKey then
-            local link = proxKey.link
-            local sucesso = pcall(function()
-                setclipboard(link)
-            end)
-            if sucesso then
-                status.Text = "Link copiado! Compartilhe com alguem."
-                status.TextColor3 = Color3.fromRGB(100, 255, 100)
-            else
-                status.Text = "Link: " .. link
-                status.TextColor3 = Color3.fromRGB(255, 200, 100)
-            end
-        else
-            status.Text = "Nenhuma key disponivel!"
-            status.TextColor3 = Color3.fromRGB(255, 100, 100)
-        end
-    end)
-
     local status = Instance.new("TextLabel")
     status.Size = UDim2.new(1, 0, 0, 25)
-    status.Position = UDim2.new(0, 0, 0.42, 0)
+    status.Position = UDim2.new(0, 0, 0.45, 0)
     status.Text = "Digite sua key e clique em ATIVAR"
     status.TextColor3 = Color3.fromRGB(150, 150, 150)
     status.TextSize = 13
     status.Font = Enum.Font.Gotham
     status.BackgroundTransparency = 1
     status.Parent = conteudoFrame
-
-    local linkFrame = Instance.new("Frame")
-    linkFrame.Size = UDim2.new(0.9, 0, 0, 60)
-    linkFrame.Position = UDim2.new(0.05, 0, 0.50, 0)
-    linkFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
-    linkFrame.BackgroundTransparency = 0.2
-    linkFrame.BorderSizePixel = 0
-    linkFrame.Visible = false
-    linkFrame.Parent = conteudoFrame
-    local linkCorner = Instance.new("UICorner")
-    linkCorner.CornerRadius = UDim.new(0, 8)
-    linkCorner.Parent = linkFrame
-
-    local linkLabel = Instance.new("TextLabel")
-    linkLabel.Size = UDim2.new(1, 0, 0, 20)
-    linkLabel.Position = UDim2.new(0, 0, 0.05, 0)
-    linkLabel.Text = "PROXIMA KEY DISPONIVEL:"
-    linkLabel.TextColor3 = Color3.fromRGB(255, 200, 50)
-    linkLabel.TextSize = 13
-    linkLabel.Font = Enum.Font.GothamBold
-    linkLabel.BackgroundTransparency = 1
-    linkLabel.Parent = linkFrame
-
-    local linkTexto = Instance.new("TextLabel")
-    linkTexto.Size = UDim2.new(1, 0, 0, 25)
-    linkTexto.Position = UDim2.new(0, 0, 0.35, 0)
-    linkTexto.Text = ""
-    linkTexto.TextColor3 = Color3.fromRGB(100, 200, 255)
-    linkTexto.TextSize = 13
-    linkTexto.Font = Enum.Font.Gotham
-    linkTexto.BackgroundTransparency = 1
-    linkTexto.Parent = linkFrame
-
-    local linkInstrucao = Instance.new("TextLabel")
-    linkInstrucao.Size = UDim2.new(1, 0, 0, 15)
-    linkInstrucao.Position = UDim2.new(0, 0, 0.70, 0)
-    linkInstrucao.Text = "Compartilhe este link com a proxima pessoa!"
-    linkInstrucao.TextColor3 = Color3.fromRGB(150, 150, 150)
-    linkInstrucao.TextSize = 11
-    linkInstrucao.Font = Enum.Font.Gotham
-    linkInstrucao.BackgroundTransparency = 1
-    linkInstrucao.Parent = linkFrame
-
-    local btnCopiar = Instance.new("TextButton")
-    btnCopiar.Size = UDim2.new(0.3, 0, 0, 25)
-    btnCopiar.Position = UDim2.new(0.6, 0, 0.35, 0)
-    btnCopiar.Text = "COPIAR LINK"
-    btnCopiar.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btnCopiar.TextSize = 12
-    btnCopiar.Font = Enum.Font.GothamBold
-    btnCopiar.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
-    btnCopiar.BackgroundTransparency = 0.2
-    btnCopiar.BorderSizePixel = 0
-    btnCopiar.Visible = false
-    btnCopiar.Parent = linkFrame
-    local btnCopiarCorner = Instance.new("UICorner")
-    btnCopiarCorner.CornerRadius = UDim.new(0, 6)
-    btnCopiarCorner.Parent = btnCopiar
-    btnCopiar.MouseButton1Click:Connect(function()
-        if linkTexto.Text ~= "" then
-            setclipboard(linkTexto.Text)
-            btnCopiar.Text = "COPIADO!"
-            task.wait(1)
-            btnCopiar.Text = "COPIAR LINK"
-        end
-    end)
 
     btnAtivar.MouseButton1Click:Connect(function()
         local key = keyBox.Text
@@ -579,38 +404,17 @@ local function criarGUIAtivacao()
         local valida, mensagem = verificarKey(key)
 
         if valida then
-            status.Text = "KEY VALIDA! Ativando DAVI HUB..."
+            status.Text = "KEY VÁLIDA! Ativando DAVI HUB..."
             status.TextColor3 = Color3.fromRGB(100, 255, 100)
             btnAtivar.Text = "ATIVADO!"
             btnAtivar.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
 
-            local proximoLink = marcarKeyUsada(key)
             player:SetAttribute("DAVI_KEY", key)
             keyValidada = true
 
-            if proximoLink then
-                linkFrame.Visible = true
-                linkTexto.Text = proximoLink
-                btnCopiar.Visible = true
-                print("PROXIMA KEY: " .. proximoLink)
-            else
-                status.Text = "Todas as keys foram distribuidas!"
-                status.TextColor3 = Color3.fromRGB(255, 200, 50)
-                linkFrame.Visible = true
-                linkTexto.Text = "Nenhuma key disponivel!"
-                linkTexto.TextColor3 = Color3.fromRGB(255, 100, 100)
-                btnCopiar.Visible = false
-                print("TODAS AS KEYS FORAM DISTRIBUIDAS!")
-            end
-
-            task.wait(1.5)
+            task.wait(1)
             gui:Destroy()
-
-            if todasKeysAcabaram() then
-                criarGUIAvisar()
-            else
-                print("DAVI HUB ATIVADO COM SUCESSO!")
-            end
+            print("DAVI HUB ATIVADO COM SUCESSO!")
         else
             status.Text = mensagem
             status.TextColor3 = Color3.fromRGB(255, 100, 100)
@@ -623,59 +427,255 @@ local function criarGUIAtivacao()
             btnAtivar.MouseButton1Click:Fire()
         end
     end)
+
     keyBox.FocusLost:Connect(function()
         local key = keyBox.Text
         if key ~= "" then
             local valida, mensagem = verificarKey(key)
-            status.Text = valida and "KEY VALIDA! Clique em ATIVAR." or mensagem
+            status.Text = valida and "KEY VÁLIDA! Clique em ATIVAR." or mensagem
             status.TextColor3 = valida and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
         end
     end)
 
     return gui
 end
-
 -- ============================================================
--- BLOQUEIA O SCRIPT ATE A KEY SER VALIDADA
+-- BLOQUEIA O SCRIPT ATÉ A KEY SER VALIDADA
 -- ============================================================
 
 local function isAtivado()
     local keySalva = player:GetAttribute("DAVI_KEY")
     if keySalva then
-        for _, item in pairs(KEYS_SEQUENCIA) do
-            if item.key == keySalva and not item.usada then
-                item.usada = true
-                return true
-            end
-        end
+        local valida, _ = verificarKey(keySalva)
+        return valida
     end
     return false
 end
 
 if isAtivado() then
-    print("DAVI HUB ja esta ativado! Continuando...")
+    print("DAVI HUB já está ativado! Continuando...")
 else
-    print("Aguardando ativacao da key...")
+    print("Aguardando ativação da key...")
     criarGUIAtivacao()
 
     while not keyValidada do
         task.wait(0.5)
         local guiExists = false
         for _, v in pairs(player.PlayerGui:GetChildren()) do
-            if v.Name == "KeySystem" or v.Name == "AvisarGUI" then
+            if v.Name == "KeySystem" then
                 guiExists = true
                 break
             end
         end
         if not guiExists and not keyValidada then
-            print("Ativacao cancelada.")
+            print("Ativação cancelada.")
             return
         end
     end
 end
 
 -- ============================================================
--- FIM DO SISTEMA DE KEY
+-- SISTEMA DE IDIOMAS E CONFIGURAÇÕES
+-- ============================================================
+
+local idiomaAtual = "pt"
+
+local TRADUCOES = {
+    pt = {
+        ["idioma"] = "Português",
+        ["config_titulo"] = "CONFIGURAÇÕES",
+        ["config_idioma"] = "Idioma",
+        ["config_salvar"] = "Salvar Configurações",
+        ["config_carregar"] = "Carregar Configurações",
+        ["config_autoload"] = "Auto Load",
+        ["config_autoload_desc"] = "Carregar configurações automaticamente",
+        ["config_salvo"] = "Configurações salvas!",
+        ["config_carregado"] = "Configurações carregadas!",
+        ["config_nao_encontrado"] = "Nenhuma configuração salva encontrada.",
+        ["config_autoload_ativado"] = "Auto Load ativado!",
+        ["config_autoload_desativado"] = "Auto Load desativado!",
+        ["config_salvar_auto"] = "Configurações salvas automaticamente!",
+        ["menu_idioma"] = "Idioma",
+        ["aba_config"] = "Configurações",
+        ["config_aba_titulo"] = "⚙️ CONFIGURAÇÕES",
+        ["config_status"] = "📁 Configurações salvas em: DAVI_HUB_Config.json",
+    },
+    en = {
+        ["idioma"] = "English",
+        ["config_titulo"] = "SETTINGS",
+        ["config_idioma"] = "Language",
+        ["config_salvar"] = "Save Settings",
+        ["config_carregar"] = "Load Settings",
+        ["config_autoload"] = "Auto Load",
+        ["config_autoload_desc"] = "Load settings automatically",
+        ["config_salvo"] = "Settings saved!",
+        ["config_carregado"] = "Settings loaded!",
+        ["config_nao_encontrado"] = "No saved settings found.",
+        ["config_autoload_ativado"] = "Auto Load enabled!",
+        ["config_autoload_desativado"] = "Auto Load disabled!",
+        ["config_salvar_auto"] = "Settings saved automatically!",
+        ["menu_idioma"] = "Language",
+        ["aba_config"] = "Settings",
+        ["config_aba_titulo"] = "⚙️ SETTINGS",
+        ["config_status"] = "📁 Settings saved at: DAVI_HUB_Config.json",
+    },
+    ["pt-pt"] = {
+        ["idioma"] = "Português (PT)",
+        ["config_titulo"] = "CONFIGURAÇÕES",
+        ["config_idioma"] = "Idioma",
+        ["config_salvar"] = "Guardar Configurações",
+        ["config_carregar"] = "Carregar Configurações",
+        ["config_autoload"] = "Auto Load",
+        ["config_autoload_desc"] = "Carregar configurações automaticamente",
+        ["config_salvo"] = "Configurações guardadas!",
+        ["config_carregado"] = "Configurações carregadas!",
+        ["config_nao_encontrado"] = "Nenhuma configuração guardada encontrada.",
+        ["config_autoload_ativado"] = "Auto Load ativado!",
+        ["config_autoload_desativado"] = "Auto Load desativado!",
+        ["config_salvar_auto"] = "Configurações guardadas automaticamente!",
+        ["menu_idioma"] = "Idioma",
+        ["aba_config"] = "Configurações",
+        ["config_aba_titulo"] = "⚙️ CONFIGURAÇÕES",
+        ["config_status"] = "📁 Configurações guardadas em: DAVI_HUB_Config.json",
+    },
+    es = {
+        ["idioma"] = "Español",
+        ["config_titulo"] = "CONFIGURACIONES",
+        ["config_idioma"] = "Idioma",
+        ["config_salvar"] = "Guardar Configuración",
+        ["config_carregar"] = "Cargar Configuración",
+        ["config_autoload"] = "Auto Load",
+        ["config_autoload_desc"] = "Cargar configuración automáticamente",
+        ["config_salvo"] = "¡Configuración guardada!",
+        ["config_carregado"] = "¡Configuración cargada!",
+        ["config_nao_encontrado"] = "No se encontró ninguna configuración guardada.",
+        ["config_autoload_ativado"] = "¡Auto Load activado!",
+        ["config_autoload_desativado"] = "¡Auto Load desactivado!",
+        ["config_salvar_auto"] = "¡Configuración guardada automáticamente!",
+        ["menu_idioma"] = "Idioma",
+        ["aba_config"] = "Configuración",
+        ["config_aba_titulo"] = "⚙️ CONFIGURACIONES",
+        ["config_status"] = "📁 Configuración guardada en: DAVI_HUB_Config.json",
+    },
+    ru = {
+        ["idioma"] = "Русский",
+        ["config_titulo"] = "НАСТРОЙКИ",
+        ["config_idioma"] = "Язык",
+        ["config_salvar"] = "Сохранить настройки",
+        ["config_carregar"] = "Загрузить настройки",
+        ["config_autoload"] = "Автозагрузка",
+        ["config_autoload_desc"] = "Автоматически загружать настройки",
+        ["config_salvo"] = "Настройки сохранены!",
+        ["config_carregado"] = "Настройки загружены!",
+        ["config_nao_encontrado"] = "Сохраненные настройки не найдены.",
+        ["config_autoload_ativado"] = "Автозагрузка включена!",
+        ["config_autoload_desativado"] = "Автозагрузка выключена!",
+        ["config_salvar_auto"] = "Настройки автоматически сохранены!",
+        ["menu_idioma"] = "Язык",
+        ["aba_config"] = "Настройки",
+        ["config_aba_titulo"] = "⚙️ НАСТРОЙКИ",
+        ["config_status"] = "📁 Настройки сохранены в: DAVI_HUB_Config.json",
+    },
+}
+
+local function t(chave)
+    if TRADUCOES[idiomaAtual] and TRADUCOES[idiomaAtual][chave] then
+        return TRADUCOES[idiomaAtual][chave]
+    end
+    return chave
+end
+
+local idiomas = {
+    {nome = "Português (BR)", codigo = "pt"},
+    {nome = "English", codigo = "en"},
+    {nome = "Português (PT)", codigo = "pt-pt"},
+    {nome = "Español", codigo = "es"},
+    {nome = "Русский", codigo = "ru"},
+}
+
+local idiomaIndex = 1
+for i, v in pairs(idiomas) do
+    if v.codigo == idiomaAtual then
+        idiomaIndex = i
+        break
+    end
+end
+-- ============================================================
+-- SISTEMA DE SAVE/LOAD
+-- ============================================================
+
+local configs = {
+    idioma = idiomaAtual,
+    noclip = false,
+    fullbright = false,
+    stamina = false,
+    antifrost = false,
+    o2 = false,
+    aimbot = false,
+    autoscare = false,
+    esp_players = false,
+    sprint_speed = 17,
+    aim_speed = 80,
+    aim_distance = 80,
+    autoload = true,
+}
+
+local function salvarConfiguracoes()
+    local dados = {
+        idioma = idiomaAtual,
+        noclip = configs.noclip,
+        fullbright = configs.fullbright,
+        stamina = configs.stamina,
+        antifrost = configs.antifrost,
+        o2 = configs.o2,
+        aimbot = configs.aimbot,
+        autoscare = configs.autoscare,
+        esp_players = configs.esp_players,
+        sprint_speed = configs.sprint_speed,
+        aim_speed = configs.aim_speed,
+        aim_distance = configs.aim_distance,
+        autoload = configs.autoload,
+    }
+    local json = HttpService:JSONEncode(dados)
+    pcall(function()
+        writefile("DAVI_HUB_Config.json", json)
+        print("💾 " .. t("config_salvo"))
+    end)
+end
+
+local function carregarConfiguracoes()
+    local sucesso, dados = pcall(function()
+        return readfile("DAVI_HUB_Config.json")
+    end)
+    if sucesso and dados then
+        local config = HttpService:JSONDecode(dados)
+        idiomaAtual = config.idioma or "pt"
+        configs.noclip = config.noclip or false
+        configs.fullbright = config.fullbright or false
+        configs.stamina = config.stamina or false
+        configs.antifrost = config.antifrost or false
+        configs.o2 = config.o2 or false
+        configs.aimbot = config.aimbot or false
+        configs.autoscare = config.autoscare or false
+        configs.esp_players = config.esp_players or false
+        configs.sprint_speed = config.sprint_speed or 17
+        configs.aim_speed = config.aim_speed or 80
+        configs.aim_distance = config.aim_distance or 80
+        configs.autoload = (config.autoload == nil and true) or config.autoload
+        print("📂 " .. t("config_carregado"))
+        return true
+    else
+        print("❌ " .. t("config_nao_encontrado"))
+        return false
+    end
+end
+
+if configs.autoload then
+    carregarConfiguracoes()
+end
+
+-- ============================================================
+-- FIM DO SISTEMA DE KEY / IDIOMAS / CONFIG
 -- ============================================================
 
 -- ============================================================
@@ -706,7 +706,7 @@ border.Thickness = 2
 border.Transparency = 0.4
 border.Parent = mainFrame
 
--- BOTAO EMBAIXO DA GUI
+-- BOTÃO EMBAIXO DA GUI
 local moverBtn = Instance.new("TextButton")
 moverBtn.Name = "MoverBtn"
 moverBtn.Size = UDim2.new(0.4, 0, 0, 25)
@@ -726,7 +726,7 @@ btnCorner.CornerRadius = UDim.new(0, 10)
 btnCorner.Parent = moverBtn
 
 -- ============================================================
--- CABECALHO
+-- CABEÇALHO
 -- ============================================================
 local header = Instance.new("Frame")
 header.Size = UDim2.new(1, 0, 0, 45)
@@ -777,6 +777,7 @@ minBtn.MouseButton1Click:Connect(function()
         end
     end
 end)
+
 local closeBtn = Instance.new("TextButton")
 closeBtn.Size = UDim2.new(0, 32, 0, 32)
 closeBtn.Position = UDim2.new(1, -38, 0, 6.5)
@@ -796,7 +797,6 @@ closeCorner.Parent = closeBtn
 closeBtn.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
-
 -- ============================================================
 -- ARRASTAR
 -- ============================================================
@@ -854,7 +854,7 @@ moverBtn.InputChanged:Connect(function(input)
 end)
 
 -- ============================================================
--- CONTEUDO
+-- CONTEÚDO
 -- ============================================================
 local contentFrame = Instance.new("Frame")
 contentFrame.Size = UDim2.new(1, 0, 1, -45)
@@ -884,23 +884,22 @@ sidebarLayout.Parent = sidebar
 local abaButtons = {}
 local abaFrames = {}
 local abas = {
+    {name = "Main", label = "Main"},
     {name = "Menu", label = "Menu"},
-    {name = "Char", label = "Char"},
     {name = "Tele", label = "Tele"},
     {name = "N1", label = "N1"},
     {name = "N2", label = "N2"},
     {name = "N3", label = "N3"},
     {name = "ESP", label = "ESP"},
-    {name = "Auto", label = "Auto"},
     {name = "Geral", label = "Geral"},
+    {name = "⚙️", label = "Config"},
 }
 
--- FUNCAO PARA CRIAR ABA
 local function criarAba(nome, icone)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(0.85, 0, 0, 45)
     btn.Position = UDim2.new(0.075, 0, 0, 0)
-    btn.Text = icone .. "\n" .. nome
+    btn.Text = nome
     btn.TextColor3 = Color3.fromRGB(200, 200, 200)
     btn.TextSize = 11
     btn.Font = Enum.Font.GothamBold
@@ -970,7 +969,7 @@ for i, aba in pairs(abas) do
 end
 
 -- ============================================================
--- FUNCOES AUXILIARES
+-- FUNÇÕES AUXILIARES
 -- ============================================================
 local function addCard(parent)
     local card = Instance.new("Frame")
@@ -1067,6 +1066,7 @@ local function addToggle(parent, text, callback, default)
         b.BackgroundColor3 = st and Color3.fromRGB(255, 140, 0) or Color3.fromRGB(80, 80, 100)
         b.TextColor3 = st and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(255, 100, 100)
         callback(st)
+        if configs.autoload then salvarConfiguracoes() end
     end)
     return c
 end
@@ -1119,7 +1119,7 @@ local function addSlider(parent, text, callback, min, max, default)
     vl.BackgroundTransparency = 1
     vl.Parent = sf
 
-    local dragging = false
+    local draggingSlider = false
     local function update(input)
         local pos = input.Position.X
         local fp = sf.AbsolutePosition.X
@@ -1130,24 +1130,27 @@ local function addSlider(parent, text, callback, min, max, default)
         vl.Text = tostring(val)
         callback(val)
         l.Text = text .. " (" .. tostring(val) .. ")"
+        if configs.autoload then salvarConfiguracoes() end
     end
+
     sb.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
+            draggingSlider = true
             update(input)
         end
     end)
-    sb.InputEnded:Connect(function() dragging = false end)
+    sb.InputEnded:Connect(function() draggingSlider = false end)
     UserInputService.InputChanged:Connect(function(input)
-        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        if draggingSlider and input.UserInputType == Enum.UserInputType.MouseMovement then
             update(input)
         end
     end)
 end
+-- ============================================================
+-- FUNÇÕES DO JOGO
+-- ============================================================
 
--- ============================================================
 -- NOCLIP
--- ============================================================
 local noclipLoop = nil
 local function toggleNoclip(v)
     if noclipLoop then
@@ -1176,6 +1179,77 @@ local function toggleNoclip(v)
                 end
             end
         end
+    end
+end
+
+-- FULLBRIGHT
+local origLight = {}
+local function toggleFullbright(v)
+    local li = Lighting
+    if v then
+        origLight = {
+            Ambient = li.Ambient,
+            OutdoorAmbient = li.OutdoorAmbient,
+            Brightness = li.Brightness,
+            GlobalShadows = li.GlobalShadows,
+            FogEnd = li.FogEnd
+        }
+        li.Ambient = Color3.fromRGB(255, 255, 255)
+        li.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+        li.Brightness = 2
+        li.GlobalShadows = false
+        li.FogEnd = 100000
+    else
+        li.Ambient = origLight.Ambient or Color3.fromRGB(128, 128, 128)
+        li.OutdoorAmbient = origLight.OutdoorAmbient or Color3.fromRGB(128, 128, 128)
+        li.Brightness = origLight.Brightness or 1
+        li.GlobalShadows = origLight.GlobalShadows or true
+        li.FogEnd = origLight.FogEnd or 1000
+    end
+end
+
+-- STAMINA
+local staminaLoop = nil
+local function toggleStamina(v)
+    if staminaLoop then staminaLoop:Disconnect(); staminaLoop = nil end
+    if v then
+        staminaLoop = RunService.RenderStepped:Connect(function()
+            local ch = player.Character
+            if ch and ch:FindFirstChild("Sprint") then
+                local sprint = ch.Sprint
+                if sprint:FindFirstChild("Overdrive") then sprint.Overdrive.Value = 1e9 end
+                if sprint:FindFirstChild("Stamina") then sprint.Stamina.Value = 100 end
+            end
+        end)
+    end
+end
+
+-- ANTI-FROSTED
+local function toggleAntiTemp(v)
+    local ch = player.Character
+    if ch then
+        local temp = ch:FindFirstChild("Temperature")
+        if temp then temp.Enabled = not v end
+    end
+end
+
+-- O2 INFINITO
+local o2Loop = nil
+local function toggleO2(v)
+    if o2Loop then o2Loop:Disconnect(); o2Loop = nil end
+    if v then
+        o2Loop = RunService.RenderStepped:Connect(function()
+            local ch = player.Character
+            if ch then
+                local breath = ch:FindFirstChild("Breath")
+                if breath then
+                    breath:SetAttribute("Max", 999999)
+                    breath.Value = 999999
+                end
+                local blur = Lighting:FindFirstChild("Blur")
+                if blur then blur.Enabled = false end
+            end
+        end)
     end
 end
 
@@ -1212,76 +1286,6 @@ local function teleportar(cframe)
     local char = player.Character or player.CharacterAdded:Wait()
     if char and char:FindFirstChild("HumanoidRootPart") then
         char.HumanoidRootPart.CFrame = cframe
-    end
-end
-
--- ============================================================
--- FUNCOES CHARACTER
--- ============================================================
-local origLight = {}
-local function toggleFullbright(v)
-    local li = Lighting
-    if v then
-        origLight = {
-            Ambient = li.Ambient,
-            OutdoorAmbient = li.OutdoorAmbient,
-            Brightness = li.Brightness,
-            GlobalShadows = li.GlobalShadows,
-            FogEnd = li.FogEnd
-        }
-        li.Ambient = Color3.fromRGB(255, 255, 255)
-        li.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
-        li.Brightness = 2
-        li.GlobalShadows = false
-        li.FogEnd = 100000
-    else
-        li.Ambient = origLight.Ambient or Color3.fromRGB(128, 128, 128)
-        li.OutdoorAmbient = origLight.OutdoorAmbient or Color3.fromRGB(128, 128, 128)
-        li.Brightness = origLight.Brightness or 1
-        li.GlobalShadows = origLight.GlobalShadows or true
-        li.FogEnd = origLight.FogEnd or 1000
-    end
-end
-
-local staminaLoop = nil
-local function toggleStamina(v)
-    if staminaLoop then staminaLoop:Disconnect(); staminaLoop = nil end
-    if v then
-        staminaLoop = RunService.RenderStepped:Connect(function()
-            local ch = player.Character
-            if ch and ch:FindFirstChild("Sprint") then
-                local sprint = ch.Sprint
-                if sprint:FindFirstChild("Overdrive") then sprint.Overdrive.Value = 1e9 end
-                if sprint:FindFirstChild("Stamina") then sprint.Stamina.Value = 100 end
-            end
-        end)
-    end
-end
-
-local function toggleAntiTemp(v)
-    local ch = player.Character
-    if ch then
-        local temp = ch:FindFirstChild("Temperature")
-        if temp then temp.Enabled = not v end
-    end
-end
-
-local o2Loop = nil
-local function toggleO2(v)
-    if o2Loop then o2Loop:Disconnect(); o2Loop = nil end
-    if v then
-        o2Loop = RunService.RenderStepped:Connect(function()
-            local ch = player.Character
-            if ch then
-                local breath = ch:FindFirstChild("Breath")
-                if breath then
-                    breath:SetAttribute("Max", 999999)
-                    breath.Value = 999999
-                end
-                local blur = Lighting:FindFirstChild("Blur")
-                if blur then blur.Enabled = false end
-            end
-        end)
     end
 end
 -- ============================================================
@@ -1457,70 +1461,13 @@ local function EscapeSnatch()
     end
 end
 -- ============================================================
--- AUTO SAFE SPOT
--- ============================================================
-local autoSafeActive = false
-local autoSafeLoop = nil
-local lastSafeTeleport = 0
-local SAFE_COOLDOWN = 2
-local SAFE_SPOT_CFRAME = CFrame.new(-29.2, 3, -62.8)
-local MONSTROS_NAMES = {"Mutant", "Larry", "Stalker"}
-
-local function isMonster(obj)
-    if not obj:IsA("Model") then return false end
-    for _, nome in pairs(MONSTROS_NAMES) do
-        if obj.Name == nome then return true end
-    end
-    return false
-end
-
-local function getMonsterPositions()
-    local positions = {}
-    for _, obj in pairs(workspace:GetDescendants()) do
-        if isMonster(obj) then
-            local humanoid = obj:FindFirstChild("Humanoid")
-            if humanoid and humanoid.Health > 0 then
-                local root = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildWhichIsA("BasePart")
-                if root then table.insert(positions, root.Position) end
-            end
-        end
-    end
-    return positions
-end
-
-local function checkAndTeleport()
-    if not autoSafeActive then return end
-    local char = player.Character
-    if not char then return end
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-    local playerPos = root.Position
-    for _, pos in pairs(getMonsterPositions()) do
-        local dist = (playerPos - pos).Magnitude
-        if dist >= 40 and dist <= 50 and tick() - lastSafeTeleport >= SAFE_COOLDOWN then
-            root.CFrame = SAFE_SPOT_CFRAME
-            lastSafeTeleport = tick()
-            break
-        end
-    end
-end
-
-local function startAutoSafe(v)
-    if autoSafeLoop then autoSafeLoop:Disconnect(); autoSafeLoop = nil end
-    autoSafeActive = v
-    if v then
-        autoSafeLoop = RunService.Stepped:Connect(checkAndTeleport)
-    end
-end
-
--- ============================================================
 -- AIMBOT
 -- ============================================================
 local NPC_NAMES = {"Worker", "ModelWorker", "WorkerHead", "Mutant", "Larry", "Stalker", "Spider"}
 local aimbotEnabled = false
 local currentTarget = nil
-local AIM_SPEED = 80
-local MAX_DISTANCE = 80
+local AIM_SPEED = configs.aim_speed or 80
+local MAX_DISTANCE = configs.aim_distance or 80
 local lastAimbotUpdate = 0
 
 local function getNearestNPC()
@@ -1619,12 +1566,10 @@ local function AutoMunicao()
     task.wait(0.6)
     root.CFrame = CFrame.new(originalPos)
 end
-
 -- ============================================================
 -- ESP
 -- ============================================================
 local espPlayers = {}
-local espMonster = {}
 
 local function toggleESPPlayers(v)
     for _, h in pairs(espPlayers) do if h then h:Destroy() end end
@@ -1644,68 +1589,231 @@ local function toggleESPPlayers(v)
     end
 end
 
-local function refreshMonsters()
-    for _, h in pairs(espMonster) do if h then h:Destroy() end end
-    espMonster = {}
-    local mutant = workspace:FindFirstChild("Mutant") or workspace:FindFirstChild("Larry")
-    if mutant then
-        local h = Instance.new("Highlight")
-        h.FillColor = Color3.fromRGB(255, 0, 0)
-        h.OutlineColor = Color3.fromRGB(200, 0, 0)
-        h.FillTransparency = 0.3
-        h.Adornee = mutant
-        h.Parent = mutant
-        table.insert(espMonster, h)
-    end
-    local stalker = workspace:FindFirstChild("Stalker")
-    if stalker then
-        local h = Instance.new("Highlight")
-        h.FillColor = Color3.fromRGB(255, 100, 0)
-        h.OutlineColor = Color3.fromRGB(200, 80, 0)
-        h.FillTransparency = 0.3
-        h.Adornee = stalker
-        h.Parent = stalker
-        table.insert(espMonster, h)
-    end
+-- ============================================================
+-- SISTEMA DE FEEDBACK (SIMPLIFICADO)
+-- ============================================================
+local function enviarFeedback(usuario, mensagem, categoria)
+    local data = {
+        ["embeds"] = {{
+            ["title"] = "NOVO FEEDBACK - DAVI HUB",
+            ["color"] = 16753920,
+            ["fields"] = {
+                {["name"] = "Usuário", ["value"] = usuario or "Desconhecido", ["inline"] = true},
+                {["name"] = "Categoria", ["value"] = categoria or "Geral", ["inline"] = true},
+                {["name"] = "Mensagem", ["value"] = mensagem or "Sem mensagem", ["inline"] = false},
+                {["name"] = "UserID", ["value"] = tostring(player.UserId), ["inline"] = true},
+                {["name"] = "Servidor", ["value"] = game.JobId or "N/A", ["inline"] = true},
+                {["name"] = "Data", ["value"] = os.date("%d/%m/%Y %H:%M:%S"), ["inline"] = true},
+            },
+            ["footer"] = {["text"] = "DAVI HUB - Feedback"},
+            ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%S.000Z")
+        }}
+    }
+    local json = HttpService:JSONEncode(data)
+    pcall(function()
+        local request = syn and syn.request or request or http_request
+        if request then
+            request({Url = WEBHOOK_URL, Method = "POST", Headers = {["Content-Type"] = "application/json"}, Body = json})
+        end
+    end)
 end
 
-spawn(function()
-    while true do wait(2) refreshMonsters() end
-end)
-workspace.ChildAdded:Connect(function(child)
-    if child.Name == "Mutant" or child.Name == "Larry" or child.Name == "Stalker" then
-        task.wait(0.5); refreshMonsters()
-    end
-end)
+local function criarGUIFeedback()
+    for _, v in pairs(player.PlayerGui:GetChildren()) do if v.Name == "FeedbackGUI" then v:Destroy() end end
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "FeedbackGUI"
+    gui.Parent = player.PlayerGui
+    gui.ResetOnSpawn = false
+    gui.IgnoreGuiInset = true
 
+    local fundo = Instance.new("Frame")
+    fundo.Size = UDim2.new(1, 0, 1, 0)
+    fundo.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    fundo.BackgroundTransparency = 0.5
+    fundo.Parent = gui
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 450, 0, 350)
+    frame.Position = UDim2.new(0.5, -225, 0.5, -175)
+    frame.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
+    frame.BackgroundTransparency = 0.05
+    frame.BorderSizePixel = 0
+    frame.ClipsDescendants = true
+    frame.Parent = fundo
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 16)
+    corner.Parent = frame
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 45)
+    title.Text = "Enviar Feedback"
+    title.TextColor3 = Color3.fromRGB(255, 200, 50)
+    title.TextSize = 20
+    title.Font = Enum.Font.GothamBold
+    title.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+    title.BackgroundTransparency = 0.2
+    title.Parent = frame
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 16)
+    titleCorner.Parent = title
+
+    local close = Instance.new("TextButton")
+    close.Size = UDim2.new(0, 30, 0, 30)
+    close.Position = UDim2.new(1, -38, 0, 7)
+    close.Text = "X"
+    close.TextColor3 = Color3.fromRGB(255, 255, 255)
+    close.TextSize = 18
+    close.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+    close.BackgroundTransparency = 0.3
+    close.BorderSizePixel = 0
+    close.Parent = title
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 8)
+    closeCorner.Parent = close
+    close.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+    local msgBox = Instance.new("TextBox")
+    msgBox.Size = UDim2.new(0.9, 0, 0, 150)
+    msgBox.Position = UDim2.new(0.05, 0, 0.15, 0)
+    msgBox.BackgroundColor3 = Color3.fromRGB(35, 35, 50)
+    msgBox.BackgroundTransparency = 0.2
+    msgBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    msgBox.TextSize = 14
+    msgBox.Font = Enum.Font.Gotham
+    msgBox.Text = "Escreva sua mensagem aqui..."
+    msgBox.TextWrapped = true
+    msgBox.TextXAlignment = Enum.TextXAlignment.Left
+    msgBox.TextYAlignment = Enum.TextYAlignment.Top
+    msgBox.ClearTextOnFocus = true
+    msgBox.BorderSizePixel = 0
+    msgBox.Parent = frame
+    local msgCorner = Instance.new("UICorner")
+    msgCorner.CornerRadius = UDim.new(0, 8)
+    msgCorner.Parent = msgBox
+
+    local btnEnviar = Instance.new("TextButton")
+    btnEnviar.Size = UDim2.new(0.4, 0, 0, 40)
+    btnEnviar.Position = UDim2.new(0.05, 0, 0.7, 0)
+    btnEnviar.Text = "Enviar"
+    btnEnviar.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnEnviar.TextSize = 16
+    btnEnviar.Font = Enum.Font.GothamBold
+    btnEnviar.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+    btnEnviar.BackgroundTransparency = 0.2
+    btnEnviar.BorderSizePixel = 0
+    btnEnviar.Parent = frame
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 8)
+    btnCorner.Parent = btnEnviar
+
+    local btnCancelar = Instance.new("TextButton")
+    btnCancelar.Size = UDim2.new(0.4, 0, 0, 40)
+    btnCancelar.Position = UDim2.new(0.55, 0, 0.7, 0)
+    btnCancelar.Text = "Cancelar"
+    btnCancelar.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btnCancelar.TextSize = 16
+    btnCancelar.Font = Enum.Font.GothamBold
+    btnCancelar.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+    btnCancelar.BackgroundTransparency = 0.2
+    btnCancelar.BorderSizePixel = 0
+    btnCancelar.Parent = frame
+    local btnCancelarCorner = Instance.new("UICorner")
+    btnCancelarCorner.CornerRadius = UDim.new(0, 8)
+    btnCancelarCorner.Parent = btnCancelar
+    btnCancelar.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+    local statusLabel = Instance.new("TextLabel")
+    statusLabel.Size = UDim2.new(0.9, 0, 0, 25)
+    statusLabel.Position = UDim2.new(0.05, 0, 0.85, 0)
+    statusLabel.Text = "Escreva sua mensagem e clique em Enviar"
+    statusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    statusLabel.TextSize = 13
+    statusLabel.Font = Enum.Font.Gotham
+    statusLabel.BackgroundTransparency = 1
+    statusLabel.Parent = frame
+
+    btnEnviar.MouseButton1Click:Connect(function()
+        local mensagem = msgBox.Text
+        if mensagem == "" or mensagem == "Escreva sua mensagem aqui..." then
+            statusLabel.Text = "Digite uma mensagem!"
+            statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+            return
+        end
+        statusLabel.Text = "Enviando..."
+        statusLabel.TextColor3 = Color3.fromRGB(255, 255, 100)
+        enviarFeedback(player.Name, mensagem, "Geral")
+        statusLabel.Text = "Feedback enviado! Obrigado!"
+        statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+        msgBox.Text = ""
+        btnEnviar.Text = "Enviado!"
+        btnEnviar.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+        task.wait(2)
+        gui:Destroy()
+    end)
+
+    msgBox.FocusLost:Connect(function(enterPressed)
+        if enterPressed then
+            btnEnviar.MouseButton1Click:Fire()
+        end
+    end)
+end
+
+local function abrirFeedback()
+    criarGUIFeedback()
+end
 -- ============================================================
--- CONSTRUCAO DAS ABAS
+-- CONSTRUÇÃO DAS ABAS
 -- ============================================================
 
--- ABA: MENU
-local menuFrame = abaFramesMap["Menu"]
-local menuCard = addCard(menuFrame)
-addLabel(menuCard, "BEM-VINDO AO DAVI HUB", Color3.fromRGB(255, 255, 255))
-addLabel(menuCard, "Selecione uma aba ao lado", Color3.fromRGB(200, 200, 200))
-addLabel(menuCard, "Versao 2.0", Color3.fromRGB(150, 150, 150))
+-- ABA: MAIN
+local mainAba = abaFramesMap["Main"]
+local mainCard = addCard(mainAba)
+addLabel(mainCard, "MAIN")
 
--- ABA: CHARACTER
-local charFrame = abaFramesMap["Char"]
-local charCard = addCard(charFrame)
-addLabel(charCard, "CHARACTER")
-addToggle(charCard, "Fullbright", toggleFullbright, false)
-addToggle(charCard, "Infinite Stamina", toggleStamina, false)
-addToggle(charCard, "Anti-Frosted", toggleAntiTemp, false)
-addToggle(charCard, "Infinite O2", toggleO2, false)
-addToggle(charCard, "Noclip", toggleNoclip, false)
-addSlider(charCard, "Sprint Speed", function(v)
+addToggle(mainCard, "Fullbright", function(v) 
+    toggleFullbright(v) 
+    configs.fullbright = v 
+end, configs.fullbright)
+
+addToggle(mainCard, "Infinite Stamina", function(v) 
+    toggleStamina(v) 
+    configs.stamina = v 
+end, configs.stamina)
+
+addToggle(mainCard, "Anti-Frosted", function(v) 
+    toggleAntiTemp(v) 
+    configs.antifrost = v 
+end, configs.antifrost)
+
+addToggle(mainCard, "Infinite O2", function(v) 
+    toggleO2(v) 
+    configs.o2 = v 
+end, configs.o2)
+
+addToggle(mainCard, "Noclip", function(v) 
+    toggleNoclip(v) 
+    configs.noclip = v 
+end, configs.noclip)
+
+addSlider(mainCard, "Sprint Speed", function(v)
     local ch = player.Character
     if ch then
         ch:SetAttribute("SprintSpeed", v)
         local hum = ch:FindFirstChild("Humanoid")
         if hum then hum.WalkSpeed = v end
     end
-end, 17, 45, 17)
+    configs.sprint_speed = v
+end, 17, 45, configs.sprint_speed)
+
+-- ABA: MENU
+local menuFrame = abaFramesMap["Menu"]
+local menuCard = addCard(menuFrame)
+addLabel(menuCard, "MENU")
+addLabel(menuCard, "Bem-vindo ao DAVI HUB", Color3.fromRGB(255, 255, 255))
+addLabel(menuCard, "Selecione uma aba ao lado", Color3.fromRGB(200, 200, 200))
+addLabel(menuCard, "Versão 2.0", Color3.fromRGB(150, 150, 150))
+addButton(menuCard, "📩 Enviar Feedback", abrirFeedback)
 
 -- ABA: TELEPORTS
 local teleFrame = abaFramesMap["Tele"]
@@ -1736,8 +1844,11 @@ addButton(n1Card, "Grab JerryCan", GrabJerryCan)
 local n2Frame = abaFramesMap["N2"]
 local n2Card = addCard(n2Frame)
 addLabel(n2Card, "NIGHT 2")
-addToggle(n2Card, "Auto Scare", function(v) scareActive = v end, false)
-addButton(n2Card, "Anti Vent-Pests", AntiVentPests)
+addToggle(n2Card, "Auto Scare", function(v) 
+    scareActive = v 
+    configs.autoscare = v 
+end, configs.autoscare)
+addButton(n2Card, "Anti Vent", AntiVentPests)
 addButton(n2Card, "Revive", ReviveN2)
 addButton(n2Card, "Escape Snatch", EscapeSnatch)
 addButton(n2Card, "Refill Power", function()
@@ -1760,7 +1871,7 @@ addButton(n2Card, "Anti Stalker", function()
         remotes.LookAt:Destroy()
         print("Anti Stalker ativado! Imune ao dano visual do Stalker.")
     else
-        print("Remote 'LookAt' nao encontrado.")
+        print("Remote 'LookAt' não encontrado.")
     end
 end)
 
@@ -1768,48 +1879,29 @@ end)
 local n3Frame = abaFramesMap["N3"]
 local n3Card = addCard(n3Frame)
 addLabel(n3Card, "NIGHT 3")
-addToggle(n3Card, "Ativar Aimbot", function(v) aimbotEnabled = v end, false)
-addSlider(n3Card, "Aimbot Speed", function(v) AIM_SPEED = v end, 30, 150, 80)
-addSlider(n3Card, "Aimbot Distance", function(v) MAX_DISTANCE = v end, 30, 150, 80)
-addButton(n3Card, "Auto Coletar Municao", AutoMunicao)
+addToggle(n3Card, "Ativar Aimbot", function(v) 
+    aimbotEnabled = v 
+    configs.aimbot = v 
+end, configs.aimbot)
+addSlider(n3Card, "Aimbot Speed", function(v) 
+    AIM_SPEED = v 
+    configs.aim_speed = v 
+end, 30, 150, configs.aim_speed)
+addSlider(n3Card, "Aimbot Distance", function(v) 
+    MAX_DISTANCE = v 
+    configs.aim_distance = v 
+end, 30, 150, configs.aim_distance)
+addButton(n3Card, "Auto Coletar Munição", AutoMunicao)
 
 -- ABA: ESP
 local espFrame = abaFramesMap["ESP"]
 local espCard = addCard(espFrame)
 addLabel(espCard, "ESP")
-addToggle(espCard, "ESP Players", toggleESPPlayers, false)
-addLabel(espCard, "ESP Monsters (Auto)", Color3.fromRGB(200, 200, 200))
 
--- ESP Players (Botão extra para ativar manualmente)
-addButton(espCard, "ESP Players", function()
-    local players = game:GetService("Players")
-    local localPlayer = players.LocalPlayer
-    
-    local function addESP(player)
-        if player == localPlayer then return end
-        player.CharacterAdded:Connect(function(character)
-            local highlight = Instance.new("Highlight")
-            highlight.Parent = game:GetService("CoreGui")
-            highlight.Adornee = character
-            highlight.OutlineColor = Color3.fromRGB(0, 0, 255)
-            highlight.FillColor = Color3.fromRGB(173, 216, 230)
-            highlight.FillTransparency = 0.85
-        end)
-        if player.Character then
-            local highlight = Instance.new("Highlight")
-            highlight.Parent = game:GetService("CoreGui")
-            highlight.Adornee = player.Character
-            highlight.OutlineColor = Color3.fromRGB(0, 0, 255)
-            highlight.FillColor = Color3.fromRGB(0, 0, 255)
-            highlight.FillTransparency = 0.9
-        end
-    end
-    for _, player in pairs(players:GetPlayers()) do
-        addESP(player)
-    end
-    players.PlayerAdded:Connect(addESP)
-    print("ESP Players ativado!")
-end)
+addToggle(espCard, "ESP Players", function(v) 
+    toggleESPPlayers(v) 
+    configs.esp_players = v 
+end, configs.esp_players)
 
 addButton(espCard, "ESP Larry", function()
     local function addESP_Larry()
@@ -1878,13 +1970,9 @@ addButton(espCard, "ESP Zombies & Skeletons", function()
     print("ESP Zombies & Skeletons ativado!")
 end)
 
--- ABA: AUTO
-local autoFrame = abaFramesMap["Auto"]
-local autoCard = addCard(autoFrame)
-addLabel(autoCard, "AUTO")
-addToggle(autoCard, "Auto Safe Spot", startAutoSafe, false)
+addLabel(espCard, "ESP Monsters (Auto)", Color3.fromRGB(200, 200, 200))
 
--- ABA: GERAL (NOVA)
+-- ABA: GERAL
 local geralFrame = abaFramesMap["Geral"]
 local geralCard = addCard(geralFrame)
 addLabel(geralCard, "GERAL")
@@ -1902,9 +1990,9 @@ addButton(geralCard, "Disable Static", function()
     local static = workspace:FindFirstChild("Static")
     if static then
         static:Destroy()
-        print("Estatica removida!")
+        print("Estática removida!")
     else
-        print("Estatica nao encontrada.")
+        print("Estática não encontrada.")
     end
 end)
 
@@ -1942,8 +2030,115 @@ addButton(geralCard, "Events Notifier", function()
     print("Events Notifier ativado!")
 end)
 
+-- ABA: CONFIGURAÇÕES
+local configFrame = abaFramesMap["Config"]
+local configCard = addCard(configFrame)
+addLabel(configCard, "⚙️ " .. t("config_titulo"))
+
+-- Seletor de Idioma
+local idiomaAtualBtn = Instance.new("TextButton")
+idiomaAtualBtn.Size = UDim2.new(0.9, 0, 0, 35)
+idiomaAtualBtn.Position = UDim2.new(0.05, 0, 0.08, 0)
+idiomaAtualBtn.Text = "🌐 " .. t("config_idioma") .. ": " .. idiomas[idiomaIndex].nome
+idiomaAtualBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+idiomaAtualBtn.TextSize = 13
+idiomaAtualBtn.Font = Enum.Font.GothamBold
+idiomaAtualBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+idiomaAtualBtn.BackgroundTransparency = 0.2
+idiomaAtualBtn.BorderSizePixel = 0
+idiomaAtualBtn.Parent = configCard
+
+local idiomaBtnCorner = Instance.new("UICorner")
+idiomaBtnCorner.CornerRadius = UDim.new(0, 8)
+idiomaBtnCorner.Parent = idiomaAtualBtn
+
+local idiomaMenu = Instance.new("ScrollingFrame")
+idiomaMenu.Size = UDim2.new(0.9, 0, 0, 0)
+idiomaMenu.Position = UDim2.new(0.05, 0, 0.14, 0)
+idiomaMenu.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+idiomaMenu.BackgroundTransparency = 0.2
+idiomaMenu.BorderSizePixel = 0
+idiomaMenu.ClipsDescendants = true
+idiomaMenu.Visible = false
+idiomaMenu.ScrollBarThickness = 4
+idiomaMenu.Parent = configCard
+
+local idiomaMenuCorner = Instance.new("UICorner")
+idiomaMenuCorner.CornerRadius = UDim.new(0, 8)
+idiomaMenuCorner.Parent = idiomaMenu
+
+local idiomaListLayout = Instance.new("UIListLayout")
+idiomaListLayout.Padding = UDim.new(0, 2)
+idiomaListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+idiomaListLayout.Parent = idiomaMenu
+
+for i, idioma in pairs(idiomas) do
+    local opt = Instance.new("TextButton")
+    opt.Size = UDim2.new(1, 0, 0, 30)
+    opt.Text = idioma.nome
+    opt.TextColor3 = Color3.fromRGB(255, 255, 255)
+    opt.TextSize = 13
+    opt.Font = Enum.Font.Gotham
+    opt.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+    opt.BackgroundTransparency = 0.2
+    opt.BorderSizePixel = 0
+    opt.Parent = idiomaMenu
+    
+    local optCorner = Instance.new("UICorner")
+    optCorner.CornerRadius = UDim.new(0, 6)
+    optCorner.Parent = opt
+    
+    opt.MouseButton1Click:Connect(function()
+        idiomaAtual = idioma.codigo
+        idiomaIndex = i
+        idiomaAtualBtn.Text = "🌐 " .. t("config_idioma") .. ": " .. idioma.nome
+        idiomaMenu.Visible = false
+        idiomaMenu.Size = UDim2.new(0.9, 0, 0, 0)
+        configs.idioma = idiomaAtual
+        salvarConfiguracoes()
+        print("🌐 Idioma alterado para: " .. idioma.nome)
+        gui:Destroy()
+        -- Recria a GUI com o novo idioma
+        -- Nota: Como o script é executado uma vez, o usuário precisa reexecutar
+        -- Em um script mais avançado, você recriaria a GUI aqui
+    end)
+end
+
+idiomaAtualBtn.MouseButton1Click:Connect(function()
+    idiomaMenu.Visible = not idiomaMenu.Visible
+    if idiomaMenu.Visible then
+        local totalHeight = #idiomas * 32
+        local maxHeight = 150
+        idiomaMenu.Size = UDim2.new(0.9, 0, 0, math.min(totalHeight, maxHeight))
+        idiomaMenu.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+    else
+        idiomaMenu.Size = UDim2.new(0.9, 0, 0, 0)
+    end
+end)
+
+-- Botões de Save/Load
+addButton(configCard, "💾 " .. t("config_salvar"), function()
+    salvarConfiguracoes()
+end)
+
+addButton(configCard, "📂 " .. t("config_carregar"), function()
+    carregarConfiguracoes()
+    print("✅ " .. t("config_carregado"))
+end)
+
+-- Auto Load Toggle
+addToggle(configCard, "🔄 " .. t("config_autoload"), function(v)
+    configs.autoload = v
+    salvarConfiguracoes()
+    print(v and t("config_autoload_ativado") or t("config_autoload_desativado"))
+end, configs.autoload)
+
+addLabel(configCard, "💡 " .. t("config_autoload_desc"), Color3.fromRGB(150, 150, 150))
+addLabel(configCard, "", Color3.fromRGB(0, 0, 0))
+addLabel(configCard, t("config_status"), Color3.fromRGB(150, 150, 150))
+
 -- ============================================================
--- FORCA ATUALIZACAO DO SCROLL
+-- FORÇA ATUALIZAÇÃO DO SCROLL
 -- ============================================================
 task.wait(0.5)
 for _, frame in pairs(abaFrames) do
@@ -1952,3 +2147,4 @@ for _, frame in pairs(abaFrames) do
         frame.CanvasSize = UDim2.new(0, 0, 0, flayout.AbsoluteContentSize.Y + 20)
     end
 end
+
