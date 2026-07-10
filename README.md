@@ -594,33 +594,43 @@ local function criarGUIAtivacao()
     btnGetKeyCorner.Parent = btnGetKey
 
 btnGetKey.MouseButton1Click:Connect(function()
-    local key = keyBox.Text
-    print("🔍 Key digitada: " .. key)  -- DIAGNÓSTICO
+    -- Pega o texto do campo de key
+    local key = ""
+    local sucesso, resultado = pcall(function()
+        key = keyBox.Text
+    end)
     
-    if key == "" then
-        status.Text = "Digite uma key primeiro!"
+    if not sucesso or key == "" then
+        -- Se não conseguir pegar a key, mostra mensagem
+        status.Text = "Digite uma key no campo acima primeiro!"
         status.TextColor3 = Color3.fromRGB(255, 100, 100)
         return
     end
     
-    print("📋 LINKS_KEYS:", LINKS_KEYS)  -- DIAGNÓSTICO
+    print("🔍 Key digitada: " .. key)
     
+    -- Procura o link
     local link = LINKS_KEYS[key]
-    print("🔗 Link encontrado:", link)  -- DIAGNÓSTICO
+    print("🔗 Link encontrado:", link)
     
     if link then
-        local sucesso = pcall(function()
+        -- Tenta copiar
+        local copiou = false
+        pcall(function()
             setclipboard(link)
+            copiou = true
         end)
-        if sucesso then
-            status.Text = "Link copiado!"
+        
+        if copiou then
+            status.Text = "✅ Link copiado!"
             status.TextColor3 = Color3.fromRGB(100, 255, 100)
         else
-            status.Text = "Link: " .. link
-            status.TextColor3 = Color3.fromRGB(255, 200, 100)
+            -- Mostra o link na tela
+            status.Text = "🔗 Link: " .. link
+            status.TextColor3 = Color3.fromRGB(100, 200, 255)
         end
     else
-        status.Text = "Nenhum link encontrado para esta key."
+        status.Text = "❌ Nenhum link encontrado para esta key."
         status.TextColor3 = Color3.fromRGB(255, 100, 100)
     end
 end)
