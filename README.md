@@ -1297,6 +1297,60 @@ local btnCorner = Instance.new("UICorner")
 btnCorner.CornerRadius = UDim.new(0, 10)
 btnCorner.Parent = moverBtn
 
+-- BOTÃO EMBAIXO DA GUI (ARRASTÁVEL - CORRIGIDO)
+local moverBtn = Instance.new("TextButton")
+moverBtn.Name = "MoverBtn"
+moverBtn.Size = UDim2.new(0.4, 0, 0, 25)
+moverBtn.Position = UDim2.new(0.3, 0, 1, -10)
+moverBtn.BackgroundColor3 = Color3.fromRGB(180, 180, 180)
+moverBtn.BackgroundTransparency = 0.3
+moverBtn.Text = "==="
+moverBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+moverBtn.TextSize = 14
+moverBtn.Font = Enum.Font.GothamBold
+moverBtn.BorderSizePixel = 0
+moverBtn.ZIndex = 10
+moverBtn.Parent = mainFrame
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 10)
+btnCorner.Parent = moverBtn
+
+-- ARRASTE DO BOTÃO (CORRIGIDO)
+local moverDragging = false
+local moverDragStart, moverStartPos
+
+moverBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        moverDragging = true
+        moverDragStart = input.Position
+        moverStartPos = mainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                moverDragging = false
+            end
+        end)
+    end
+end)
+
+moverBtn.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        moverDragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if moverDragging and input == moverDragInput then
+        local delta = input.Position - moverDragStart
+        mainFrame.Position = UDim2.new(
+            moverStartPos.X.Scale,
+            moverStartPos.X.Offset + delta.X,
+            moverStartPos.Y.Scale,
+            moverStartPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
 -- ============================================================
 -- CABECALHO
 -- ============================================================
@@ -2582,9 +2636,8 @@ end
 
 -- ============================================================
 -- CONSTRUCAO DAS ABAS
--- ============================================================
+-- ===========================================================
 
--- ABA: MAIN
 local mainAba = abaFramesMap["Main"]
 local mainCard = addCard(mainAba)
 addLabel(mainCard, t("main"))
