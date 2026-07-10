@@ -595,50 +595,29 @@ local function criarGUIAtivacao()
 
 btnGetKey.MouseButton1Click:Connect(function()
     local key = keyBox.Text
+    print("🔍 Key digitada: " .. key)  -- DIAGNÓSTICO
+    
     if key == "" then
         status.Text = "Digite uma key primeiro!"
         status.TextColor3 = Color3.fromRGB(255, 100, 100)
         return
     end
     
+    print("📋 LINKS_KEYS:", LINKS_KEYS)  -- DIAGNÓSTICO
+    
     local link = LINKS_KEYS[key]
+    print("🔗 Link encontrado:", link)  -- DIAGNÓSTICO
+    
     if link then
-        -- Tenta copiar de várias formas
-        local copiou = false
-        
-        -- Método 1: setclipboard (mais comum)
-        local sucesso1, erro1 = pcall(function()
+        local sucesso = pcall(function()
             setclipboard(link)
-            copiou = true
         end)
-        
-        -- Método 2: toclipboard (alternativa)
-        if not copiou then
-            local sucesso2, erro2 = pcall(function()
-                toclipboard(link)
-                copiou = true
-            end)
-        end
-        
-        -- Método 3: Clipboard service (para alguns executores)
-        if not copiou then
-            local sucesso3, erro3 = pcall(function()
-                game:GetService("Clipboard"):set(link)
-                copiou = true
-            end)
-        end
-        
-        if copiou then
-            status.Text = "Link copiado! Acesse para obter sua key."
+        if sucesso then
+            status.Text = "Link copiado!"
             status.TextColor3 = Color3.fromRGB(100, 255, 100)
         else
-            -- Se não conseguir copiar, mostra o link na tela
             status.Text = "Link: " .. link
             status.TextColor3 = Color3.fromRGB(255, 200, 100)
-            -- Tenta abrir no navegador
-            pcall(function()
-                syn and syn.open_url and syn.open_url(link)
-            end)
         end
     else
         status.Text = "Nenhum link encontrado para esta key."
