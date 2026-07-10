@@ -6,7 +6,161 @@ local UserInputService = game:GetService("UserInputService")
 local RS = game.ReplicatedStorage
 local HttpService = game:GetService("HttpService")
 local TweenService = game:GetService("TweenService")
+-- ============================================================
+-- auto Key
+-- ============================================================
 
+-- Tabela de expiração das keys (defina a data de expiração de cada key)
+local EXPIRACAO_KEYS = {
+    ["free_10182alapapqaoqkfa"] = "15/07/2026",
+    ["free_20394blbqbqbrbrlsb"] = "15/07/2026",
+    ["free_30567cmcrcrcscsmtc"] = "15/07/2026",
+    ["free_40821dndsdtdudunud"] = "15/07/2026",
+    ["free_50943eoeuevevevove"] = "15/07/2026",
+    ["free_61054fpfwfwfwfwpwf"] = "15/07/2026",
+    ["free_71265gqgxgxgxgxqgx"] = "15/07/2026",
+    ["free_81376hrhyhyhyhyrhy"] = "15/07/2026",
+    ["free_91487isizizizizsiz"] = "15/07/2026",
+    ["free_101598jtjajajajataj"] = "15/07/2026",
+}
+
+-- Função para verificar se a key expirou
+local function isKeyExpirada(key)
+    local dataExp = EXPIRACAO_KEYS[key]
+    if not dataExp then return true end
+    
+    local dia, mes, ano = dataExp:match("(%d+)/(%d+)/(%d+)")
+    if not dia then return true end
+    
+    local expiraTimestamp = os.time({
+        day = tonumber(dia),
+        month = tonumber(mes),
+        year = tonumber(ano),
+        hour = 23,
+        min = 59,
+        sec = 59
+    })
+    
+    return os.time() > expiraTimestamp
+end
+
+-- Função para salvar a key ativada automaticamente
+local function autoSaveKey(key)
+    if key and key ~= "" then
+        player:SetAttribute("DAVI_KEY_ATIVADA", key)
+        player:SetAttribute("DAVI_KEY_DATA", os.date("%d/%m/%Y %H:%M:%S"))
+        print("💾 Key salva automaticamente: " .. key)
+    end
+end
+
+-- Função para verificar se a key salva ainda é válida
+local function verificarKeySalva()
+    local keySalva = player:GetAttribute("DAVI_KEY_ATIVADA")
+    if not keySalva then return false end
+    
+    -- Verifica se a key expirou
+    if isKeyExpirada(keySalva) then
+        print("⏰ KEY EXPIRADA! (" .. keySalva .. ")")
+        player:SetAttribute("DAVI_KEY_ATIVADA", nil)
+        player:SetAttribute("DAVI_KEY_DATA", nil)
+        return false
+    end
+    
+    -- Verifica se a key ainda está no Pastebin (não foi revogada)
+    local keysOnline = baixarListaKeys()
+    if keysOnline and not keysOnline[keySalva] then
+        print("❌ KEY REVOGADA! (" .. keySalva .. ")")
+        player:SetAttribute("DAVI_KEY_ATIVADA", nil)
+        player:SetAttribute("DAVI_KEY_DATA", nil)
+        return false
+    end
+    
+    return true
+end
+
+-- Substitua a função verificarKey por esta versão com expiração
+local function verificarKey(key)
+    -- Key VIP de desenvolvedor (nunca expira)
+    if key == VIP_DEV_KEY then
+        return true, "KEY VIP DE DESENVOLVEDOR!"
+    end
+    
+    -- Verifica se a key expirou
+    if isKeyExpirada(key) then
+        return false, "⏰ KEY EXPIRADA!"
+    end
+    
+    local keysOnline = baixarListaKeys()
+    if keysOnline then
+        if keysOnline[key] then
+            -- Salva a key automaticamente
+            autoSaveKey(key)
+            return true, "KEY VÁLIDA!"
+        else
+            return false, "KEY INVÁLIDA OU REVOGADA!"
+        end
+    else
+        return false, "ERRO AO VALIDAR KEY! TENTE NOVAMENTE."
+    end
+end
+
+-- No início do script, verifica se já tem uma key salva
+local function verificarKeySalvaInicial()
+    if verificarKeySalva() then
+        local keySalva = player:GetAttribute("DAVI_KEY_ATIVADA")
+        print("🔑 Key salva encontrada: " .. keySalva)
+        print("✅ Key ainda válida! Liberando HUB...")
+        keyValidada = true
+        return true
+    else
+        return false
+    end
+end
+
+-- Função para mostrar status da key no console
+local function statusKey()
+    local key = player:GetAttribute("DAVI_KEY_ATIVADA")
+    if not key then
+        print("❌ Nenhuma key ativada.")
+        return
+    end
+    
+    local data = player:GetAttribute("DAVI_KEY_DATA")
+    local expirada = isKeyExpirada(key)
+    
+    print("=== STATUS DA KEY ===")
+    print("🔑 Key: " .. key)
+    print("📅 Ativada em: " .. (data or "N/A"))
+    if expirada then
+        print("⏰ Status: EXPIRADA!")
+    else
+        print("✅ Status: VÁLIDA")
+    end
+    print("======================")
+end
+
+-- Substitua a parte de verificação inicial por:
+if verificarKeySalvaInicial() then
+    print("DAVI HUB já está ativado! Continuando...")
+else
+    print("Aguardando ativação da key...")
+    criarGUIAtivacao()
+
+    while not keyValidada do
+        task.wait(0.5)
+        local guiExists = false
+        for _, v in pairs(player.PlayerGui:GetChildren()) do
+            if v.Name == "KeySystem" then
+                guiExists = true
+                break
+            end
+        end
+        if not guiExists and not keyValidada then
+            print("Ativação cancelada.")
+            return
+        end
+    end
+end
 -- ============================================================
 -- SISTEMA DE KEY (VALIDAÇÃO VIA PASTEBIN)
 -- ============================================================
