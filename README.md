@@ -577,61 +577,51 @@ local function criarGUIAtivacao()
     btnCorner.CornerRadius = UDim.new(0, 10)
     btnCorner.Parent = btnAtivar
 
-    -- BOTÃO OBTER KEY
-    local btnGetKey = Instance.new("TextButton")
-    btnGetKey.Size = UDim2.new(0.35, 0, 0, 45)
-    btnGetKey.Position = UDim2.new(0.55, 0, 0.30, 0)
-    btnGetKey.Text = "OBTER KEY"
-    btnGetKey.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btnGetKey.TextSize = 16
-    btnGetKey.Font = Enum.Font.GothamBold
-    btnGetKey.BackgroundColor3 = Color3.fromRGB(45, 150, 200)
-    btnGetKey.BackgroundTransparency = 0.15
-    btnGetKey.BorderSizePixel = 0
-    btnGetKey.Parent = conteudoFrame
-    local btnGetKeyCorner = Instance.new("UICorner")
-    btnGetKeyCorner.CornerRadius = UDim.new(0, 10)
-    btnGetKeyCorner.Parent = btnGetKey
+    -- Botão Get Key (substitua TODO o código do btnGetKey por este)
+local btnGetKey = Instance.new("TextButton")
+btnGetKey.Size = UDim2.new(0.35, 0, 0, 45)
+btnGetKey.Position = UDim2.new(0.55, 0, 0.30, 0)
+btnGetKey.Text = "OBTER KEY"
+btnGetKey.TextColor3 = Color3.fromRGB(255, 255, 255)
+btnGetKey.TextSize = 16
+btnGetKey.Font = Enum.Font.GothamBold
+btnGetKey.BackgroundColor3 = Color3.fromRGB(45, 150, 200)
+btnGetKey.BackgroundTransparency = 0.15
+btnGetKey.BorderSizePixel = 0
+btnGetKey.Parent = conteudoFrame
+local btnGetKeyCorner = Instance.new("UICorner")
+btnGetKeyCorner.CornerRadius = UDim.new(0, 10)
+btnGetKeyCorner.Parent = btnGetKey
 
+-- Função do botão Get Key (sem usar status e keyBox)
 btnGetKey.MouseButton1Click:Connect(function()
-    -- Pega o texto do campo de key
+    -- Pega o texto do campo keyBox se ele existir
     local key = ""
-    local sucesso, resultado = pcall(function()
+    pcall(function()
         key = keyBox.Text
     end)
     
-    if not sucesso or key == "" then
-        -- Se não conseguir pegar a key, mostra mensagem
-        status.Text = "Digite uma key no campo acima primeiro!"
-        status.TextColor3 = Color3.fromRGB(255, 100, 100)
+    if key == "" then
+        print("❌ Digite uma key primeiro!")
         return
     end
     
-    print("🔍 Key digitada: " .. key)
-    
-    -- Procura o link
-    local link = LINKS_KEYS[key]
-    print("🔗 Link encontrado:", link)
+    local link = LINKS_KEYS and LINKS_KEYS[key]
     
     if link then
-        -- Tenta copiar
-        local copiou = false
+        print("🔗 Link da key: " .. link)
+        -- Tenta abrir no navegador
         pcall(function()
-            setclipboard(link)
-            copiou = true
+            if syn and syn.open_url then
+                syn.open_url(link)
+            elseif open_url then
+                open_url(link)
+            else
+                print("📋 Copie o link manualmente: " .. link)
+            end
         end)
-        
-        if copiou then
-            status.Text = "✅ Link copiado!"
-            status.TextColor3 = Color3.fromRGB(100, 255, 100)
-        else
-            -- Mostra o link na tela
-            status.Text = "🔗 Link: " .. link
-            status.TextColor3 = Color3.fromRGB(100, 200, 255)
-        end
     else
-        status.Text = "❌ Nenhum link encontrado para esta key."
-        status.TextColor3 = Color3.fromRGB(255, 100, 100)
+        print("❌ Nenhum link encontrado para esta key.")
     end
 end)
 
