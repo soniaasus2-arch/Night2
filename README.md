@@ -120,139 +120,249 @@ local function statusKey()
     print("======================")
 end
 -- ============================================================
--- SISTEMA DE IDIOMAS
+-- SISTEMA DE IDIOMAS (COMPLETO E CORRIGIDO)
 -- ============================================================
 
 local IDIOMAS = {
     pt = {
         nome = "Português",
-        main = "PRINCIPAL", menu = "MENU", tele = "TELEPORTES",
-        n1 = "NOITE 1", n2 = "NOITE 2", n3 = "NOITE 3",
-        esp = "ESP", geral = "GERAL", config = "CONFIGURAÇÕES",
-        fullbright = "Fullbright", stamina = "Stamina Infinita",
-        antifrost = "Anti-Frosted", o2 = "O2 Infinito",
-        noclip = "Noclip", sprint = "Velocidade da Sprint",
-        feedback = "Enviar Feedback", usuarios = "Ver Usuários do HUB",
-        autoscare = "Auto Scare", antivent = "Anti Vent",
-        revive = "Reviver", escapesnatch = "Escape Snatch",
-        refillpower = "Recarregar Energia", antistalker = "Anti Stalker",
-        aimbot = "Ativar Aimbot", aimspeed = "Velocidade do Aimbot",
-        aimdist = "Distância do Aimbot", municao = "Auto Coletar Munição",
-        esp_players = "ESP Players", esp_larry = "ESP Larry",
-        esp_stalker = "ESP Stalker", esp_zombie = "ESP Zumbis & Esqueletos",
-        bypass = "Bypass Anti-Cheat", static = "Desabilitar Estática",
-        notifier = "Notificador", salvar = "Salvar Configurações",
-        carregar = "Carregar Configurações", autoload = "Auto Load",
-        idioma = "Idioma", config_salvas = "As configurações são salvas em:",
+        main = "PRINCIPAL",
+        menu = "MENU",
+        tele = "TELEPORTES",
+        n1 = "NOITE 1",
+        n2 = "NOITE 2",
+        n3 = "NOITE 3",
+        esp = "ESP",
+        geral = "GERAL",
+        config = "CONFIGURAÇÕES",
+        fullbright = "Fullbright",
+        stamina = "Stamina Infinita",
+        antifrost = "Anti-Frosted",
+        o2 = "O2 Infinito",
+        noclip = "Noclip",
+        sprint = "Velocidade da Sprint",
+        feedback = "Enviar Feedback",
+        usuarios = "Ver Usuários do HUB",
+        autoscare = "Auto Scare",
+        antivent = "Anti Vent",
+        revive = "Reviver",
+        escapesnatch = "Escape Snatch",
+        refillpower = "Recarregar Energia",
+        antistalker = "Anti Stalker",
+        aimbot = "Ativar Aimbot",
+        aimspeed = "Velocidade do Aimbot",
+        aimdist = "Distância do Aimbot",
+        municao = "Auto Coletar Munição",
+        esp_players = "ESP Players",
+        esp_larry = "ESP Larry",
+        esp_stalker = "ESP Stalker",
+        esp_zombie = "ESP Zumbis & Esqueletos",
+        bypass = "Bypass Anti-Cheat",
+        static = "Desabilitar Estática",
+        notifier = "Notificador",
+        salvar = "Salvar Configurações",
+        carregar = "Carregar Configurações",
+        autoload = "Auto Load",
+        idioma = "Idioma",
+        config_salvas = "As configurações são salvas em:",
         arquivo_config = "DAVI_HUB_Config.json",
         bemvindo = "Bem-vindo ao DAVI HUB",
         selecione = "Selecione uma aba ao lado",
         versao = "Versão 2.0",
         idioma_alterado = "Idioma alterado para: ",
+        status_key = "🔑 Status da Key",
     },
     en = {
         nome = "English",
-        main = "MAIN", menu = "MENU", tele = "TELEPORTS",
-        n1 = "NIGHT 1", n2 = "NIGHT 2", n3 = "NIGHT 3",
-        esp = "ESP", geral = "GENERAL", config = "SETTINGS",
-        fullbright = "Fullbright", stamina = "Infinite Stamina",
-        antifrost = "Anti-Frosted", o2 = "Infinite O2",
-        noclip = "Noclip", sprint = "Sprint Speed",
-        feedback = "Send Feedback", usuarios = "View HUB Users",
-        autoscare = "Auto Scare", antivent = "Anti Vent",
-        revive = "Revive", escapesnatch = "Escape Snatch",
-        refillpower = "Refill Power", antistalker = "Anti Stalker",
-        aimbot = "Enable Aimbot", aimspeed = "Aimbot Speed",
-        aimdist = "Aimbot Distance", municao = "Auto Collect Ammo",
-        esp_players = "ESP Players", esp_larry = "ESP Larry",
-        esp_stalker = "ESP Stalker", esp_zombie = "ESP Zombies & Skeletons",
-        bypass = "Bypass Anti-Cheat", static = "Disable Static",
-        notifier = "Notifier", salvar = "Save Settings",
-        carregar = "Load Settings", autoload = "Auto Load",
-        idioma = "Language", config_salvas = "Settings are saved at:",
+        main = "MAIN",
+        menu = "MENU",
+        tele = "TELEPORTS",
+        n1 = "NIGHT 1",
+        n2 = "NIGHT 2",
+        n3 = "NIGHT 3",
+        esp = "ESP",
+        geral = "GENERAL",
+        config = "SETTINGS",
+        fullbright = "Fullbright",
+        stamina = "Infinite Stamina",
+        antifrost = "Anti-Frosted",
+        o2 = "Infinite O2",
+        noclip = "Noclip",
+        sprint = "Sprint Speed",
+        feedback = "Send Feedback",
+        usuarios = "View HUB Users",
+        autoscare = "Auto Scare",
+        antivent = "Anti Vent",
+        revive = "Revive",
+        escapesnatch = "Escape Snatch",
+        refillpower = "Refill Power",
+        antistalker = "Anti Stalker",
+        aimbot = "Enable Aimbot",
+        aimspeed = "Aimbot Speed",
+        aimdist = "Aimbot Distance",
+        municao = "Auto Collect Ammo",
+        esp_players = "ESP Players",
+        esp_larry = "ESP Larry",
+        esp_stalker = "ESP Stalker",
+        esp_zombie = "ESP Zombies & Skeletons",
+        bypass = "Bypass Anti-Cheat",
+        static = "Disable Static",
+        notifier = "Notifier",
+        salvar = "Save Settings",
+        carregar = "Load Settings",
+        autoload = "Auto Load",
+        idioma = "Language",
+        config_salvas = "Settings are saved at:",
         arquivo_config = "DAVI_HUB_Config.json",
         bemvindo = "Welcome to DAVI HUB",
         selecione = "Select a tab on the side",
         versao = "Version 2.0",
         idioma_alterado = "Language changed to: ",
+        status_key = "🔑 Key Status",
     },
     ["pt-pt"] = {
         nome = "Português (PT)",
-        main = "PRINCIPAL", menu = "MENU", tele = "TELEPORTES",
-        n1 = "NOITE 1", n2 = "NOITE 2", n3 = "NOITE 3",
-        esp = "ESP", geral = "GERAL", config = "CONFIGURAÇÕES",
-        fullbright = "Fullbright", stamina = "Stamina Infinita",
-        antifrost = "Anti-Frosted", o2 = "O2 Infinito",
-        noclip = "Noclip", sprint = "Velocidade da Sprint",
-        feedback = "Enviar Feedback", usuarios = "Ver Utilizadores do HUB",
-        autoscare = "Auto Scare", antivent = "Anti Vent",
-        revive = "Reviver", escapesnatch = "Escape Snatch",
-        refillpower = "Recarregar Energia", antistalker = "Anti Stalker",
-        aimbot = "Ativar Aimbot", aimspeed = "Velocidade do Aimbot",
-        aimdist = "Distância do Aimbot", municao = "Auto Colecionar Munição",
-        esp_players = "ESP Jogadores", esp_larry = "ESP Larry",
-        esp_stalker = "ESP Stalker", esp_zombie = "ESP Zumbis & Esqueletos",
-        bypass = "Bypass Anti-Cheat", static = "Desabilitar Estática",
-        notifier = "Notificador", salvar = "Guardar Configurações",
-        carregar = "Carregar Configurações", autoload = "Auto Load",
-        idioma = "Idioma", config_salvas = "As configurações são guardadas em:",
+        main = "PRINCIPAL",
+        menu = "MENU",
+        tele = "TELEPORTES",
+        n1 = "NOITE 1",
+        n2 = "NOITE 2",
+        n3 = "NOITE 3",
+        esp = "ESP",
+        geral = "GERAL",
+        config = "CONFIGURAÇÕES",
+        fullbright = "Fullbright",
+        stamina = "Stamina Infinita",
+        antifrost = "Anti-Frosted",
+        o2 = "O2 Infinito",
+        noclip = "Noclip",
+        sprint = "Velocidade da Sprint",
+        feedback = "Enviar Feedback",
+        usuarios = "Ver Utilizadores do HUB",
+        autoscare = "Auto Scare",
+        antivent = "Anti Vent",
+        revive = "Reviver",
+        escapesnatch = "Escape Snatch",
+        refillpower = "Recarregar Energia",
+        antistalker = "Anti Stalker",
+        aimbot = "Ativar Aimbot",
+        aimspeed = "Velocidade do Aimbot",
+        aimdist = "Distância do Aimbot",
+        municao = "Auto Colecionar Munição",
+        esp_players = "ESP Jogadores",
+        esp_larry = "ESP Larry",
+        esp_stalker = "ESP Stalker",
+        esp_zombie = "ESP Zumbis & Esqueletos",
+        bypass = "Bypass Anti-Cheat",
+        static = "Desabilitar Estática",
+        notifier = "Notificador",
+        salvar = "Guardar Configurações",
+        carregar = "Carregar Configurações",
+        autoload = "Auto Load",
+        idioma = "Idioma",
+        config_salvas = "As configurações são guardadas em:",
         arquivo_config = "DAVI_HUB_Config.json",
         bemvindo = "Bem-vindo ao DAVI HUB",
         selecione = "Selecione uma aba ao lado",
         versao = "Versão 2.0",
         idioma_alterado = "Idioma alterado para: ",
+        status_key = "🔑 Estado da Key",
     },
     es = {
         nome = "Español",
-        main = "PRINCIPAL", menu = "MENÚ", tele = "TELETRANSPORTES",
-        n1 = "NOCHE 1", n2 = "NOCHE 2", n3 = "NOCHE 3",
-        esp = "ESP", geral = "GENERAL", config = "CONFIGURACIÓN",
-        fullbright = "Fullbright", stamina = "Resistencia Infinita",
-        antifrost = "Anti-Frosted", o2 = "O2 Infinito",
-        noclip = "Noclip", sprint = "Velocidad de Sprint",
-        feedback = "Enviar Feedback", usuarios = "Ver Usuarios del HUB",
-        autoscare = "Auto Scare", antivent = "Anti Vent",
-        revive = "Revivir", escapesnatch = "Escape Snatch",
-        refillpower = "Recargar Energía", antistalker = "Anti Stalker",
-        aimbot = "Activar Aimbot", aimspeed = "Velocidad del Aimbot",
-        aimdist = "Distancia del Aimbot", municao = "Auto Recoger Munición",
-        esp_players = "ESP Jugadores", esp_larry = "ESP Larry",
-        esp_stalker = "ESP Stalker", esp_zombie = "ESP Zombies & Esqueletos",
-        bypass = "Bypass Anti-Cheat", static = "Desactivar Estática",
-        notifier = "Notificador", salvar = "Guardar Configuración",
-        carregar = "Cargar Configuración", autoload = "Auto Load",
-        idioma = "Idioma", config_salvas = "La configuración se guarda en:",
+        main = "PRINCIPAL",
+        menu = "MENÚ",
+        tele = "TELETRANSPORTES",
+        n1 = "NOCHE 1",
+        n2 = "NOCHE 2",
+        n3 = "NOCHE 3",
+        esp = "ESP",
+        geral = "GENERAL",
+        config = "CONFIGURACIÓN",
+        fullbright = "Fullbright",
+        stamina = "Resistencia Infinita",
+        antifrost = "Anti-Frosted",
+        o2 = "O2 Infinito",
+        noclip = "Noclip",
+        sprint = "Velocidad de Sprint",
+        feedback = "Enviar Feedback",
+        usuarios = "Ver Usuarios del HUB",
+        autoscare = "Auto Scare",
+        antivent = "Anti Vent",
+        revive = "Revivir",
+        escapesnatch = "Escape Snatch",
+        refillpower = "Recargar Energía",
+        antistalker = "Anti Stalker",
+        aimbot = "Activar Aimbot",
+        aimspeed = "Velocidad del Aimbot",
+        aimdist = "Distancia del Aimbot",
+        municao = "Auto Recoger Munición",
+        esp_players = "ESP Jugadores",
+        esp_larry = "ESP Larry",
+        esp_stalker = "ESP Stalker",
+        esp_zombie = "ESP Zombies & Esqueletos",
+        bypass = "Bypass Anti-Cheat",
+        static = "Desactivar Estática",
+        notifier = "Notificador",
+        salvar = "Guardar Configuración",
+        carregar = "Cargar Configuración",
+        autoload = "Auto Load",
+        idioma = "Idioma",
+        config_salvas = "La configuración se guarda en:",
         arquivo_config = "DAVI_HUB_Config.json",
         bemvindo = "Bienvenido a DAVI HUB",
         selecione = "Seleccione una pestaña al lado",
         versao = "Versión 2.0",
         idioma_alterado = "Idioma cambiado a: ",
+        status_key = "🔑 Estado de la Key",
     },
     ru = {
         nome = "Русский",
-        main = "ГЛАВНАЯ", menu = "МЕНЮ", tele = "ТЕЛЕПОРТЫ",
-        n1 = "НОЧЬ 1", n2 = "НОЧЬ 2", n3 = "НОЧЬ 3",
-        esp = "ESP", geral = "ОБЩЕЕ", config = "НАСТРОЙКИ",
-        fullbright = "Fullbright", stamina = "Бесконечная Выносливость",
-        antifrost = "Anti-Frosted", o2 = "Бесконечный O2",
-        noclip = "Noclip", sprint = "Скорость Спринта",
-        feedback = "Отправить Отзыв", usuarios = "Посмотреть Пользователей HUB",
-        autoscare = "Auto Scare", antivent = "Anti Vent",
-        revive = "Воскресить", escapesnatch = "Escape Snatch",
-        refillpower = "Перезарядка Энергии", antistalker = "Anti Stalker",
-        aimbot = "Включить Aimbot", aimspeed = "Скорость Aimbot",
-        aimdist = "Дистанция Aimbot", municao = "Автосбор Патронов",
-        esp_players = "ESP Игроков", esp_larry = "ESP Larry",
-        esp_stalker = "ESP Stalker", esp_zombie = "ESP Зомби & Скелеты",
-        bypass = "Bypass Anti-Cheat", static = "Отключить Статику",
-        notifier = "Уведомитель", salvar = "Сохранить Настройки",
-        carregar = "Загрузить Настройки", autoload = "Автозагрузка",
-        idioma = "Язык", config_salvas = "Настройки сохраняются в:",
+        main = "ГЛАВНАЯ",
+        menu = "МЕНЮ",
+        tele = "ТЕЛЕПОРТЫ",
+        n1 = "НОЧЬ 1",
+        n2 = "НОЧЬ 2",
+        n3 = "НОЧЬ 3",
+        esp = "ESP",
+        geral = "ОБЩЕЕ",
+        config = "НАСТРОЙКИ",
+        fullbright = "Fullbright",
+        stamina = "Бесконечная Выносливость",
+        antifrost = "Anti-Frosted",
+        o2 = "Бесконечный O2",
+        noclip = "Noclip",
+        sprint = "Скорость Спринта",
+        feedback = "Отправить Отзыв",
+        usuarios = "Посмотреть Пользователей HUB",
+        autoscare = "Auto Scare",
+        antivent = "Anti Vent",
+        revive = "Воскресить",
+        escapesnatch = "Escape Snatch",
+        refillpower = "Перезарядка Энергии",
+        antistalker = "Anti Stalker",
+        aimbot = "Включить Aimbot",
+        aimspeed = "Скорость Aimbot",
+        aimdist = "Дистанция Aimbot",
+        municao = "Автосбор Патронов",
+        esp_players = "ESP Игроков",
+        esp_larry = "ESP Larry",
+        esp_stalker = "ESP Stalker",
+        esp_zombie = "ESP Зомби & Скелеты",
+        bypass = "Bypass Anti-Cheat",
+        static = "Отключить Статику",
+        notifier = "Уведомитель",
+        salvar = "Сохранить Настройки",
+        carregar = "Загрузить Настройки",
+        autoload = "Автозагрузка",
+        idioma = "Язык",
+        config_salvas = "Настройки сохраняются в:",
         arquivo_config = "DAVI_HUB_Config.json",
         bemvindo = "Добро пожаловать в DAVI HUB",
         selecione = "Выберите вкладку сбоку",
         versao = "Версия 2.0",
         idioma_alterado = "Язык изменен на: ",
+        status_key = "🔑 Статус Key",
     },
 }
 
@@ -270,6 +380,184 @@ local function t(chave)
         return IDIOMAS[idiomaAtual][chave]
     end
     return chave
+end
+
+-- ============================================================
+-- FUNÇÃO PARA RECARREGAR A GUI (QUANDO O IDIOMA MUDAR)
+-- ============================================================
+local function recarregarGUI()
+    -- Fecha a GUI atual
+    for _, v in pairs(player.PlayerGui:GetChildren()) do
+        if v.Name == "DaviHub" then
+            v:Destroy()
+        end
+    end
+    
+    -- Recria a GUI chamando a função criarGUI()
+    criarGUI()
+    print("🔄 " .. t("idioma_alterado") .. IDIOMAS[idiomaAtual].nome)
+end
+
+-- ============================================================
+-- FUNÇÃO PARA CRIAR A GUI (USA O IDIOMA ATUAL)
+-- ============================================================
+function criarGUI()
+    -- CRIA GUI PRINCIPAL
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "DaviHub"
+    gui.Parent = player:WaitForChild("PlayerGui")
+    gui.ResetOnSpawn = false
+    gui.IgnoreGuiInset = true
+
+    -- JANELA PRINCIPAL
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 480, 0, 500)
+    mainFrame.Position = UDim2.new(0.5, -240, 0.15, 0)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    mainFrame.BackgroundTransparency = 0.1
+    mainFrame.BorderSizePixel = 0
+    mainFrame.ClipsDescendants = true
+    mainFrame.Parent = gui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 16)
+    corner.Parent = mainFrame
+
+    local border = Instance.new("UIStroke")
+    border.Color = Color3.fromRGB(255, 140, 0)
+    border.Thickness = 2
+    border.Transparency = 0.4
+    border.Parent = mainFrame
+
+    -- CABEÇALHO
+    local header = Instance.new("Frame")
+    header.Size = UDim2.new(1, 0, 0, 45)
+    header.BackgroundColor3 = Color3.fromRGB(255, 140, 0)
+    header.BackgroundTransparency = 0.25
+    header.BorderSizePixel = 0
+    header.Parent = mainFrame
+
+    local headerCorner = Instance.new("UICorner")
+    headerCorner.CornerRadius = UDim.new(0, 16)
+    headerCorner.Parent = header
+
+    local titulo = Instance.new("TextLabel")
+    titulo.Size = UDim2.new(1, -80, 1, 0)
+    titulo.Position = UDim2.new(0, 15, 0, 0)
+    titulo.Text = "DAVI HUB"
+    titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titulo.TextSize = 18
+    titulo.Font = Enum.Font.GothamBold
+    titulo.BackgroundTransparency = 1
+    titulo.TextXAlignment = Enum.TextXAlignment.Left
+    titulo.Parent = header
+
+    -- ... CONTINUE COM O RESTO DA CRIAÇÃO DA GUI (mainFrame, moverBtn, abas, etc.) ...
+
+    -- Quando chegar na parte das abas, use t("") para os textos:
+    -- addLabel(mainCard, t("main"))
+    -- addToggle(mainCard, t("fullbright"), ...)
+    -- addButton(menuCard, t("feedback"), ...)
+    -- addButton(menuCard, t("usuarios"), ...)
+    -- addButton(menuCard, t("status_key"), ...)
+
+    -- Quando chegar no seletor de idioma, use o código abaixo:
+
+    -- SELETOR DE IDIOMA (dentro da aba CONFIG)
+    local idiomaIndex = 1
+    for i, v in pairs(listaIdiomas) do
+        if v.codigo == idiomaAtual then idiomaIndex = i; break end
+    end
+
+    local idiomaBtn = Instance.new("TextButton")
+    idiomaBtn.Size = UDim2.new(0.9, 0, 0, 35)
+    idiomaBtn.Position = UDim2.new(0.05, 0, 0.42, 0)
+    idiomaBtn.Text = "🌐 " .. t("idioma") .. ": " .. listaIdiomas[idiomaIndex].nome
+    idiomaBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    idiomaBtn.TextSize = 13
+    idiomaBtn.Font = Enum.Font.GothamBold
+    idiomaBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+    idiomaBtn.BackgroundTransparency = 0.2
+    idiomaBtn.BorderSizePixel = 0
+    idiomaBtn.Parent = configCard
+
+    local idiomaBtnCorner = Instance.new("UICorner")
+    idiomaBtnCorner.CornerRadius = UDim.new(0, 8)
+    idiomaBtnCorner.Parent = idiomaBtn
+
+    local idiomaMenu = Instance.new("ScrollingFrame")
+    idiomaMenu.Size = UDim2.new(0.9, 0, 0, 0)
+    idiomaMenu.Position = UDim2.new(0.05, 0, 0.50, 0)
+    idiomaMenu.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+    idiomaMenu.BackgroundTransparency = 0.2
+    idiomaMenu.BorderSizePixel = 0
+    idiomaMenu.ClipsDescendants = true
+    idiomaMenu.Visible = false
+    idiomaMenu.ScrollBarThickness = 4
+    idiomaMenu.Parent = configCard
+
+    local idiomaMenuCorner = Instance.new("UICorner")
+    idiomaMenuCorner.CornerRadius = UDim.new(0, 8)
+    idiomaMenuCorner.Parent = idiomaMenu
+
+    local idiomaListLayout = Instance.new("UIListLayout")
+    idiomaListLayout.Padding = UDim.new(0, 2)
+    idiomaListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    idiomaListLayout.Parent = idiomaMenu
+
+    for i, idioma in pairs(listaIdiomas) do
+        local opt = Instance.new("TextButton")
+        opt.Size = UDim2.new(1, 0, 0, 30)
+        opt.Text = idioma.nome
+        opt.TextColor3 = Color3.fromRGB(255, 255, 255)
+        opt.TextSize = 13
+        opt.Font = Enum.Font.Gotham
+        opt.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+        opt.BackgroundTransparency = 0.2
+        opt.BorderSizePixel = 0
+        opt.Parent = idiomaMenu
+        local optCorner = Instance.new("UICorner")
+        optCorner.CornerRadius = UDim.new(0, 6)
+        optCorner.Parent = opt
+        opt.MouseButton1Click:Connect(function()
+            idiomaAtual = idioma.codigo
+            idiomaIndex = i
+            idiomaBtn.Text = "🌐 " .. t("idioma") .. ": " .. idioma.nome
+            idiomaMenu.Visible = false
+            idiomaMenu.Size = UDim2.new(0.9, 0, 0, 0)
+            configs.idioma = idiomaAtual
+            salvarConfiguracoes()
+            recarregarGUI()  -- 🔥 RECARREGA A GUI
+        end)
+    end
+
+    idiomaBtn.MouseButton1Click:Connect(function()
+        idiomaMenu.Visible = not idiomaMenu.Visible
+        if idiomaMenu.Visible then
+            local totalHeight = #listaIdiomas * 32
+            local maxHeight = 150
+            idiomaMenu.Size = UDim2.new(0.9, 0, 0, math.min(totalHeight, maxHeight))
+            idiomaMenu.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+        else
+            idiomaMenu.Size = UDim2.new(0.9, 0, 0, 0)
+        end
+    end)
+
+    -- ... CONTINUE COM O RESTO DO SCRIPT ...
+
+    -- FORÇA ATUALIZAÇÃO DO SCROLL
+    task.wait(0.5)
+    for _, frame in pairs(abaFrames) do
+        local flayout = frame:FindFirstChildWhichIsA("UIListLayout")
+        if flayout then
+            frame.CanvasSize = UDim2.new(0, 0, 0, flayout.AbsoluteContentSize.Y + 20)
+        end
+    end
+
+    print("✅ DAVI HUB CARREGADO COM SUCESSO!")
+    print("📌 Abas: Main | Menu | Tele | N1 | N2 | N3 | ESP | Geral | Config")
+    print("💡 Arraste pelo cabeçalho laranja | Use o scroll em cada aba")
+    print("🌐 Idioma atual: " .. IDIOMAS[idiomaAtual].nome)
 end
 -- ============================================================
 -- SISTEMA DE CONFIGURAÇÕES
