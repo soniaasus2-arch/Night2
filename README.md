@@ -577,7 +577,7 @@ local function criarGUIAtivacao()
     btnCorner.CornerRadius = UDim.new(0, 10)
     btnCorner.Parent = btnAtivar
 
-    -- Botão Get Key (substitua TODO o código do btnGetKey por este)
+-- Botão Get Key (copia o link da próxima key disponível)
 local btnGetKey = Instance.new("TextButton")
 btnGetKey.Size = UDim2.new(0.35, 0, 0, 45)
 btnGetKey.Position = UDim2.new(0.55, 0, 0.30, 0)
@@ -593,35 +593,60 @@ local btnGetKeyCorner = Instance.new("UICorner")
 btnGetKeyCorner.CornerRadius = UDim.new(0, 10)
 btnGetKeyCorner.Parent = btnGetKey
 
--- Função do botão Get Key (sem usar status e keyBox)
-btnGetKey.MouseButton1Click:Connect(function()
-    -- Pega o texto do campo keyBox se ele existir
-    local key = ""
-    pcall(function()
-        key = keyBox.Text
-    end)
-    
-    if key == "" then
-        print("❌ Digite uma key primeiro!")
-        return
+-- LINK DO LINKVERTISE PARA CADA KEY (10 primeiras)
+local LINKS_KEYS = {
+    ["free_10182alapapqaoqkfa"] = "https://link-target.net/5450045/U8UGMFUQ22Uc",
+    ["free_20394blbqbqbrbrlsb"] = "https://direct-link.net/5450045/QykQLu41Fp2x",
+    ["free_30567cmcrcrcscsmtc"] = "https://direct-link.net/5450045/m1aASokV7pIF",
+    ["free_40821dndsdtdudunud"] = "https://direct-link.net/5450045/glVLfwhKt4et",
+    ["free_50943eoeuevevevove"] = "https://link-center.net/5450045/l1peI74weA4g",
+    ["free_61054fpfwfwfwfwpwf"] = "https://direct-link.net/5450045/eaCiSMyybd74",
+    ["free_71265gqgxgxgxgxqgx"] = "https://link-hub.net/5450045/TGIbYBsV7EcU",
+    ["free_81376hrhyhyhyhyrhy"] = "https://link-hub.net/5450045/IkJsx7RSCwyp",
+    ["free_91487isizizizizsiz"] = "https://link-center.net/5450045/YR4NQ7ewNSkJ",
+    ["free_101598jtjajajajataj"] = "https://link-target.net/5450045/gdChsmYq0rb5",
+}
+
+-- FUNÇÃO: pega a próxima key disponível
+local function getProximaKeyDisponivel()
+    for key, link in pairs(LINKS_KEYS) do
+        -- Verifica se a key já foi usada (pelas keys usadas no sistema)
+        local usada = false
+        for _, item in pairs(KEYS_SEQUENCIA) do
+            if item.key == key and item.usada then
+                usada = true
+                break
+            end
+        end
+        if not usada then
+            return key, link
+        end
     end
-    
-    local link = LINKS_KEYS and LINKS_KEYS[key]
+    return nil, nil
+end
+
+-- FUNÇÃO DO BOTÃO GET KEY
+btnGetKey.MouseButton1Click:Connect(function()
+    local key, link = getProximaKeyDisponivel()
     
     if link then
-        print("🔗 Link da key: " .. link)
-        -- Tenta abrir no navegador
-        pcall(function()
-            if syn and syn.open_url then
-                syn.open_url(link)
-            elseif open_url then
-                open_url(link)
-            else
-                print("📋 Copie o link manualmente: " .. link)
-            end
+        print("🔗 PRÓXIMA KEY DISPONÍVEL:")
+        print("📌 Key: " .. key)
+        print("🔗 Link: " .. link)
+        
+        -- Tenta copiar o link
+        local sucesso = pcall(function()
+            setclipboard(link)
         end)
+        
+        if sucesso then
+            print("✅ Link copiado para a área de transferência!")
+        else
+            print("📋 Copie manualmente: " .. link)
+        end
     else
-        print("❌ Nenhum link encontrado para esta key.")
+        print("❌ Nenhuma key disponível no momento!")
+        print("📌 Todas as keys foram usadas.")
     end
 end)
 
