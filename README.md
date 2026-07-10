@@ -576,7 +576,6 @@ local function criarGUIAtivacao()
     local btnCorner = Instance.new("UICorner")
     btnCorner.CornerRadius = UDim.new(0, 10)
     btnCorner.Parent = btnAtivar
-
 -- Botão Get Key (copia o link da próxima key disponível)
 local btnGetKey = Instance.new("TextButton")
 btnGetKey.Size = UDim2.new(0.35, 0, 0, 45)
@@ -607,18 +606,23 @@ local LINKS_KEYS = {
     ["free_101598jtjajajajataj"] = "https://link-target.net/5450045/gdChsmYq0rb5",
 }
 
--- FUNÇÃO: pega a próxima key disponível
+-- FUNÇÃO: pega a próxima key disponível (usando as keys usadas do sistema)
 local function getProximaKeyDisponivel()
-    for key, link in pairs(LINKS_KEYS) do
-        -- Verifica se a key já foi usada (pelas keys usadas no sistema)
-        local usada = false
-        for _, item in pairs(KEYS_SEQUENCIA) do
-            if item.key == key and item.usada then
-                usada = true
-                break
+    -- Primeiro, tenta pegar as keys usadas do sistema
+    local keysUsadas = {}
+    pcall(function()
+        if KEYS_SEQUENCIA then
+            for _, item in pairs(KEYS_SEQUENCIA) do
+                if item.usada then
+                    keysUsadas[item.key] = true
+                end
             end
         end
-        if not usada then
+    end)
+    
+    -- Procura uma key disponível na lista LINKS_KEYS
+    for key, link in pairs(LINKS_KEYS) do
+        if not keysUsadas[key] then
             return key, link
         end
     end
@@ -2065,77 +2069,150 @@ local espFrame = abaFramesMap["ESP"]
 local espCard = addCard(espFrame)
 addLabel(espCard, "ESP")
 
+-- ============================================================
+-- ESP PLAYERS (TOGGLE)
+-- ============================================================
 addToggle(espCard, "ESP Players", toggleESPPlayers, false)
 
-addButton(espCard, "ESP Larry", function()
-    local function addESP_Larry()
-        local larry = workspace:FindFirstChild("Larry")
-        if larry then
-            local highlight = Instance.new("Highlight")
-            highlight.Parent = game:GetService("CoreGui")
-            highlight.Adornee = larry
-            highlight.FillColor = Color3.fromRGB(255, 0, 0)
-            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-            highlight.FillTransparency = 0.7
-        end
-    end
-    addESP_Larry()
-    workspace.ChildAdded:Connect(function(child)
-        if child.Name == "Larry" then
-            task.wait(1)
-            addESP_Larry()
-        end
-    end)
-    print("ESP Larry ativado!")
-end)
+-- ============================================================
+-- ESP LARRY (TOGGLE ON/OFF)
+-- ============================================================
+local espLarryAtivo = false
+local espLarryHighlight = nil
 
-addButton(espCard, "ESP Stalker", function()
-    local function addESP_Stalker()
-        local stalker = workspace:FindFirstChild("Stalker")
-        if stalker then
-            local highlight = Instance.new("Highlight")
-            highlight.Parent = game:GetService("CoreGui")
-            highlight.Adornee = stalker
-            highlight.FillColor = Color3.fromRGB(255, 165, 0)
-            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-            highlight.FillTransparency = 0.7
-        end
+local function toggleESPLarry(v)
+    if espLarryHighlight then
+        espLarryHighlight:Destroy()
+        espLarryHighlight = nil
     end
-    addESP_Stalker()
-    workspace.ChildAdded:Connect(function(child)
-        if child.Name == "Stalker" then
-            task.wait(1)
-            addESP_Stalker()
-        end
-    end)
-    print("ESP Stalker ativado!")
-end)
-
-addButton(espCard, "ESP Zombies & Skeletons", function()
-    local function addESP_Zombie()
-        for _, obj in pairs(workspace:GetDescendants()) do
-            if obj:IsA("Model") and (obj.Name == "Zombie" or obj.Name == "Skeleton") then
-                local highlight = Instance.new("Highlight")
-                highlight.Parent = game:GetService("CoreGui")
-                highlight.Adornee = obj
-                highlight.FillColor = Color3.fromRGB(0, 255, 0)
-                highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                highlight.FillTransparency = 0.7
+    
+    espLarryAtivo = v
+    
+    if v then
+        print("👁️ ESP Larry ATIVADO!")
+        local function adicionarLarry()
+            local larry = workspace:FindFirstChild("Larry")
+            if larry then
+                if espLarryHighlight then espLarryHighlight:Destroy() end
+                espLarryHighlight = Instance.new("Highlight")
+                espLarryHighlight.Parent = larry
+                espLarryHighlight.Adornee = larry
+                espLarryHighlight.FillColor = Color3.fromRGB(255, 0, 0)
+                espLarryHighlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                espLarryHighlight.FillTransparency = 0.4
             end
         end
+        
+        adicionarLarry()
+        
+        workspace.ChildAdded:Connect(function(child)
+            if espLarryAtivo and child.Name == "Larry" then
+                task.wait(1)
+                adicionarLarry()
+            end
+        end)
+    else
+        print("👁️ ESP Larry DESATIVADO!")
     end
-    addESP_Zombie()
-    workspace.ChildAdded:Connect(function(child)
-        if child.Name == "Zombie" or child.Name == "Skeleton" then
-            task.wait(1)
-            addESP_Zombie()
+end
+
+addToggle(espCard, "ESP Larry", toggleESPLarry, false)
+
+-- ============================================================
+-- ESP STALKER (TOGGLE ON/OFF)
+-- ============================================================
+local espStalkerAtivo = false
+local espStalkerHighlight = nil
+
+local function toggleESPStalker(v)
+    if espStalkerHighlight then
+        espStalkerHighlight:Destroy()
+        espStalkerHighlight = nil
+    end
+    
+    espStalkerAtivo = v
+    
+    if v then
+        print("👁️ ESP Stalker ATIVADO!")
+        local function adicionarStalker()
+            local stalker = workspace:FindFirstChild("Stalker")
+            if stalker then
+                if espStalkerHighlight then espStalkerHighlight:Destroy() end
+                espStalkerHighlight = Instance.new("Highlight")
+                espStalkerHighlight.Parent = stalker
+                espStalkerHighlight.Adornee = stalker
+                espStalkerHighlight.FillColor = Color3.fromRGB(255, 165, 0)
+                espStalkerHighlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                espStalkerHighlight.FillTransparency = 0.4
+            end
         end
-    end)
-    print("ESP Zombies & Skeletons ativado!")
-end)
+        
+        adicionarStalker()
+        
+        workspace.ChildAdded:Connect(function(child)
+            if espStalkerAtivo and child.Name == "Stalker" then
+                task.wait(1)
+                adicionarStalker()
+            end
+        end)
+    else
+        print("👁️ ESP Stalker DESATIVADO!")
+    end
+end
 
-addLabel(espCard, "ESP Monsters (Auto)", Color3.fromRGB(200, 200, 200))
+addToggle(espCard, "ESP Stalker", toggleESPStalker, false)
 
+-- ============================================================
+-- ESP ZOMBIES & SKELETONS (TOGGLE ON/OFF)
+-- ============================================================
+local espZombieAtivo = false
+local espZombieHighlights = {}
+
+local function toggleESPZombie(v)
+    -- Remove todos os highlights
+    for _, h in pairs(espZombieHighlights) do
+        if h then h:Destroy() end
+    end
+    espZombieHighlights = {}
+    
+    espZombieAtivo = v
+    
+    if v then
+        print("👁️ ESP Zombies & Skeletons ATIVADO!")
+        local function adicionarZombies()
+            -- Remove highlights antigos
+            for _, h in pairs(espZombieHighlights) do
+                if h then h:Destroy() end
+            end
+            espZombieHighlights = {}
+            
+            for _, obj in pairs(workspace:GetDescendants()) do
+                if obj:IsA("Model") and (obj.Name == "Zombie" or obj.Name == "Skeleton") then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Parent = obj
+                    highlight.Adornee = obj
+                    highlight.FillColor = Color3.fromRGB(0, 255, 0)
+                    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+                    highlight.FillTransparency = 0.4
+                    table.insert(espZombieHighlights, highlight)
+                end
+            end
+        end
+        
+        adicionarZombies()
+        
+        workspace.ChildAdded:Connect(function(child)
+            if espZombieAtivo and (child.Name == "Zombie" or child.Name == "Skeleton") then
+                task.wait(0.5)
+                adicionarZombies()
+            end
+        end)
+    else
+        print("👁️ ESP Zombies & Skeletons DESATIVADO!")
+    end
+end
+
+addToggle(espCard, "ESP Zombies & Skeletons", toggleESPZombie, false)
 -- ABA: GERAL
 local geralFrame = abaFramesMap["Geral"]
 local geralCard = addCard(geralFrame)
